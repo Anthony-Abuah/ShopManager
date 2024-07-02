@@ -49,7 +49,6 @@ fun PreferencesContent() {
                 info = currency
             )
         }
-
     }
     AutoCompleteTextFieldAlertDialog(
         openDialog = openCurrencyDialog,
