@@ -15,8 +15,8 @@ import com.example.myshopmanagerapp.core.FormRelatedString.SelectCurrency
 import com.example.myshopmanagerapp.core.FormRelatedString.listOfCurrencies
 import com.example.myshopmanagerapp.core.UserPreferences
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.settings.SettingsContentCard
-import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.AutoCompleteTextFieldAlertDialog
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenColumnWithoutBottomBar
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.SelectOnlyAutoCompleteTextFieldAlertDialog
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
 import kotlinx.coroutines.launch
 
@@ -50,7 +50,7 @@ fun PreferencesContent() {
             )
         }
     }
-    AutoCompleteTextFieldAlertDialog(
+    SelectOnlyAutoCompleteTextFieldAlertDialog(
         openDialog = openCurrencyDialog,
         title = SelectCurrency,
         textContent = emptyString,

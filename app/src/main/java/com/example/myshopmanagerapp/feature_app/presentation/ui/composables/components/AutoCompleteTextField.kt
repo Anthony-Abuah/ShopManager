@@ -26,6 +26,150 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpaci
 
 
 @Composable
+fun SelectOnlyAutoCompleteTextField(
+    label: String,
+    placeholder: String,
+    readOnly: Boolean,
+    expandedIcon: Int,
+    unexpandedIcon: Int,
+    listItems: List<String>,
+    getSelectedItem: (listItem: String) -> Unit
+) {
+    var item by remember {
+        mutableStateOf("")
+    }
+    var expanded by remember {
+        mutableStateOf(false)
+    }
+    var isFocused by remember {
+        mutableStateOf(false)
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.Top
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
+            OutlinedTextField(
+                modifier = Modifier
+                    .requiredHeight(LocalSpacing.current.textFieldHeight)
+                    .fillMaxWidth()
+                    .onFocusChanged { focusState ->
+                        isFocused = focusState.isFocused
+                        expanded = isFocused
+                    },
+                value = item,
+                readOnly = readOnly,
+                onValueChange = { _item ->
+                    item = _item
+                    //getSelectedItem(item)
+                    expanded = true
+                },
+                shape = MaterialTheme.shapes.small,
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    focusedContainerColor = MaterialTheme.colorScheme.background,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    errorIndicatorColor = MaterialTheme.colorScheme.onErrorContainer,
+                    errorContainerColor = MaterialTheme.colorScheme.errorContainer,
+                    cursorColor = MaterialTheme.colorScheme.onSurface,
+                    errorTextColor = MaterialTheme.colorScheme.onErrorContainer,
+                    focusedLabelColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface,
+                    focusedTrailingIconColor = MaterialTheme.colorScheme.primary,
+                    unfocusedTrailingIconColor = MaterialTheme.colorScheme.primary,
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface,
+                ),
+                textStyle = MaterialTheme.typography.bodyLarge,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Done
+                ),
+                placeholder = {
+                    Text(
+                        text = placeholder,
+                        textAlign = TextAlign.Start,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                },
+                label = {
+                    Text(
+                        text = label,
+                        textAlign = TextAlign.Start,
+                        overflow = TextOverflow.Ellipsis,
+                        color = if (isFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                    )
+                },
+                singleLine = true,
+                trailingIcon = {
+                    Icon(
+                        modifier = Modifier.clickable { expanded = !expanded },
+                        painter = painterResource(id = if (expanded) expandedIcon else unexpandedIcon),
+                        contentDescription = emptyString,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            )
+
+            AnimatedVisibility(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = LocalSpacing.current.extraSmall),
+                visible = expanded
+            ) {
+                Card(
+                    elevation = CardDefaults.cardElevation(defaultElevation = LocalSpacing.current.smallMedium),
+                ) {
+                    LazyColumn(
+                        modifier = Modifier.heightIn(max = 150.dp),
+                    ) {
+                        if (item.isNotEmpty()) {
+                            items(
+                                if (readOnly) listItems else listItems
+                                    .filter {
+                                    it.lowercase()
+                                        .contains(item.lowercase()) || it.lowercase()
+                                        .contains("others")
+                                }.sorted()
+                            ) {
+                                DropDownItems(title = it) { title ->
+                                    item = title
+                                    getSelectedItem(title)
+                                    expanded = false
+                                }
+                            }
+                        } else {
+                            items(
+                                if (readOnly) listItems else
+                                listItems.sorted()
+                            ) {
+                                DropDownItems(title = it) { title ->
+                                    item = title
+                                    getSelectedItem(title)
+                                    expanded = false
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+}
+
+@Composable
 fun AutoCompleteTextField(
     label: String,
     placeholder: String,
