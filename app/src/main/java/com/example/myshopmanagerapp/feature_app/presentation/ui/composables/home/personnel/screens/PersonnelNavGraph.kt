@@ -118,7 +118,6 @@ fun PersonnelNavGraph(
                 ViewPersonnelScreen(
                     personnelViewModel = personnelViewModel,
                     uniquePersonnelId = uniquePersonnelId,
-                    navigateToTakePhotoScreen = { navController.navigate(PersonnelScreens.PersonnelPhotoScreen.route) },
                 ) {
                     navController.popBackStack()
                 }

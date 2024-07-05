@@ -144,6 +144,7 @@ fun AutoCompleteTextFieldAlertDialog(
         }
 }
 
+
 @Composable
 fun SelectOnlyAutoCompleteTextFieldAlertDialog(
     openDialog: Boolean,
@@ -178,7 +179,9 @@ fun SelectOnlyAutoCompleteTextFieldAlertDialog(
                     .padding(LocalSpacing.current.noPadding)
                     .fillMaxWidth(),
                 onDismissRequest = {
-                    Toast.makeText(context, unconfirmedUpdatedToastText, Toast.LENGTH_LONG).show()
+                    if (unconfirmedUpdatedToastText != null) {
+                        Toast.makeText(context, unconfirmedUpdatedToastText, Toast.LENGTH_LONG).show()
+                    }
                     closeDialog()
                 },
                 title = {
@@ -221,6 +224,9 @@ fun SelectOnlyAutoCompleteTextFieldAlertDialog(
                             getSelectedItem = {
                                 value = it
                                 getSelectedItem(it)
+                                if (confirmedUpdatedToastText != null) {
+                                    Toast.makeText(context, confirmedUpdatedToastText, Toast.LENGTH_LONG).show()
+                                }
                             }
                         )
 
@@ -228,17 +234,7 @@ fun SelectOnlyAutoCompleteTextFieldAlertDialog(
                 },
                 confirmButton = {
                     TextButton(
-                        onClick = {
-                            if (confirmedUpdatedToastText != null) {
-                                Toast.makeText(
-                                    context,
-                                    confirmedUpdatedToastText,
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                            getSelectedItem(value)
-                            closeDialog()
-                        }
+                        onClick = { closeDialog() }
                     ){
                         Text(
                             text = "Save",

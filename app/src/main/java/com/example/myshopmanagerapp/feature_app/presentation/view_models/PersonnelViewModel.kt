@@ -39,6 +39,9 @@ class PersonnelViewModel @Inject constructor(
     private val _addPersonnelState = mutableStateOf(ItemValueState())
     val addPersonnelState: State<ItemValueState> = _addPersonnelState
 
+    private val _resetPasswordState = mutableStateOf(ItemValueState())
+    val resetPasswordState: State<ItemValueState> = _resetPasswordState
+
     private val _updatePersonnelState = mutableStateOf(ItemValueState())
     val updatePersonnelState: State<ItemValueState> = _updatePersonnelState
 
@@ -88,6 +91,36 @@ class PersonnelViewModel @Inject constructor(
             isLoading = false
         )
     }
+
+
+    fun resetPassword(uniquePersonnelId: String) = viewModelScope.launch {
+        personnelRepository.resetPersonnelPassword(uniquePersonnelId).onEach { response->
+            when(response){
+                is Resource.Success ->{
+                    _resetPasswordState.value = resetPasswordState.value.copy(
+                        message = response.data,
+                        isSuccessful = true,
+                        isLoading = false,
+                    )
+                }
+                is Resource.Loading ->{
+                    _resetPasswordState.value = resetPasswordState.value.copy(
+                        message = response.message,
+                        isSuccessful = false,
+                        isLoading = true,
+                    )
+                }
+                is Resource.Error ->{
+                    _resetPasswordState.value = resetPasswordState.value.copy(
+                        message = response.message,
+                        isSuccessful = false,
+                        isLoading = false,
+                    )
+                }
+            }
+        }.launchIn(this)
+    }
+
 
     fun addPersonnel(personnel: PersonnelEntity) = viewModelScope.launch {
         personnelRepository.addPersonnel(personnel).onEach { response->

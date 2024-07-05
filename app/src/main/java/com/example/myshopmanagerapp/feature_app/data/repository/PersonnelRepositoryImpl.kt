@@ -1,6 +1,5 @@
 package com.example.myshopmanagerapp.feature_app.data.repository
 
-import androidx.compose.ui.text.toLowerCase
 import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.Functions.generateUniquePersonnelId
 import com.example.myshopmanagerapp.core.Functions.toCompanyEntityJson
@@ -262,8 +261,33 @@ class PersonnelRepositoryImpl(
         TODO("Not yet implemented")
     }
 
-    override suspend fun adminChangePersonnelPassword(): Flow<Resource<String?>> {
-        TODO("Not yet implemented")
+    override suspend fun resetPersonnelPassword(uniquePersonnelId: String): Flow<Resource<String?>> = flow{
+        try {
+            emit(Resource.Loading())
+            val context = MyShopManagerApp.applicationContext()
+            val userPreferences = UserPreferences(context)
+            val personnelIsLoggedIn = userPreferences.getPersonnelLoggedInState.first() ?: false
+            val personnelHasAdminRights = userPreferences.getPersonnelInfo.first().toPersonnelEntity()?.hasAdminRights ?: false
+            val personnel = personnelDao.getPersonnel(uniquePersonnelId)
+            when(true){
+                !personnelIsLoggedIn->{
+                    emit(Resource.Error("Could not reset password because you are not logged in"))
+                }
+                !personnelHasAdminRights->{
+                    emit(Resource.Error("Could not reset password because you do not have admin rights"))
+                }
+                (personnel == null)->{
+                    emit(Resource.Error("Could not reset password because this personnel's details could not be loaded"))
+                }
+                else->{
+                    val updatedPersonnel = personnel.copy(password = "1234")
+                    personnelDao.updatePersonnel(updatedPersonnel)
+                    emit(Resource.Success("Password successfully changed to 1234"))
+                }
+            }
+        }catch (e: Exception){
+            emit(Resource.Error("Unable to reset password\nError Message: ${e.message}"))
+        }
     }
 
 }

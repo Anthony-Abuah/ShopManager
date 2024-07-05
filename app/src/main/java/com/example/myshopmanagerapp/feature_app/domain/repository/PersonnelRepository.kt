@@ -32,7 +32,7 @@ interface PersonnelRepository {
 
     suspend fun changePersonnelPassword(currentPassword: String, newPassword: String): Flow<Resource<String?>>
 
-    suspend fun adminChangePersonnelPassword(): Flow<Resource<String?>>
+    suspend fun resetPersonnelPassword(uniquePersonnelId: String): Flow<Resource<String?>>
 
 
 
