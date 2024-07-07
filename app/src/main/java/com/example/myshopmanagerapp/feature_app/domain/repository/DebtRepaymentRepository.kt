@@ -14,6 +14,8 @@ interface DebtRepaymentRepository {
 
     suspend fun addDebtRepayment(debtRepayment: DebtRepaymentEntity): Flow<Resource<String?>>
 
+    suspend fun addDebtRepayments(debtRepayments: DebtRepaymentEntities)
+
     suspend fun getDebtRepayment(uniqueDebtRepaymentId: String): DebtRepaymentEntity?
 
     suspend fun getDebtRepaymentByCustomer(uniqueCustomerId: String): DebtRepaymentEntities?

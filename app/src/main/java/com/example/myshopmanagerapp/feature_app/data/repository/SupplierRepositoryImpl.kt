@@ -1,13 +1,14 @@
 package com.example.myshopmanagerapp.feature_app.data.repository
 
+import com.example.myshopmanagerapp.core.*
 import com.example.myshopmanagerapp.core.Functions.toNotNull
-import com.example.myshopmanagerapp.core.Resource
-import com.example.myshopmanagerapp.core.SupplierEntities
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
-import com.example.myshopmanagerapp.core.UserPreferences
+import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
+import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIdsJson
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
 import com.example.myshopmanagerapp.feature_app.data.local.entities.suppliers.SupplierEntity
+import com.example.myshopmanagerapp.feature_app.domain.model.UniqueId
 import com.example.myshopmanagerapp.feature_app.domain.repository.SupplierRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -65,7 +66,12 @@ class SupplierRepositoryImpl(
     }
 
     override suspend fun addSuppliers(suppliers: SupplierEntities) {
-        appDatabase.supplierDao.addSuppliers(suppliers)
+        try {
+            val allSuppliers = appDatabase.supplierDao.getAllSuppliers() ?: emptyList()
+            val allUniqueSupplierIds = allSuppliers.map { it.uniqueSupplierId }
+            val newSuppliers = suppliers.filter { !allUniqueSupplierIds.contains(it.uniqueSupplierId) }
+            appDatabase.supplierDao.addSuppliers(newSuppliers)
+        }catch (_: Exception){}
     }
 
     override suspend fun getSupplier(uniqueSupplierId: String): SupplierEntity? {
@@ -106,6 +112,9 @@ class SupplierRepositoryImpl(
                 }
                 else->{
                     appDatabase.supplierDao.updateSupplier(supplier)
+                    val updatedSupplierIdsJson = UpdateEntityMarkers(context).getUpdatedSupplierId.first().toNotNull()
+                    val updatedSupplierIds = updatedSupplierIdsJson.toUniqueIds().plus(UniqueId(supplier.uniqueSupplierId)).toSet().toList()
+                    UpdateEntityMarkers(context).saveUpdatedSupplierIds(updatedSupplierIds.toUniqueIdsJson())
                     emit(Resource.Success("Supplier updated successfully"))
                 }
             }
@@ -149,6 +158,9 @@ class SupplierRepositoryImpl(
                 }
                 else ->{
                     appDatabase.supplierDao.deleteSupplier(uniqueSupplierId)
+                    val deletedSupplierIdsJson = DeleteEntityMarkers(context).getDeletedSupplierId.first().toNotNull()
+                    val deletedSupplierIds = deletedSupplierIdsJson.toUniqueIds().plus(UniqueId(uniqueSupplierId)).toSet().toList()
+                    DeleteEntityMarkers(context).saveDeletedSupplierIds(deletedSupplierIds.toUniqueIdsJson())
                     emit(Resource.Success(
                         "Supplier successfully deleted"
                     ))

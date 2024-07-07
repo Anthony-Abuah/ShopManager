@@ -11,6 +11,19 @@ object TypeConverters {
     private val jsonParser: JsonParser = GsonParser(Gson())
 
 
+    fun String?.toUniqueIds(): UniqueIds {
+        return this?.let {
+            jsonParser.fromJson<UniqueIds>(
+                it, object : TypeToken<UniqueIds>(){}.type)
+        }?: emptyList()
+    }
+
+    fun UniqueIds?.toUniqueIdsJson(): String{
+        return jsonParser.toJson(
+            this,
+            object : TypeToken<UniqueIds>(){}.type
+        ) ?: "[]"
+    }
     fun String?.toRevenueTypes(): RevenueTypes {
         return this?.let {
             jsonParser.fromJson<RevenueTypes>(

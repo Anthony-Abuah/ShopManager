@@ -1,7 +1,6 @@
 package com.example.myshopmanagerapp.feature_app.data.repository
 
 import android.content.Context
-import android.content.Intent
 import android.util.Log
 import com.example.myshopmanagerapp.core.Constants.SQLITE_SHMFILE_SUFFIX
 import com.example.myshopmanagerapp.core.Constants.SQLITE_WALFILE_SUFFIX
@@ -42,7 +41,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
-import kotlin.system.exitProcess
 
 class BackupRepositoryImpl(
     private val appDatabase: AppDatabase,
@@ -740,7 +738,7 @@ class BackupRepositoryImpl(
                     val remoteBanks =
                         shopManagerDatabaseApi.fetchAllCompanyBanks(uniqueCompanyId)?.data
                             ?: emptyList()
-                    bankAccountDao.addBanks(remoteBanks.map { it.toBankEntity() })
+                    bankAccountDao.addBankAccounts(remoteBanks.map { it.toBankEntity() })
                 }
             }else{
                 emit(Resource.Error(

@@ -1,23 +1,31 @@
 package com.example.myshopmanagerapp.feature_app.data.repository
 
 import com.example.myshopmanagerapp.core.CashInEntities
+import com.example.myshopmanagerapp.core.DeleteEntityMarkers
 import com.example.myshopmanagerapp.core.Functions.toDate
+import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.Resource
-import com.example.myshopmanagerapp.feature_app.data.local.entities.cash_in.CashInDao
+import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
+import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIdsJson
+import com.example.myshopmanagerapp.core.UpdateEntityMarkers
+import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
+import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
 import com.example.myshopmanagerapp.feature_app.data.local.entities.cash_in.CashInEntity
+import com.example.myshopmanagerapp.feature_app.domain.model.UniqueId
 import com.example.myshopmanagerapp.feature_app.domain.repository.CashInRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import java.time.LocalDate
 
 class CashInRepositoryImpl(
-    private val cashInDao: CashInDao
+    private val appDatabase: AppDatabase
 ): CashInRepository{
     override fun getAllCashIns(): Flow<Resource<CashInEntities?>> = flow{
         emit(Resource.Loading())
         val allCashIns: List<CashInEntity>?
         try {
-            allCashIns = cashInDao.getAllCashIns()
+            allCashIns = appDatabase.cashInDao.getAllCashIns()
             emit(Resource.Success(allCashIns))
         }catch (e: Exception){
             emit(Resource.Error(
@@ -48,7 +56,7 @@ class CashInRepositoryImpl(
                     emit(Resource.Error("Unable to save to database\nSince this is a loan, please ensure that either the interestAmount or the payment amount is not empty"))
                 }
                 else->{
-                    cashInDao.addCashIn(cashIn)
+                    appDatabase.cashInDao.addCashIn(cashIn)
                     emit(Resource.Success("Successfully added"))
                 }
             }
@@ -58,17 +66,23 @@ class CashInRepositoryImpl(
     }
 
     override suspend fun addCashIns(cashIns: CashInEntities) {
-        cashInDao.addCashIns(cashIns)
+        try {
+            val allCashIns = appDatabase.cashInDao.getAllCashIns() ?: emptyList()
+            val allUniqueCashInIds = allCashIns.map { it.uniqueCashInId }
+            val newCashIns = cashIns.filter { !allUniqueCashInIds.contains(it.uniqueCashInId) }
+            appDatabase.cashInDao.addCashIns(newCashIns)
+        }catch (_: Exception){}
     }
 
     override suspend fun getCashIn(uniqueCashInId: String): CashInEntity? {
-        return cashInDao.getCashIn(uniqueCashInId)
+        return appDatabase.cashInDao.getCashIn(uniqueCashInId)
     }
 
 
     override suspend fun updateCashIn(cashIn: CashInEntity): Flow<Resource<String?>> = flow  {
         emit(Resource.Loading())
         try {
+            val context = MyShopManagerApp.applicationContext()
             val importantFieldsAreMissing = ((cashIn.cashInType.isBlank()) || (cashIn.cashInAmount < 0.1))
             val loanPaymentAmountIsRequired = ((cashIn.isLoan) && ((cashIn.paymentAmount == null) || (cashIn.paymentAmount < 1)))
             val interestAndPaymentAmountIsNull = ((cashIn.interestAmount == null) && ((cashIn.paymentAmount == null) || (cashIn.paymentAmount < 1)))
@@ -87,7 +101,10 @@ class CashInRepositoryImpl(
                     emit(Resource.Error("Unable to update\nSince this is a loan, please ensure that either the interestAmount or the payment amount is not empty"))
                 }
                 else -> {
-                    cashInDao.addCashIn(cashIn)
+                    appDatabase.cashInDao.addCashIn(cashIn)
+                    val updatedCashInIdsJson = UpdateEntityMarkers(context).getUpdatedCashInId.first().toNotNull()
+                    val updatedCashInIds = updatedCashInIdsJson.toUniqueIds().plus(UniqueId(cashIn.uniqueCashInId))
+                    UpdateEntityMarkers(context).saveUpdatedCashInIds(updatedCashInIds.toUniqueIdsJson())
                     emit(Resource.Success("Successfully updated"))
                 }
             }
@@ -100,11 +117,15 @@ class CashInRepositoryImpl(
     override suspend fun deleteCashIn(uniqueCashInId: String): Flow<Resource<String?>> = flow  {
         emit(Resource.Loading())
         try {
-            val cashIn = cashInDao.getCashIn(uniqueCashInId)
+            val context = MyShopManagerApp.applicationContext()
+            val cashIn = appDatabase.cashInDao.getCashIn(uniqueCashInId)
             if (cashIn == null){
                 emit(Resource.Error("Unable to delete\nCould not load the details of this cash in entity"))
             }else{
-                cashInDao.deleteCashIn(uniqueCashInId)
+                appDatabase.cashInDao.deleteCashIn(uniqueCashInId)
+                val deletedCashInIdsJson = DeleteEntityMarkers(context).getDeletedCashInId.first().toNotNull()
+                val deletedCashInIds = deletedCashInIdsJson.toUniqueIds().plus(UniqueId(uniqueCashInId))
+                DeleteEntityMarkers(context).saveDeletedCashInIds(deletedCashInIds.toUniqueIdsJson())
                 emit(Resource.Success("Successfully deleted"))
             }
 
@@ -114,6 +135,6 @@ class CashInRepositoryImpl(
     }
 
     override suspend fun deleteAllCashIns() {
-        cashInDao.deleteAllCashIns()
+        appDatabase.cashInDao.deleteAllCashIns()
     }
 }

@@ -5,20 +5,21 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import com.example.myshopmanagerapp.R
+import com.example.myshopmanagerapp.core.*
 import com.example.myshopmanagerapp.core.Constants.NotAvailable
-import com.example.myshopmanagerapp.core.ExpenseEntities
 import com.example.myshopmanagerapp.core.Functions.shortened
 import com.example.myshopmanagerapp.core.Functions.toCompanyEntity
 import com.example.myshopmanagerapp.core.Functions.toDate
 import com.example.myshopmanagerapp.core.Functions.toDateString
 import com.example.myshopmanagerapp.core.Functions.toEllipses
 import com.example.myshopmanagerapp.core.Functions.toNotNull
-import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
-import com.example.myshopmanagerapp.core.UserPreferences
+import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
+import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIdsJson
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
 import com.example.myshopmanagerapp.feature_app.data.local.entities.expenses.ExpenseEntity
+import com.example.myshopmanagerapp.feature_app.domain.model.UniqueId
 import com.example.myshopmanagerapp.feature_app.domain.repository.ExpenseRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -91,7 +92,12 @@ class ExpenseRepositoryImpl(
     }
 
     override suspend fun addExpenses(expenses: ExpenseEntities) {
-        appDatabase.expenseDao.addExpenses(expenses)
+        try {
+            val allExpenses = appDatabase.expenseDao.getAllExpenses() ?: emptyList()
+            val allUniqueExpenseIds = allExpenses.map { it.uniqueExpenseId }
+            val newExpenses = expenses.filter { !allUniqueExpenseIds.contains(it.uniqueExpenseId) }
+            appDatabase.expenseDao.addExpenses(newExpenses)
+        }catch (_: Exception){}
     }
 
     override suspend fun getExpense(uniqueExpenseId: String): ExpenseEntity? {
@@ -142,6 +148,9 @@ class ExpenseRepositoryImpl(
                 }
                 else ->{
                     appDatabase.expenseDao.updateExpense(expense.copy(uniquePersonnelId = uniquePersonnelId))
+                    val updatedExpenseIdsJson = UpdateEntityMarkers(context).getUpdatedExpenseId.first().toNotNull()
+                    val updatedExpenseIds = updatedExpenseIdsJson.toUniqueIds().plus(UniqueId(expense.uniqueExpenseId)).toSet().toList()
+                    UpdateEntityMarkers(context).saveUpdatedExpenseIds(updatedExpenseIds.toUniqueIdsJson())
                     emit(Resource.Success("Expense successfully updated"))
                 }
             }
@@ -188,6 +197,9 @@ class ExpenseRepositoryImpl(
                 }
                 else->{
                     appDatabase.expenseDao.deleteExpense(uniqueExpenseId)
+                    val deletedExpenseIdsJson = DeleteEntityMarkers(context).getDeletedExpenseId.first().toNotNull()
+                    val deletedExpenseIds = deletedExpenseIdsJson.toUniqueIds().plus(UniqueId(uniqueExpenseId)).toSet().toList()
+                    DeleteEntityMarkers(context).saveDeletedExpenseIds(deletedExpenseIds.toUniqueIdsJson())
                     emit(Resource.Success("Expense successfully deleted"))
                 }
             }

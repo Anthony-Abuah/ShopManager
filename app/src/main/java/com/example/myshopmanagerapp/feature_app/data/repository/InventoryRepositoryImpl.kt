@@ -1,5 +1,6 @@
 package com.example.myshopmanagerapp.feature_app.data.repository
 
+import com.example.myshopmanagerapp.core.*
 import com.example.myshopmanagerapp.core.Constants.Unit
 import com.example.myshopmanagerapp.core.Constants.ZERO
 import com.example.myshopmanagerapp.core.Functions.addItemQuantities
@@ -10,10 +11,9 @@ import com.example.myshopmanagerapp.core.Functions.subtractItemQuantities
 import com.example.myshopmanagerapp.core.Functions.toDate
 import com.example.myshopmanagerapp.core.Functions.toDateString
 import com.example.myshopmanagerapp.core.Functions.toNotNull
-import com.example.myshopmanagerapp.core.InventoryEntities
-import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
-import com.example.myshopmanagerapp.core.UserPreferences
+import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
+import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIdsJson
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
 import com.example.myshopmanagerapp.feature_app.data.local.entities.inventory.InventoryEntity
@@ -23,6 +23,7 @@ import com.example.myshopmanagerapp.feature_app.data.local.entities.stock.StockE
 import com.example.myshopmanagerapp.feature_app.domain.model.ItemValue
 import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
 import com.example.myshopmanagerapp.feature_app.domain.model.Price
+import com.example.myshopmanagerapp.feature_app.domain.model.UniqueId
 import com.example.myshopmanagerapp.feature_app.domain.repository.InventoryRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -151,7 +152,12 @@ class InventoryRepositoryImpl(
     }
 
     override suspend fun addInventories(inventories: InventoryEntities) {
-        appDatabase.inventoryDao.addInventories(inventories)
+        try {
+            val allInventories = appDatabase.inventoryDao.getAllInventories() ?: emptyList()
+            val allUniqueInventoryIds = allInventories.map { it.uniqueInventoryId }
+            val newInventories = inventories.filter { !allUniqueInventoryIds.contains(it.uniqueInventoryId) }
+            appDatabase.inventoryDao.addInventories(newInventories)
+        }catch (_: Exception){}
     }
 
     override suspend fun getInventory(uniqueInventoryId: String): InventoryEntity? {
@@ -261,6 +267,18 @@ class InventoryRepositoryImpl(
                         inventory.copy(uniquePersonnelId = uniquePersonnelId),
                         updatedInventoryItem
                     )
+                    val updatedStockIdsJson = UpdateEntityMarkers(context).getUpdatedStockId.first().toNotNull()
+                    val updatedStockIds = updatedStockIdsJson.toUniqueIds().plus(UniqueId(updatedStock.uniqueStockId)).toSet().toList()
+                    UpdateEntityMarkers(context).saveUpdatedStockIds(updatedStockIds.toUniqueIdsJson())
+
+                    val updatedInventoryIdsJson = UpdateEntityMarkers(context).getUpdatedInventoryId.first().toNotNull()
+                    val updatedInventoryIds = updatedInventoryIdsJson.toUniqueIds().plus(UniqueId(inventory.uniqueInventoryId)).toSet().toList()
+                    UpdateEntityMarkers(context).saveUpdatedInventoryIds(updatedInventoryIds.toUniqueIdsJson())
+
+                    val updatedInventoryItemIdsJson = UpdateEntityMarkers(context).getUpdatedInventoryItemId.first().toNotNull()
+                    val updatedInventoryItemIds = updatedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(updatedInventoryItem.uniqueInventoryItemId)).toSet().toList()
+                    UpdateEntityMarkers(context).saveUpdatedInventoryItemIds(updatedInventoryItemIds.toUniqueIdsJson())
+
                     emit(Resource.Success("Inventory successfully updated"))
                 }
             }
@@ -361,6 +379,22 @@ class InventoryRepositoryImpl(
                         uniqueInventoryStockId,
                         updatedInventoryItem
                     )
+                    val deletedInventoryStockIdsJson = DeleteEntityMarkers(context).getDeletedInventoryStockId.first().toNotNull()
+                    val deletedInventoryStockIds = deletedInventoryStockIdsJson.toUniqueIds().plus(UniqueId(uniqueInventoryStockId)).toSet().toList()
+                    DeleteEntityMarkers(context).saveDeletedInventoryStockIds(deletedInventoryStockIds.toUniqueIdsJson())
+
+                    val deletedInventoryIdsJson = DeleteEntityMarkers(context).getDeletedInventoryId.first().toNotNull()
+                    val deletedInventoryIds = deletedInventoryIdsJson.toUniqueIds().plus(UniqueId(uniqueInventoryId)).toSet().toList()
+                    DeleteEntityMarkers(context).saveDeletedInventoryIds(deletedInventoryIds.toUniqueIdsJson())
+
+                    val deletedStockIdsJson = DeleteEntityMarkers(context).getDeletedStockId.first().toNotNull()
+                    val deletedStockIds = deletedStockIdsJson.toUniqueIds().plus(UniqueId(oldStock.uniqueStockId)).toSet().toList()
+                    DeleteEntityMarkers(context).saveDeletedStockIds(deletedStockIds.toUniqueIdsJson())
+
+                    val updatedInventoryItemIdsJson = UpdateEntityMarkers(context).getUpdatedInventoryItemId.first().toNotNull()
+                    val updatedInventoryItemIds = updatedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(updatedInventoryItem.uniqueInventoryItemId)).toSet().toList()
+                    UpdateEntityMarkers(context).saveUpdatedInventoryItemIds(updatedInventoryItemIds.toUniqueIdsJson())
+
                     emit(Resource.Success("Inventory successfully deleted"))
                 }
             }

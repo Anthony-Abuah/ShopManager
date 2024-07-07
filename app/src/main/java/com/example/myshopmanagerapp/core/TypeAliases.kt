@@ -19,6 +19,7 @@ import com.example.myshopmanagerapp.feature_app.data.local.entities.suppliers.Su
 import com.example.myshopmanagerapp.feature_app.data.local.entities.withdrawals.WithdrawalEntity
 import com.example.myshopmanagerapp.feature_app.domain.model.*
 
+typealias UniqueIds = List<UniqueId>
 typealias Prices = List<Price>
 typealias ReceiptEntities = List<ReceiptEntity>
 typealias StockEntities = List<StockEntity>

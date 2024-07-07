@@ -35,7 +35,7 @@ object RepositoryModule {
     fun provideBankRepository(
         db: AppDatabase,
     ): BankAccountRepository {
-        return BankAccountRepositoryImpl(db.bankAccountDao)
+        return BankAccountRepositoryImpl(db)
     }
 
     @Provides
@@ -43,7 +43,7 @@ object RepositoryModule {
     fun providePersonnelRepository(
         db: AppDatabase,
     ): PersonnelRepository {
-        return PersonnelRepositoryImpl(db.personnelDao, db.revenueDao, db.expenseDao, db.savingsDao, db.withdrawalDao, db.debtDao, db.debtRepaymentDao, db.companyDao)
+        return PersonnelRepositoryImpl(db)
     }
 
     @Provides
@@ -75,8 +75,39 @@ object RepositoryModule {
     fun provideCompanyRepository(
         shopManagerDatabaseApi: ShopManagerDatabaseApi,
         db: AppDatabase,
+        customerRepository: CustomerRepository,
+        bankAccountRepository: BankAccountRepository,
+        cashInRepository: CashInRepository,
+        debtRepository: DebtRepository,
+        debtRepaymentRepository: DebtRepaymentRepository,
+        expenseRepository: ExpenseRepository,
+        inventoryRepository: InventoryRepository,
+        inventoryItemRepository: InventoryItemRepository,
+        personnelRepository: PersonnelRepository,
+        revenueRepository: RevenueRepository,
+        savingsRepository: SavingsRepository,
+        stockRepository: StockRepository,
+        supplierRepository: SupplierRepository,
+        withdrawalRepository: WithdrawalRepository,
     ): CompanyRepository {
-        return CompanyRepositoryImpl(db, shopManagerDatabaseApi, db.companyDao)
+        return CompanyRepositoryImpl(
+            db,
+            shopManagerDatabaseApi,
+            customerRepository,
+            bankAccountRepository,
+            cashInRepository,
+            debtRepository,
+            debtRepaymentRepository,
+            expenseRepository,
+            inventoryRepository,
+            inventoryItemRepository,
+            personnelRepository,
+            revenueRepository,
+            savingsRepository,
+            stockRepository,
+            supplierRepository,
+            withdrawalRepository
+        )
     }
 
     @Provides
@@ -126,6 +157,13 @@ object RepositoryModule {
         db: AppDatabase,
     ): InventoryRepository {
         return InventoryRepositoryImpl(db)
+    }
+    @Provides
+    @Singleton
+    fun provideCashInRepository(
+        db: AppDatabase,
+    ): CashInRepository {
+        return CashInRepositoryImpl(db)
     }
 
     @Provides

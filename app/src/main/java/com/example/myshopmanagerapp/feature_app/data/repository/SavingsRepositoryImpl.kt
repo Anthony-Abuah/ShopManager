@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import com.example.myshopmanagerapp.R
+import com.example.myshopmanagerapp.core.*
 import com.example.myshopmanagerapp.core.Constants.NotAvailable
 import com.example.myshopmanagerapp.core.Functions.shortened
 import com.example.myshopmanagerapp.core.Functions.toCompanyEntity
@@ -12,13 +13,13 @@ import com.example.myshopmanagerapp.core.Functions.toDate
 import com.example.myshopmanagerapp.core.Functions.toDateString
 import com.example.myshopmanagerapp.core.Functions.toEllipses
 import com.example.myshopmanagerapp.core.Functions.toNotNull
-import com.example.myshopmanagerapp.core.Resource
-import com.example.myshopmanagerapp.core.SavingsEntities
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
-import com.example.myshopmanagerapp.core.UserPreferences
+import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
+import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIdsJson
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
 import com.example.myshopmanagerapp.feature_app.data.local.entities.savings.SavingsEntity
+import com.example.myshopmanagerapp.feature_app.domain.model.UniqueId
 import com.example.myshopmanagerapp.feature_app.domain.repository.SavingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -96,7 +97,12 @@ class SavingsRepositoryImpl(
     }
 
     override suspend fun addSavings(savings: SavingsEntities) {
-        appDatabase.savingsDao.addSavings(savings)
+        try {
+            val allSavings = appDatabase.savingsDao.getAllSavings() ?: emptyList()
+            val allUniqueSavingsIds = allSavings.map { it.uniqueSavingsId }
+            val newSavings = savings.filter { !allUniqueSavingsIds.contains(it.uniqueSavingsId) }
+            appDatabase.savingsDao.addSavings(newSavings)
+        }catch (_: Exception){}
     }
 
     override suspend fun getSavings(uniqueSavingsId: String): SavingsEntity? {
@@ -153,6 +159,16 @@ class SavingsRepositoryImpl(
                         bankAccount.uniqueBankAccountId,
                         totalSavingsAmount
                     )
+                    val updatedSavingsIdsJson = UpdateEntityMarkers(context).getUpdatedSavingsId.first().toNotNull()
+                    val updatedSavingsIds = updatedSavingsIdsJson.toUniqueIds().plus(UniqueId(savings.uniqueSavingsId)).toSet().toList()
+                    UpdateEntityMarkers(context).saveUpdatedSavingsIds(updatedSavingsIds.toUniqueIdsJson())
+
+                    val updatedBankAccountIdsJson = UpdateEntityMarkers(context).getUpdatedBankAccountId.first().toNotNull()
+                    val updatedBankAccountIds = updatedBankAccountIdsJson.toUniqueIds().plus(
+                        UniqueId(bankAccount.uniqueBankAccountId)
+                    ).toSet().toList()
+                    UpdateEntityMarkers(context).saveUpdatedBankAccountIds(updatedBankAccountIds.toUniqueIdsJson())
+
                     emit(Resource.Success("Savings successfully updated"))
                 }
             }
@@ -210,6 +226,14 @@ class SavingsRepositoryImpl(
                         bankAccount.uniqueBankAccountId,
                         totalSavingsAmount
                     )
+                    val deletedSavingsIdsJson = DeleteEntityMarkers(context).getDeletedSavingsId.first().toNotNull()
+                    val deletedSavingsIds = deletedSavingsIdsJson.toUniqueIds().plus(UniqueId(uniqueSavingsId)).toSet().toList()
+                    DeleteEntityMarkers(context).saveDeletedSavingsIds(deletedSavingsIds.toUniqueIdsJson())
+
+                    val updatedBankAccountIdsJson = UpdateEntityMarkers(context).getUpdatedBankAccountId.first().toNotNull()
+                    val updatedBankAccountIds = updatedBankAccountIdsJson.toUniqueIds().plus(UniqueId(bankAccount.uniqueBankAccountId)).toSet().toList()
+                    UpdateEntityMarkers(context).saveUpdatedBankAccountIds(updatedBankAccountIds.toUniqueIdsJson())
+
                     emit(Resource.Success("Savings successfully deleted"))
                 }
             }

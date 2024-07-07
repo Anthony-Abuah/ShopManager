@@ -12,7 +12,7 @@ interface BankAccountDao {
     suspend fun addBank(bank: BankAccountEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addBanks(banks: BankAccountEntities)
+    suspend fun addBankAccounts(banks: BankAccountEntities)
 
 
     @Query ("DELETE FROM $BankAccount_Table")

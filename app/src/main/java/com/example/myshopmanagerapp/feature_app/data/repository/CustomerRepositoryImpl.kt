@@ -1,12 +1,14 @@
 package com.example.myshopmanagerapp.feature_app.data.repository
 
-import com.example.myshopmanagerapp.core.CustomerEntities
-import com.example.myshopmanagerapp.core.Resource
+import com.example.myshopmanagerapp.core.*
+import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
-import com.example.myshopmanagerapp.core.UserPreferences
+import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
+import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIdsJson
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
 import com.example.myshopmanagerapp.feature_app.data.local.entities.customers.CustomerEntity
+import com.example.myshopmanagerapp.feature_app.domain.model.UniqueId
 import com.example.myshopmanagerapp.feature_app.domain.repository.CustomerRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -71,7 +73,12 @@ class CustomerRepositoryImpl(
     }
 
     override suspend fun addCustomers(customers: CustomerEntities) {
-        appDatabase.customerDao.addCustomers(customers)
+        try {
+            val allCustomers = appDatabase.customerDao.getAllCustomers() ?: emptyList()
+            val allUniqueCustomerIds = allCustomers.map { it.uniqueCustomerId }
+            val newCustomers = customers.filter { !allUniqueCustomerIds.contains(it.uniqueCustomerId) }
+            appDatabase.customerDao.addCustomers(newCustomers)
+        }catch (_: Exception){}
     }
 
     override suspend fun getCustomer(uniqueCustomerId: String): CustomerEntity? {
@@ -122,6 +129,9 @@ class CustomerRepositoryImpl(
                 }
                 else->{
                     appDatabase.customerDao.updateCustomer(customer)
+                    val updatedCustomerIdsJson = UpdateEntityMarkers(context).getUpdatedCustomerId.first().toNotNull()
+                    val updatedCustomerIds = updatedCustomerIdsJson.toUniqueIds().plus(UniqueId(customer.uniqueCustomerId)).toSet().toList()
+                    UpdateEntityMarkers(context).saveUpdatedCustomerIds(updatedCustomerIds.toUniqueIdsJson())
                     emit(Resource.Success("Customer successfully updated"))
                 }
             }
@@ -179,6 +189,9 @@ class CustomerRepositoryImpl(
                 }
                 else->{
                     appDatabase.customerDao.deleteCustomer(uniqueCustomerId)
+                    val deletedCustomerIdsJson = DeleteEntityMarkers(context).getDeletedCustomerId.first().toNotNull()
+                    val deletedCustomerIds = deletedCustomerIdsJson.toUniqueIds().plus(UniqueId(uniqueCustomerId)).toSet().toList()
+                    DeleteEntityMarkers(context).saveDeletedCustomerIds(deletedCustomerIds.toUniqueIdsJson())
                     emit(Resource.Success("Customer successfully deleted"))
                 }
             }

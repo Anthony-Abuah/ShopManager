@@ -76,6 +76,8 @@ object Constants{
     const val Delete = "Delete"
     val editDelete = listOf(Edit, Delete)
 
+    const val DeleteEntityMarkers = "Delete Markers"
+    const val UpdateEntityMarkers = "Update Entity Markers"
     const val UserPreferences = "User Preferences"
     const val StringValue = "String Value"
     const val SupplierRole = "Supplier Role"

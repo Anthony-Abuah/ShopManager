@@ -12,6 +12,8 @@ interface BankAccountRepository {
 
     suspend fun addBankAccount(bankAccount: BankAccountEntity): Flow<Resource<String?>>
 
+    suspend fun addBankAccounts(bankAccounts: BankAccountEntities)
+
     suspend fun getBankAccount(uniqueBankAccountId: String): BankAccountEntity?
 
     suspend fun updateBankAccount(bankAccount: BankAccountEntity): Flow<Resource<String?>>

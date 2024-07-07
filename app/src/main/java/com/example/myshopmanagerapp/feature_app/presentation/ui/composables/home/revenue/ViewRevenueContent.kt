@@ -27,6 +27,7 @@ import com.example.myshopmanagerapp.core.FormRelatedString.RevenueType
 import com.example.myshopmanagerapp.core.FormRelatedString.RevenueTypePlaceholder
 import com.example.myshopmanagerapp.core.FormRelatedString.SelectRevenueType
 import com.example.myshopmanagerapp.core.FormRelatedString.ShortNotesPlaceholder
+import com.example.myshopmanagerapp.core.FormRelatedString.UniqueRevenueId
 import com.example.myshopmanagerapp.core.FormRelatedString.UpdateChanges
 import com.example.myshopmanagerapp.core.Functions.convertToInt
 import com.example.myshopmanagerapp.core.Functions.toDate
@@ -82,6 +83,11 @@ fun ViewRevenueContent(
         ViewInfo(info = RevenueInformation)
 
         HorizontalDivider(thickness = LocalSpacing.current.extraSmall)
+
+        // Unique Savings Id
+        ViewTextValueRow(viewTitle = UniqueRevenueId, viewValue = revenue.uniqueRevenueId)
+
+        HorizontalDivider()
 
         // Date
         ViewOrUpdateDateValueRow(

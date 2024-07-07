@@ -17,6 +17,8 @@ object FormRelatedString{
     const val Personnel_Name = "Personnel name"
     const val BankAccount = "Bank Account"
     const val UniqueWithdrawalId = "Unique Withdrawal Id"
+    const val UniqueReceiptId = "Unique Receipt Id"
+    const val UniqueCashInId = "Unique CashIn Id"
     const val Save = "Save"
     const val EnterValue = "Enter value"
     const val SearchPlaceholder = "Search..."
@@ -153,6 +155,7 @@ object FormRelatedString{
     const val RevenueTypePlaceholder = "Eg: Sales"
     const val SaveRevenue = "Save Revenue"
     const val RevenueInformation = "Revenue Information"
+    const val UniqueRevenueId = "Unique Revenue Id"
     const val RevenueAmount = "Revenue Amount"
     const val RevenueShortNotes = "Enter short notes"
 

@@ -17,12 +17,11 @@ import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntities
 import com.example.myshopmanagerapp.core.UserPreferences
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
-import com.example.myshopmanagerapp.feature_app.data.local.entities.company.CompanyDao
 import com.example.myshopmanagerapp.feature_app.data.local.entities.company.CompanyEntity
 import com.example.myshopmanagerapp.feature_app.data.remote.ShopManagerDatabaseApi
 import com.example.myshopmanagerapp.feature_app.data.remote.dto.company.CompanyResponseDto
 import com.example.myshopmanagerapp.feature_app.domain.model.AddCompanyResponse
-import com.example.myshopmanagerapp.feature_app.domain.repository.CompanyRepository
+import com.example.myshopmanagerapp.feature_app.domain.repository.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import retrofit2.Call
@@ -37,7 +36,20 @@ import kotlin.system.exitProcess
 class CompanyRepositoryImpl(
     private val appDatabase: AppDatabase,
     private val shopManagerDatabaseApi: ShopManagerDatabaseApi,
-    private val companyDao: CompanyDao,
+    private val customerRepository: CustomerRepository,
+    private val bankAccountRepository: BankAccountRepository,
+    private val cashInRepository: CashInRepository,
+    private val debtRepository: DebtRepository,
+    private val debtRepaymentRepository: DebtRepaymentRepository,
+    private val expenseRepository: ExpenseRepository,
+    private val inventoryRepository: InventoryRepository,
+    private val inventoryItemRepository: InventoryItemRepository,
+    private val personnelRepository: PersonnelRepository,
+    private val revenueRepository: RevenueRepository,
+    private val savingsRepository: SavingsRepository,
+    private val stockRepository: StockRepository,
+    private val supplierRepository: SupplierRepository,
+    private val withdrawalRepository: WithdrawalRepository,
 ): CompanyRepository{
     override fun getAllCompanies(): Flow<Resource<CompanyEntities?>> = flow{
         emit(Resource.Loading())
@@ -98,8 +110,8 @@ class CompanyRepositoryImpl(
                                     val registeredAccountInfo = responseInfo?.toCompanyEntity()?.toCompanyEntityJson()
                                     registeredAccountInfo?.let {
                                         it.toCompanyEntity()?.let { companyEntity ->
-                                            companyDao.deleteAllCompanies()
-                                            companyDao.addCompany(companyEntity)
+                                            appDatabase.companyDao.deleteAllCompanies()
+                                            appDatabase.companyDao.addCompany(companyEntity)
                                         }
                                         userPreferences.saveShopInfo(it)
                                         userPreferences.saveLoggedInState(true)
@@ -121,7 +133,7 @@ class CompanyRepositoryImpl(
                                 userPreferences.saveRepositoryJobMessage(t.message ?: "Couldn't connect to server")
                                 val shopInfo = userPreferences.getShopInfo.first().toCompanyEntity()
                                 if (shopInfo != null) {
-                                    companyDao.updateCompany(shopInfo.copy(password = newPassword))
+                                    appDatabase.companyDao.updateCompany(shopInfo.copy(password = newPassword))
                                     userPreferences.saveRepositoryJobSuccessValue(true)
                                     userPreferences.saveRepositoryJobMessage("Password changed successfully")
                                 }else{
@@ -254,7 +266,7 @@ class CompanyRepositoryImpl(
                                                 else -> {
                                                     val uniqueCompanyId = generateUniqueCompanyId(company.companyName)
                                                     val newCompany = company.copy(uniqueCompanyId = uniqueCompanyId)
-                                                    companyDao.addCompany(newCompany)
+                                                    appDatabase.companyDao.addCompany(newCompany)
                                                     userPreferences.saveLoggedInState(true)
                                                     userPreferences.saveRepositoryJobSuccessValue(true)
                                                     userPreferences.saveRepositoryJobMessage("Company registered successfully\nNB: Your company has only been registered locally on this device")
@@ -357,7 +369,7 @@ class CompanyRepositoryImpl(
             try {
                 val thisEmail = email.trim()
                 val invalidParameters = thisEmail.isBlank() || password.isBlank()
-                val company = companyDao.getAllCompanies()?.firstOrNull()
+                val company = appDatabase.companyDao.getAllCompanies()?.firstOrNull()
                 when(true) {
                     invalidParameters -> {
                         emit(
@@ -479,7 +491,7 @@ class CompanyRepositoryImpl(
             try {
                 val thisEmail = email.trim()
                 val invalidParameters = thisEmail.isBlank() || password.isBlank()
-                val company = companyDao.getAllCompanies()?.firstOrNull{(it.email.trim() == thisEmail) && (it.password.trim() == password)}
+                val company = appDatabase.companyDao.getAllCompanies()?.firstOrNull{(it.email.trim() == thisEmail) && (it.password.trim() == password)}
                 when(true) {
                     invalidParameters -> {
                         userPreferences.saveRepositoryJobMessage("Failed to log in.\nEmail or password field is empty")
@@ -520,7 +532,7 @@ class CompanyRepositoryImpl(
             try {
                 val thisEmail = email.trim()
                 val invalidParameters = thisEmail.isBlank() || password.isBlank()
-                val company = companyDao.getAllCompanies()?.firstOrNull{(it.email.trim() == thisEmail) && (it.password.trim() == password)}
+                val company = appDatabase.companyDao.getAllCompanies()?.firstOrNull{(it.email.trim() == thisEmail) && (it.password.trim() == password)}
                 when(true) {
                     invalidParameters -> {
                         userPreferences.saveRepositoryJobMessage("Failed to log in.\nEmail or password field is empty")
@@ -563,7 +575,7 @@ class CompanyRepositoryImpl(
             userPreferences.saveShopInfo(emptyString)
             userPreferences.savePersonnelLoggedInState(false)
             userPreferences.savePersonnelInfo(emptyString)
-            companyDao.deleteAllTables()
+            appDatabase.companyDao.deleteAllTables()
             emit(Resource.Success(
                 data = "Log out successful"
             ))
@@ -585,7 +597,7 @@ class CompanyRepositoryImpl(
             userPreferences.saveShopInfo(emptyString)
             userPreferences.savePersonnelLoggedInState(false)
             userPreferences.savePersonnelInfo(emptyString)
-            companyDao.deleteAllTables()
+            appDatabase.companyDao.deleteAllTables()
             userPreferences.saveRepositoryJobMessage("Log out successful")
             userPreferences.saveRepositoryJobSuccessValue(false)
         }catch (e: Exception){
@@ -595,31 +607,31 @@ class CompanyRepositoryImpl(
     }
 
     override suspend fun addCompanies(companies: CompanyEntities) {
-        companyDao.addCompanies(companies)
+        appDatabase.companyDao.addCompanies(companies)
     }
 
     override suspend fun getCompany(uniqueCompanyId: String): CompanyEntity? {
-        return companyDao.getCompany(uniqueCompanyId)
+        return appDatabase.companyDao.getCompany(uniqueCompanyId)
     }
 
     override suspend fun getCompanyByName(companyName: String): CompanyEntities? {
-        return companyDao.getCompanyByName(companyName)
+        return appDatabase.companyDao.getCompanyByName(companyName)
     }
 
     override suspend fun updateCompany(company: CompanyEntity) {
-        companyDao.updateCompany(company)
+        appDatabase.companyDao.updateCompany(company)
     }
 
     override suspend fun deleteCompany(companyId: Int) {
-        companyDao.deleteCompany(companyId)
+        appDatabase.companyDao.deleteCompany(companyId)
     }
 
     override suspend fun deleteCompany(uniqueCompanyId: String) {
-        companyDao.deleteCompany(uniqueCompanyId)
+        appDatabase.companyDao.deleteCompany(uniqueCompanyId)
     }
 
     override suspend fun deleteAllCompanies() {
-        companyDao.deleteAllCompanies()
+        appDatabase.companyDao.deleteAllCompanies()
     }
 
     private suspend fun syncCompanyInfo(){
@@ -638,70 +650,81 @@ class CompanyRepositoryImpl(
                     userPreferences.saveRepositoryJobMessage("Could not get the shop account details\nPlease ensure that you are logged in")
                     userPreferences.saveRepositoryJobSuccessValue(false)
                 }else {
-                    val remoteCustomers =
-                        shopManagerDatabaseApi.fetchAllCompanyCustomers(uniqueCompanyId)?.data
-                            ?: emptyList()
-                    appDatabase.customerDao.addCustomers(remoteCustomers.map { it.toCustomerEntity() })
+                    val remoteCustomers = shopManagerDatabaseApi.fetchAllCompanyCustomers(uniqueCompanyId)?.data ?: emptyList()
+                    //appDatabase.customerDao.addCustomers(remoteCustomers.map { it.toCustomerEntity() })
+                    customerRepository.addCustomers(remoteCustomers.map { it.toCustomerEntity() })
 
                     val remoteSuppliers =
                         shopManagerDatabaseApi.fetchAllCompanySuppliers(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.supplierDao.addSuppliers(remoteSuppliers.map { it.toSupplierEntity() })
+                    //appDatabase.supplierDao.addSuppliers(remoteSuppliers.map { it.toSupplierEntity() })
+                    supplierRepository.addSuppliers(remoteSuppliers.map { it.toSupplierEntity() })
 
                     val remoteDebts =
                         shopManagerDatabaseApi.fetchAllCompanyDebts(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.debtDao.addDebts(remoteDebts.map { it.toDebtEntity() })
+                    //appDatabase.debtDao.addDebts(remoteDebts.map { it.toDebtEntity() })
+                    debtRepository.addDebts(remoteDebts.map { it.toDebtEntity() })
 
                     val remoteCashIns =
                         shopManagerDatabaseApi.fetchAllCompanyCashIns(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.cashInDao.addCashIns(remoteCashIns.map { it.toCashInEntity() })
+                    //appDatabase.cashInDao.addCashIns(remoteCashIns.map { it.toCashInEntity() })
+                    cashInRepository.addCashIns(remoteCashIns.map { it.toCashInEntity() })
 
                     val remoteDebtRepayments =
                         shopManagerDatabaseApi.fetchAllCompanyDebtRepayments(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.debtRepaymentDao.addDebtRepayments(remoteDebtRepayments.map { it.toDebtRepaymentEntity() })
+                    //appDatabase.debtRepaymentDao.addDebtRepayments(remoteDebtRepayments.map { it.toDebtRepaymentEntity() })
+                    debtRepaymentRepository.addDebtRepayments(remoteDebtRepayments.map { it.toDebtRepaymentEntity() })
 
                     val remoteInventories =
                         shopManagerDatabaseApi.fetchAllCompanyInventories(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.inventoryDao.addInventories(remoteInventories.map { it.toInventoryEntity() })
+                    //appDatabase.inventoryDao.addInventories(remoteInventories.map { it.toInventoryEntity() })
+                    inventoryRepository.addInventories(remoteInventories.map { it.toInventoryEntity() })
 
                     val remoteInventoryItems =
                         shopManagerDatabaseApi.fetchAllCompanyInventoryItems(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.inventoryItemDao.addInventoryItems(remoteInventoryItems.map { it.toInventoryItemEntity() })
+                    //appDatabase.inventoryItemDao.addInventoryItems(remoteInventoryItems.map { it.toInventoryItemEntity() })
+                    inventoryItemRepository.addInventoryItems(remoteInventoryItems.map { it.toInventoryItemEntity() })
 
                     val remoteRevenues =
                         shopManagerDatabaseApi.fetchAllCompanyRevenues(uniqueCompanyId)?.data
                             ?: emptyList()
                     appDatabase.revenueDao.addRevenues(remoteRevenues.map { it.toRevenueEntity() })
+                    revenueRepository.addRevenues(remoteRevenues.map { it.toRevenueEntity() })
 
                     val remoteExpenses =
                         shopManagerDatabaseApi.fetchAllCompanyExpenses(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.expenseDao.addExpenses(remoteExpenses.map { it.toExpenseEntity() })
+                    //appDatabase.expenseDao.addExpenses(remoteExpenses.map { it.toExpenseEntity() })
+                    expenseRepository.addExpenses(remoteExpenses.map { it.toExpenseEntity() })
 
                     val remoteStocks =
                         shopManagerDatabaseApi.fetchAllCompanyStocks(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.stockDao.addStocks(remoteStocks.map { it.toStockEntity() })
+                    //appDatabase.stockDao.addStocks(remoteStocks.map { it.toStockEntity() })
+                    stockRepository.addStocks(remoteStocks.map { it.toStockEntity() })
 
                     val remotePersonnel =
                         shopManagerDatabaseApi.fetchAllCompanyPersonnel(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.personnelDao.addPersonnel(remotePersonnel.map { it.toPersonnelEntity() })
+                    //appDatabase.personnelDao.addPersonnel(remotePersonnel.map { it.toPersonnelEntity() })
+                    personnelRepository.addPersonnel(remotePersonnel.map { it.toPersonnelEntity() })
 
                     val remoteSavings =
                         shopManagerDatabaseApi.fetchAllCompanySavings(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.savingsDao.addSavings(remoteSavings.map { it.toSavingsEntity() })
+                    //appDatabase.savingsDao.addSavings(remoteSavings.map { it.toSavingsEntity() })
+                    savingsRepository.addSavings(remoteSavings.map { it.toSavingsEntity() })
 
                     val remoteWithdrawals =
                         shopManagerDatabaseApi.fetchAllCompanyWithdrawals(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.withdrawalDao.addWithdrawals(remoteWithdrawals.map { it.toWithdrawalEntity() })
+                    //appDatabase.withdrawalDao.addWithdrawals(remoteWithdrawals.map { it.toWithdrawalEntity() })
+                    withdrawalRepository.addWithdrawals(remoteWithdrawals.map { it.toWithdrawalEntity() })
 
                     val remoteInventoryStocks =
                         shopManagerDatabaseApi.fetchAllCompanyInventoryStocks(uniqueCompanyId)?.data
@@ -711,7 +734,8 @@ class CompanyRepositoryImpl(
                     val remoteBanks =
                         shopManagerDatabaseApi.fetchAllCompanyBanks(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.bankAccountDao.addBanks(remoteBanks.map { it.toBankEntity() })
+                    //appDatabase.bankAccountDao.addBankAccounts(remoteBanks.map { it.toBankEntity() })
+                    bankAccountRepository.addBankAccounts(remoteBanks.map { it.toBankEntity() })
 
                     userPreferences.saveRepositoryJobMessage("Data successfully loaded and synced")
                     userPreferences.saveRepositoryJobSuccessValue(true)

@@ -5,22 +5,22 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import com.example.myshopmanagerapp.R
-import com.example.myshopmanagerapp.core.Constants
+import com.example.myshopmanagerapp.core.*
 import com.example.myshopmanagerapp.core.Constants.Zero
-import com.example.myshopmanagerapp.core.DebtEntities
 import com.example.myshopmanagerapp.core.Functions.shortened
 import com.example.myshopmanagerapp.core.Functions.toCompanyEntity
 import com.example.myshopmanagerapp.core.Functions.toDate
 import com.example.myshopmanagerapp.core.Functions.toDateString
 import com.example.myshopmanagerapp.core.Functions.toEllipses
 import com.example.myshopmanagerapp.core.Functions.toNotNull
-import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
-import com.example.myshopmanagerapp.core.UserPreferences
+import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
+import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIdsJson
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
 import com.example.myshopmanagerapp.feature_app.data.local.entities.customers.CustomerEntity
 import com.example.myshopmanagerapp.feature_app.data.local.entities.debt.DebtEntity
+import com.example.myshopmanagerapp.feature_app.domain.model.UniqueId
 import com.example.myshopmanagerapp.feature_app.domain.repository.DebtRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -113,6 +113,15 @@ class DebtRepositoryImpl(
         }
     }
 
+    override suspend fun addDebts(debt: DebtEntities) {
+        try {
+            val allDebts = appDatabase.debtDao.getAllDebt() ?: emptyList()
+            val allUniqueDebtIds = allDebts.map { it.uniqueDebtId }
+            val newDebts = debt.filter { !allUniqueDebtIds.contains(it.uniqueDebtId) }
+            appDatabase.debtDao.addDebts(newDebts)
+        }catch (_: Exception){}
+    }
+
     override suspend fun getDebt(uniqueDebtId: String): DebtEntity? {
         return appDatabase.debtDao.getDebt(uniqueDebtId)
     }
@@ -187,17 +196,17 @@ class DebtRepositoryImpl(
                     val debtDifference = debt.debtAmount.minus(oldDebtAmount)
                     val customerDebt = debtDifference.plus(currentOutstandingDebt)
 
-                    val updatedCustomer = CustomerEntity(
-                        customerId = customer.customerId,
-                        uniqueCustomerId = customer.uniqueCustomerId,
-                        customerName = customer.customerName,
-                        customerContact = customer.customerContact,
-                        customerLocation = customer.customerLocation,
-                        customerPhoto = customer.customerPhoto,
-                        otherInfo = customer.otherInfo,
-                        debtAmount = customerDebt,
-                    )
+                    val updatedCustomer = customer.copy(debtAmount = customerDebt)
                     appDatabase.debtDao.updateDebt(debt.copy(uniquePersonnelId = uniquePersonnelId), updatedCustomer)
+
+                    val updatedDebtIdsJson = UpdateEntityMarkers(context).getUpdatedDebtId.first().toNotNull()
+                    val updatedDebtIds = updatedDebtIdsJson.toUniqueIds().plus(UniqueId(debt.uniqueDebtId)).toSet().toList()
+                    UpdateEntityMarkers(context).saveUpdatedDebtIds(updatedDebtIds.toUniqueIdsJson())
+
+                    val updatedCustomerIdsJson = UpdateEntityMarkers(context).getUpdatedCustomerId.first().toNotNull()
+                    val updatedCustomerIds = updatedCustomerIdsJson.toUniqueIds().plus(UniqueId(customer.uniqueCustomerId)).toSet().toList()
+                    UpdateEntityMarkers(context).saveUpdatedCustomerIds(updatedCustomerIds.toUniqueIdsJson())
+
                     emit(Resource.Success("Debt updated successfully"))
                 }
             }
@@ -257,17 +266,17 @@ class DebtRepositoryImpl(
                     val currentOutstandingDebt = customerDebtAmount.minus(customerDebtRepaymentAmount)
                     val customerDebt = currentOutstandingDebt.minus(debt.debtAmount)
 
-                    val updatedCustomer = CustomerEntity(
-                        customerId = customer.customerId,
-                        uniqueCustomerId = customer.uniqueCustomerId,
-                        customerName = customer.customerName,
-                        customerContact = customer.customerContact,
-                        customerLocation = customer.customerLocation,
-                        customerPhoto = customer.customerPhoto,
-                        otherInfo = customer.otherInfo,
-                        debtAmount = customerDebt,
-                    )
+                    val updatedCustomer = customer.copy(debtAmount = customerDebt)
                     appDatabase.debtDao.deleteDebt(debt.uniqueDebtId, updatedCustomer)
+
+                    val deletedDebtIdsJson = DeleteEntityMarkers(context).getDeletedDebtId.first().toNotNull()
+                    val deletedDebtIds = deletedDebtIdsJson.toUniqueIds().plus(UniqueId(uniqueDebtId)).toSet().toList()
+                    DeleteEntityMarkers(context).saveDeletedDebtIds(deletedDebtIds.toUniqueIdsJson())
+
+                    val updatedCustomerIdsJson = UpdateEntityMarkers(context).getUpdatedCustomerId.first().toNotNull()
+                    val updatedCustomerIds = updatedCustomerIdsJson.toUniqueIds().plus(UniqueId(uniqueCustomerId)).toSet().toList()
+                    UpdateEntityMarkers(context).saveUpdatedCustomerIds(updatedCustomerIds.toUniqueIdsJson())
+
                     emit(Resource.Success("Debt deleted successfully"))
                 }
             }

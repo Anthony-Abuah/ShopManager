@@ -1,20 +1,17 @@
 package com.example.myshopmanagerapp.feature_app.data.repository
 
+import com.example.myshopmanagerapp.core.*
 import com.example.myshopmanagerapp.core.Constants.ONE
 import com.example.myshopmanagerapp.core.Constants.Unit
 import com.example.myshopmanagerapp.core.Functions.toDate
 import com.example.myshopmanagerapp.core.Functions.toNotNull
-import com.example.myshopmanagerapp.core.InventoryItemEntities
-import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
-import com.example.myshopmanagerapp.core.UserPreferences
+import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
+import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIdsJson
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
 import com.example.myshopmanagerapp.feature_app.data.local.entities.inventory_items.InventoryItemEntity
-import com.example.myshopmanagerapp.feature_app.domain.model.ItemValue
-import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
-import com.example.myshopmanagerapp.feature_app.domain.model.Price
-import com.example.myshopmanagerapp.feature_app.domain.model.QuantityCategorization
+import com.example.myshopmanagerapp.feature_app.domain.model.*
 import com.example.myshopmanagerapp.feature_app.domain.repository.InventoryItemRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -127,6 +124,9 @@ class InventoryItemRepositoryImpl(
                         inventoryItemName = inventoryItem.inventoryItemName.trim(),
                         quantityCategorizations = categorizations)
                     )
+                    val updatedInventoryItemIdsJson = UpdateEntityMarkers(context).getUpdatedInventoryItemId.first().toNotNull()
+                    val updatedInventoryItemIds = updatedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(inventoryItem.uniqueInventoryItemId)).toSet().toList()
+                    UpdateEntityMarkers(context).saveUpdatedInventoryItemIds(updatedInventoryItemIds.toUniqueIdsJson())
                     emit(Resource.Success("${inventoryItem.inventoryItemName} successfully updated"))
                 }
             }
@@ -178,6 +178,9 @@ class InventoryItemRepositoryImpl(
                 }
                 else ->{
                     appDatabase.inventoryItemDao.deleteInventoryItem(uniqueInventoryItemId)
+                    val deletedInventoryItemIdsJson = DeleteEntityMarkers(context).getDeletedInventoryItemId.first().toNotNull()
+                    val deletedInventoryItemIds = deletedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(uniqueInventoryItemId)).toSet().toList()
+                    DeleteEntityMarkers(context).saveDeletedInventoryItemIds(deletedInventoryItemIds.toUniqueIdsJson())
                     emit(Resource.Success("Item successfully deleted"))
                 }
             }
@@ -441,7 +444,12 @@ class InventoryItemRepositoryImpl(
     }
 
     override suspend fun addInventoryItems(inventoryItems: InventoryItemEntities) {
-        appDatabase.inventoryItemDao.addInventoryItems(inventoryItems)
+        try {
+            val allInventoryItems = appDatabase.inventoryItemDao.getAllInventoryItems() ?: emptyList()
+            val allUniqueInventoryItemIds = allInventoryItems.map { it.uniqueInventoryItemId }
+            val newInventoryItems = inventoryItems.filter { !allUniqueInventoryItemIds.contains(it.uniqueInventoryItemId) }
+            appDatabase.inventoryItemDao.addInventoryItems(newInventoryItems)
+        }catch (_: Exception){}
     }
 
     override suspend fun getInventoryItem(uniqueInventoryItemId: String): InventoryItemEntity? {

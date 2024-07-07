@@ -5,7 +5,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import com.example.myshopmanagerapp.R
-import com.example.myshopmanagerapp.core.Constants
+import com.example.myshopmanagerapp.core.*
 import com.example.myshopmanagerapp.core.Functions.shortened
 import com.example.myshopmanagerapp.core.Functions.toCompanyEntity
 import com.example.myshopmanagerapp.core.Functions.toDate
@@ -13,15 +13,15 @@ import com.example.myshopmanagerapp.core.Functions.toDateString
 import com.example.myshopmanagerapp.core.Functions.toEllipses
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.Functions.toTimestamp
-import com.example.myshopmanagerapp.core.Resource
-import com.example.myshopmanagerapp.core.RevenueEntities
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
-import com.example.myshopmanagerapp.core.UserPreferences
+import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
+import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIdsJson
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
 import com.example.myshopmanagerapp.feature_app.data.local.entities.revenue.RevenueEntity
 import com.example.myshopmanagerapp.feature_app.domain.model.ItemValue
 import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
+import com.example.myshopmanagerapp.feature_app.domain.model.UniqueId
 import com.example.myshopmanagerapp.feature_app.domain.repository.RevenueRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -206,7 +206,12 @@ class RevenueRepositoryImpl(
     }
 
     override suspend fun addRevenues(revenues: RevenueEntities) {
-        appDatabase.revenueDao.addRevenues(revenues)
+        try {
+            val allRevenues = appDatabase.revenueDao.getAllRevenues() ?: emptyList()
+            val allUniqueRevenueIds = allRevenues.map { it.uniqueRevenueId }
+            val newRevenues = revenues.filter { !allUniqueRevenueIds.contains(it.uniqueRevenueId) }
+            appDatabase.revenueDao.addRevenues(newRevenues)
+        }catch (_: Exception){}
     }
 
     override suspend fun getRevenueHours(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>> =flow{
@@ -329,6 +334,9 @@ class RevenueRepositoryImpl(
                 }
                 else -> {
                     appDatabase.revenueDao.updateRevenue(revenue.copy(uniquePersonnelId = uniquePersonnelId))
+                    val updatedRevenueIdsJson = UpdateEntityMarkers(context).getUpdatedRevenueId.first().toNotNull()
+                    val updatedRevenueIds = updatedRevenueIdsJson.toUniqueIds().plus(UniqueId(revenue.uniqueRevenueId)).toSet().toList()
+                    UpdateEntityMarkers(context).saveUpdatedRevenueIds(updatedRevenueIds.toUniqueIdsJson())
                     emit(Resource.Success("Revenue successfully updated"))
                 }
             }
@@ -375,6 +383,9 @@ class RevenueRepositoryImpl(
                 }
                 else->{
                     appDatabase.revenueDao.deleteRevenue(uniqueRevenueId)
+                    val deletedRevenueIdsJson = DeleteEntityMarkers(context).getDeletedRevenueId.first().toNotNull()
+                    val deletedRevenueIds = deletedRevenueIdsJson.toUniqueIds().plus(UniqueId(uniqueRevenueId)).toSet().toList()
+                    DeleteEntityMarkers(context).saveDeletedRevenueIds(deletedRevenueIds.toUniqueIdsJson())
                     emit(Resource.Success("Revenue successfully deleted"))
                 }
             }

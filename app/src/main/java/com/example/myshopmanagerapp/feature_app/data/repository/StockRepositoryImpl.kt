@@ -1,19 +1,20 @@
 package com.example.myshopmanagerapp.feature_app.data.repository
 
+import com.example.myshopmanagerapp.core.*
 import com.example.myshopmanagerapp.core.Constants.ZERO
 import com.example.myshopmanagerapp.core.Functions.addItemQuantities
 import com.example.myshopmanagerapp.core.Functions.getTotalNumberOfUnits
 import com.example.myshopmanagerapp.core.Functions.subtractItemQuantities
 import com.example.myshopmanagerapp.core.Functions.toDateString
 import com.example.myshopmanagerapp.core.Functions.toNotNull
-import com.example.myshopmanagerapp.core.Resource
-import com.example.myshopmanagerapp.core.StockEntities
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
-import com.example.myshopmanagerapp.core.UserPreferences
+import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
+import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIdsJson
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
 import com.example.myshopmanagerapp.feature_app.data.local.entities.stock.StockEntity
 import com.example.myshopmanagerapp.feature_app.domain.model.AddStockInfo
+import com.example.myshopmanagerapp.feature_app.domain.model.UniqueId
 import com.example.myshopmanagerapp.feature_app.domain.repository.StockRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -126,7 +127,12 @@ class StockRepositoryImpl(
     }
 
     override suspend fun addStocks(stocks: StockEntities) {
-        appDatabase.stockDao.addStocks(stocks)
+        try {
+            val allStocks = appDatabase.stockDao.getAllStocks() ?: emptyList()
+            val allUniqueStockIds = allStocks.map { it.uniqueStockId }
+            val newStocks = stocks.filter { !allUniqueStockIds.contains(it.uniqueStockId) }
+            appDatabase.stockDao.addStocks(newStocks)
+        }catch (_: Exception){}
     }
 
     override suspend fun getStock(uniqueStockId: String): StockEntity? {
@@ -216,6 +222,15 @@ class StockRepositoryImpl(
                         totalNumberOfUnits = updatedQuantityInfo.getTotalNumberOfUnits(),
                     )
                     appDatabase.stockDao.updateStockWithInventoryItemUpdate(thisStock, updatedInventoryItem)
+
+                    val updatedStockIdsJson = UpdateEntityMarkers(context).getUpdatedStockId.first().toNotNull()
+                    val updatedStockIds = updatedStockIdsJson.toUniqueIds().plus(UniqueId(thisStock.uniqueStockId)).toSet().toList()
+                    UpdateEntityMarkers(context).saveUpdatedStockIds(updatedStockIds.toUniqueIdsJson())
+
+                    val updatedInventoryItemIdsJson = UpdateEntityMarkers(context).getUpdatedInventoryItemId.first().toNotNull()
+                    val updatedInventoryItemIds = updatedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(updatedInventoryItem.uniqueInventoryItemId)).toSet().toList()
+                    UpdateEntityMarkers(context).saveUpdatedInventoryItemIds(updatedInventoryItemIds.toUniqueIdsJson())
+
                     emit(Resource.Success("Stock updated successfully"))
                 }
             }
@@ -285,6 +300,14 @@ class StockRepositoryImpl(
                         totalNumberOfUnits = penultimateStock?.totalNumberOfUnits ?: ZERO,
                     )
                     appDatabase.stockDao.deleteStockWithItemUpdate(uniqueStockId, updatedInventoryItem)
+                    val deletedStockIdsJson = DeleteEntityMarkers(context).getDeletedStockId.first().toNotNull()
+                    val deletedStockIds = deletedStockIdsJson.toUniqueIds().plus(UniqueId(uniqueStockId)).toSet().toList()
+                    DeleteEntityMarkers(context).saveDeletedStockIds(deletedStockIds.toUniqueIdsJson())
+
+                    val updatedInventoryItemIdsJson = UpdateEntityMarkers(context).getUpdatedInventoryItemId.first().toNotNull()
+                    val updatedInventoryItemIds = updatedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(updatedInventoryItem.uniqueInventoryItemId)).toSet().toList()
+                    UpdateEntityMarkers(context).saveUpdatedInventoryItemIds(updatedInventoryItemIds.toUniqueIdsJson())
+
                     emit(Resource.Success("Stock deleted successfully"))
                 }
             }

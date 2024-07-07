@@ -13,6 +13,8 @@ interface DebtRepository {
 
     suspend fun addDebt(debt: DebtEntity): Flow<Resource<String?>>
 
+    suspend fun addDebts(debt: DebtEntities)
+
     suspend fun getDebt(uniqueDebtId: String): DebtEntity?
 
     suspend fun getDebtByCustomer(uniqueCustomerId: String): DebtEntities?

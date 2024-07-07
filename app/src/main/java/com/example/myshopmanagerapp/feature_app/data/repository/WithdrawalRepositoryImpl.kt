@@ -5,20 +5,20 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import com.example.myshopmanagerapp.R
-import com.example.myshopmanagerapp.core.Constants
+import com.example.myshopmanagerapp.core.*
 import com.example.myshopmanagerapp.core.Functions.shortened
 import com.example.myshopmanagerapp.core.Functions.toCompanyEntity
 import com.example.myshopmanagerapp.core.Functions.toDate
 import com.example.myshopmanagerapp.core.Functions.toDateString
 import com.example.myshopmanagerapp.core.Functions.toEllipses
 import com.example.myshopmanagerapp.core.Functions.toNotNull
-import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
-import com.example.myshopmanagerapp.core.UserPreferences
-import com.example.myshopmanagerapp.core.WithdrawalEntities
+import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
+import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIdsJson
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
 import com.example.myshopmanagerapp.feature_app.data.local.entities.withdrawals.WithdrawalEntity
+import com.example.myshopmanagerapp.feature_app.domain.model.UniqueId
 import com.example.myshopmanagerapp.feature_app.domain.repository.WithdrawalRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -96,7 +96,12 @@ class WithdrawalRepositoryImpl(
     }
 
     override suspend fun addWithdrawals(withdrawals: WithdrawalEntities) {
-        appDatabase.withdrawalDao.addWithdrawals(withdrawals)
+        try {
+            val allWithdrawals = appDatabase.withdrawalDao.getAllWithdrawals() ?: emptyList()
+            val allUniqueWithdrawalIds = allWithdrawals.map { it.uniqueWithdrawalId }
+            val newWithdrawals = withdrawals.filter { !allUniqueWithdrawalIds.contains(it.uniqueWithdrawalId) }
+            appDatabase.withdrawalDao.addWithdrawals(newWithdrawals)
+        }catch (_: Exception){}
     }
 
     override suspend fun getWithdrawal(uniqueWithdrawalId: String): WithdrawalEntity? {
@@ -153,6 +158,14 @@ class WithdrawalRepositoryImpl(
                         bankAccount.uniqueBankAccountId,
                         totalSavingsAmount
                     )
+                    val updatedWithdrawalIdsJson = UpdateEntityMarkers(context).getUpdatedWithdrawalId.first().toNotNull()
+                    val updatedWithdrawalIds = updatedWithdrawalIdsJson.toUniqueIds().plus(UniqueId(withdrawal.uniqueWithdrawalId)).toSet().toList()
+                    UpdateEntityMarkers(context).saveUpdatedWithdrawalIds(updatedWithdrawalIds.toUniqueIdsJson())
+
+                    val updatedBankAccountIdsJson = UpdateEntityMarkers(context).getUpdatedBankAccountId.first().toNotNull()
+                    val updatedBankAccountIds = updatedBankAccountIdsJson.toUniqueIds().plus(UniqueId(bankAccount.uniqueBankAccountId)).toSet().toList()
+                    UpdateEntityMarkers(context).saveUpdatedBankAccountIds(updatedBankAccountIds.toUniqueIdsJson())
+
                     emit(Resource.Success("Withdrawal successfully updated"))
                 }
             }
@@ -209,6 +222,14 @@ class WithdrawalRepositoryImpl(
                         bankAccount.uniqueBankAccountId,
                         totalSavingsAmount
                     )
+                    val deletedWithdrawalIdsJson = DeleteEntityMarkers(context).getDeletedWithdrawalId.first().toNotNull()
+                    val deletedWithdrawalIds = deletedWithdrawalIdsJson.toUniqueIds().plus(UniqueId(uniqueWithdrawalId)).toSet().toList()
+                    DeleteEntityMarkers(context).saveDeletedWithdrawalIds(deletedWithdrawalIds.toUniqueIdsJson())
+
+                    val updatedBankAccountIdsJson = UpdateEntityMarkers(context).getUpdatedBankAccountId.first().toNotNull()
+                    val updatedBankAccountIds = updatedBankAccountIdsJson.toUniqueIds().plus(UniqueId(bankAccount.uniqueBankAccountId)).toSet().toList()
+                    UpdateEntityMarkers(context).saveUpdatedBankAccountIds(updatedBankAccountIds.toUniqueIdsJson())
+
                     emit(Resource.Success("Withdrawal successfully deleted"))
                 }
             }
