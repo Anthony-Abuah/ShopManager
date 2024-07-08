@@ -106,6 +106,19 @@ class StockRepositoryImpl(
                         totalNumberOfUnits = stock.stockQuantityInfo.getTotalNumberOfUnits(),
                     )
                     appDatabase.stockDao.addStockWithInventoryItemUpdate(thisStock, updatedInventoryItem)
+
+                    val addedStockIdsJson = AdditionEntityMarkers(context).getAddedStockIds.first().toNotNull()
+                    val addedStockIds = addedStockIdsJson.toUniqueIds().plus(UniqueId(stock.uniqueStockId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedStockIds(addedStockIds.toUniqueIdsJson())
+
+                    val addedInventoryItemIdsJson = AdditionEntityMarkers(context).getAddedInventoryItemIds.first().toNotNull()
+                    val addedInventoryItemIds = addedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(inventoryItem.uniqueInventoryItemId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedInventoryItemIds(addedInventoryItemIds.toUniqueIdsJson())
+
+                    val updatedInventoryItemIdsJson = ChangesEntityMarkers(context).getChangedInventoryItemIds.first().toNotNull()
+                    val updatedInventoryItemIds = updatedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(inventoryItem.uniqueInventoryItemId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedInventoryItemIds(updatedInventoryItemIds.toUniqueIdsJson())
+
                     emit(Resource.Success("Stock added successfully"))
                 }
             }
@@ -223,13 +236,21 @@ class StockRepositoryImpl(
                     )
                     appDatabase.stockDao.updateStockWithInventoryItemUpdate(thisStock, updatedInventoryItem)
 
-                    val updatedStockIdsJson = UpdateEntityMarkers(context).getUpdatedStockId.first().toNotNull()
-                    val updatedStockIds = updatedStockIdsJson.toUniqueIds().plus(UniqueId(thisStock.uniqueStockId)).toSet().toList()
-                    UpdateEntityMarkers(context).saveUpdatedStockIds(updatedStockIds.toUniqueIdsJson())
+                    val addedStockIdsJson = AdditionEntityMarkers(context).getAddedStockIds.first().toNotNull()
+                    val addedStockIds = addedStockIdsJson.toUniqueIds().plus(UniqueId(stock.uniqueStockId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedStockIds(addedStockIds.toUniqueIdsJson())
 
-                    val updatedInventoryItemIdsJson = UpdateEntityMarkers(context).getUpdatedInventoryItemId.first().toNotNull()
-                    val updatedInventoryItemIds = updatedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(updatedInventoryItem.uniqueInventoryItemId)).toSet().toList()
-                    UpdateEntityMarkers(context).saveUpdatedInventoryItemIds(updatedInventoryItemIds.toUniqueIdsJson())
+                    val updatedStockIdsJson = ChangesEntityMarkers(context).getChangedStockIds.first().toNotNull()
+                    val updatedStockIds = updatedStockIdsJson.toUniqueIds().plus(UniqueId(stock.uniqueStockId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedStockIds(updatedStockIds.toUniqueIdsJson())
+
+                    val addedInventoryItemIdsJson = AdditionEntityMarkers(context).getAddedInventoryItemIds.first().toNotNull()
+                    val addedInventoryItemIds = addedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(inventoryItem.uniqueInventoryItemId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedInventoryItemIds(addedInventoryItemIds.toUniqueIdsJson())
+
+                    val updatedInventoryItemIdsJson = ChangesEntityMarkers(context).getChangedInventoryItemIds.first().toNotNull()
+                    val updatedInventoryItemIds = updatedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(inventoryItem.uniqueInventoryItemId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedInventoryItemIds(updatedInventoryItemIds.toUniqueIdsJson())
 
                     emit(Resource.Success("Stock updated successfully"))
                 }
@@ -300,13 +321,22 @@ class StockRepositoryImpl(
                         totalNumberOfUnits = penultimateStock?.totalNumberOfUnits ?: ZERO,
                     )
                     appDatabase.stockDao.deleteStockWithItemUpdate(uniqueStockId, updatedInventoryItem)
-                    val deletedStockIdsJson = DeleteEntityMarkers(context).getDeletedStockId.first().toNotNull()
-                    val deletedStockIds = deletedStockIdsJson.toUniqueIds().plus(UniqueId(uniqueStockId)).toSet().toList()
-                    DeleteEntityMarkers(context).saveDeletedStockIds(deletedStockIds.toUniqueIdsJson())
 
-                    val updatedInventoryItemIdsJson = UpdateEntityMarkers(context).getUpdatedInventoryItemId.first().toNotNull()
-                    val updatedInventoryItemIds = updatedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(updatedInventoryItem.uniqueInventoryItemId)).toSet().toList()
-                    UpdateEntityMarkers(context).saveUpdatedInventoryItemIds(updatedInventoryItemIds.toUniqueIdsJson())
+                    val addedStockIdsJson = AdditionEntityMarkers(context).getAddedStockIds.first().toNotNull()
+                    val addedStockIds = addedStockIdsJson.toUniqueIds().filter { it.uniqueId != uniqueStockId }.toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedStockIds(addedStockIds.toUniqueIdsJson())
+
+                    val deletedStockIdsJson = ChangesEntityMarkers(context).getChangedStockIds.first().toNotNull()
+                    val deletedStockIds = deletedStockIdsJson.toUniqueIds().plus(UniqueId(stock.uniqueStockId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedStockIds(deletedStockIds.toUniqueIdsJson())
+
+                    val addedInventoryItemIdsJson = AdditionEntityMarkers(context).getAddedInventoryItemIds.first().toNotNull()
+                    val addedInventoryItemIds = addedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(inventoryItem.uniqueInventoryItemId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedInventoryItemIds(addedInventoryItemIds.toUniqueIdsJson())
+
+                    val updatedInventoryItemIdsJson = ChangesEntityMarkers(context).getChangedInventoryItemIds.first().toNotNull()
+                    val updatedInventoryItemIds = updatedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(inventoryItem.uniqueInventoryItemId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedInventoryItemIds(updatedInventoryItemIds.toUniqueIdsJson())
 
                     emit(Resource.Success("Stock deleted successfully"))
                 }

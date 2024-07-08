@@ -1,9 +1,11 @@
 package com.example.myshopmanagerapp.feature_app.domain.repository
 
+import android.content.Context
 import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.InventoryEntities
 import com.example.myshopmanagerapp.feature_app.data.local.entities.inventory.InventoryEntity
 import com.example.myshopmanagerapp.feature_app.data.local.entities.stock.StockEntity
+import com.example.myshopmanagerapp.feature_app.domain.model.InventoryQuantityDisplayValues
 import com.example.myshopmanagerapp.feature_app.domain.model.ItemQuantityCategorization
 import com.example.myshopmanagerapp.feature_app.domain.model.ItemValue
 import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
@@ -48,5 +50,12 @@ interface InventoryRepository {
     suspend fun getMostAvailableItem(period: PeriodDropDownItem): Flow<Resource<ItemValue>>
 
     suspend fun getLeastAvailableItem(period: PeriodDropDownItem): Flow<Resource<ItemValue>>
+
+    suspend fun generateInventoryList(
+        context: Context,
+        date: String,
+        inventories: List<InventoryQuantityDisplayValues>,
+    ): Flow<Resource<String?>>
+
 
 }

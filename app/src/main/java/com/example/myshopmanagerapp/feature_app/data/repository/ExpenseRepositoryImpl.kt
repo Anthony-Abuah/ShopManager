@@ -83,6 +83,9 @@ class ExpenseRepositoryImpl(
                 }
                 else ->{
                     appDatabase.expenseDao.addExpense(expense.copy(uniquePersonnelId = uniquePersonnelId))
+                    val addedExpenseIdsJson = AdditionEntityMarkers(context).getAddedExpenseIds.first().toNotNull()
+                    val addedExpenseIds = addedExpenseIdsJson.toUniqueIds().plus(UniqueId(expense.uniqueExpenseId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedExpenseIds(addedExpenseIds.toUniqueIdsJson())
                     emit(Resource.Success("Expense successfully added"))
                 }
             }
@@ -148,9 +151,13 @@ class ExpenseRepositoryImpl(
                 }
                 else ->{
                     appDatabase.expenseDao.updateExpense(expense.copy(uniquePersonnelId = uniquePersonnelId))
-                    val updatedExpenseIdsJson = UpdateEntityMarkers(context).getUpdatedExpenseId.first().toNotNull()
+                    val addedExpenseIdsJson = AdditionEntityMarkers(context).getAddedExpenseIds.first().toNotNull()
+                    val addedExpenseIds = addedExpenseIdsJson.toUniqueIds().plus(UniqueId(expense.uniqueExpenseId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedExpenseIds(addedExpenseIds.toUniqueIdsJson())
+
+                    val updatedExpenseIdsJson = ChangesEntityMarkers(context).getChangedExpenseIds.first().toNotNull()
                     val updatedExpenseIds = updatedExpenseIdsJson.toUniqueIds().plus(UniqueId(expense.uniqueExpenseId)).toSet().toList()
-                    UpdateEntityMarkers(context).saveUpdatedExpenseIds(updatedExpenseIds.toUniqueIdsJson())
+                    ChangesEntityMarkers(context).saveChangedExpenseIds(updatedExpenseIds.toUniqueIdsJson())
                     emit(Resource.Success("Expense successfully updated"))
                 }
             }
@@ -197,9 +204,13 @@ class ExpenseRepositoryImpl(
                 }
                 else->{
                     appDatabase.expenseDao.deleteExpense(uniqueExpenseId)
-                    val deletedExpenseIdsJson = DeleteEntityMarkers(context).getDeletedExpenseId.first().toNotNull()
+                    val addedExpenseIdsJson = AdditionEntityMarkers(context).getAddedExpenseIds.first().toNotNull()
+                    val addedExpenseIds = addedExpenseIdsJson.toUniqueIds().filter{it.uniqueId != uniqueExpenseId}.toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedExpenseIds(addedExpenseIds.toUniqueIdsJson())
+
+                    val deletedExpenseIdsJson = ChangesEntityMarkers(context).getChangedExpenseIds.first().toNotNull()
                     val deletedExpenseIds = deletedExpenseIdsJson.toUniqueIds().plus(UniqueId(uniqueExpenseId)).toSet().toList()
-                    DeleteEntityMarkers(context).saveDeletedExpenseIds(deletedExpenseIds.toUniqueIdsJson())
+                    ChangesEntityMarkers(context).saveChangedExpenseIds(deletedExpenseIds.toUniqueIdsJson())
                     emit(Resource.Success("Expense successfully deleted"))
                 }
             }

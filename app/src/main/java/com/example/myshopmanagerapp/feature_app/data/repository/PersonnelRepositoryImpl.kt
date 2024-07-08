@@ -67,6 +67,11 @@ class PersonnelRepositoryImpl(
                     val currentPersonnel = existingPersonnel.plus(newPersonnel)
                     val newCompany = company.copy(companyPersonnel = currentPersonnel.toPersonnelEntitiesJson())
                     appDatabase.personnelDao.registerPersonnel(newPersonnel, newCompany)
+
+                    val addedPersonnelIdsJson = AdditionEntityMarkers(context).getAddedPersonnelIds.first().toNotNull()
+                    val addedPersonnelIds = addedPersonnelIdsJson.toUniqueIds().plus(UniqueId(personnel.uniquePersonnelId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedPersonnelIds(addedPersonnelIds.toUniqueIdsJson())
+
                     userPreferences.savePersonnelInfo(newPersonnel.toPersonnelEntityJson().toNotNull())
                     userPreferences.savePersonnelLoggedInState(true)
                     userPreferences.saveShopInfo(newCompany.toCompanyEntityJson().toNotNull())
@@ -113,6 +118,11 @@ class PersonnelRepositoryImpl(
                     val currentPersonnel = existingPersonnel.plus(newPersonnel)
                     val newCompany = company.copy(companyPersonnel = currentPersonnel.toPersonnelEntitiesJson())
                     appDatabase.personnelDao.registerPersonnel(newPersonnel, newCompany)
+
+                    val addedPersonnelIdsJson = AdditionEntityMarkers(context).getAddedPersonnelIds.first().toNotNull()
+                    val addedPersonnelIds = addedPersonnelIdsJson.toUniqueIds().plus(UniqueId(personnel.uniquePersonnelId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedPersonnelIds(addedPersonnelIds.toUniqueIdsJson())
+
                     emit(Resource.Success("Personnel successfully added"))
                     userPreferences.saveShopInfo(newCompany.toCompanyEntityJson().toNotNull())
                 }
@@ -158,9 +168,13 @@ class PersonnelRepositoryImpl(
                         emit(Resource.Error("Unable to update personnel \nPersonnel with provided names already exists"))
                     } else {
                         appDatabase.personnelDao.updatePersonnel(personnel)
-                        val updatedPersonnelIdsJson = UpdateEntityMarkers(context).getUpdatedPersonnelId.first().toNotNull()
+                        val addedPersonnelIdsJson = AdditionEntityMarkers(context).getAddedPersonnelIds.first().toNotNull()
+                        val addedPersonnelIds = addedPersonnelIdsJson.toUniqueIds().plus(UniqueId(personnel.uniquePersonnelId)).toSet().toList()
+                        AdditionEntityMarkers(context).saveAddedPersonnelIds(addedPersonnelIds.toUniqueIdsJson())
+
+                        val updatedPersonnelIdsJson = ChangesEntityMarkers(context).getChangedPersonnelIds.first().toNotNull()
                         val updatedPersonnelIds = updatedPersonnelIdsJson.toUniqueIds().plus(UniqueId(personnel.uniquePersonnelId)).toSet().toList()
-                        UpdateEntityMarkers(context).saveUpdatedPersonnelIds(updatedPersonnelIds.toUniqueIdsJson())
+                        ChangesEntityMarkers(context).saveChangedPersonnelIds(updatedPersonnelIds.toUniqueIdsJson())
                         emit(Resource.Success("Personnel successfully updated"))
                     }
                 }
@@ -190,9 +204,13 @@ class PersonnelRepositoryImpl(
                             "\nTo delete personnel, you have to delete all the records this personnel is associated with"))
                 }else{
                     appDatabase.personnelDao.deletePersonnel(uniquePersonnelId)
-                    val deletedPersonnelIdsJson = DeleteEntityMarkers(context).getDeletedPersonnelId.first().toNotNull()
-                    val deletedPersonnelIds = deletedPersonnelIdsJson.toUniqueIds().plus(UniqueId(uniquePersonnelId)).toSet().toList()
-                    DeleteEntityMarkers(context).saveDeletedPersonnelIds(deletedPersonnelIds.toUniqueIdsJson())
+                    val addedPersonnelIdsJson = AdditionEntityMarkers(context).getAddedPersonnelIds.first().toNotNull()
+                    val addedPersonnelIds = addedPersonnelIdsJson.toUniqueIds().plus(UniqueId(personnel.uniquePersonnelId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedPersonnelIds(addedPersonnelIds.toUniqueIdsJson())
+
+                    val updatedPersonnelIdsJson = ChangesEntityMarkers(context).getChangedPersonnelIds.first().toNotNull()
+                    val updatedPersonnelIds = updatedPersonnelIdsJson.toUniqueIds().plus(UniqueId(personnel.uniquePersonnelId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedPersonnelIds(updatedPersonnelIds.toUniqueIdsJson())
                     emit(Resource.Success("Personnel successfully deleted"))
                 }
             }
@@ -283,9 +301,14 @@ class PersonnelRepositoryImpl(
                     val updatedPersonnel = personnel.copy(password = "1234")
                     appDatabase.personnelDao.updatePersonnel(updatedPersonnel)
 
-                    val updatedPersonnelIdsJson = UpdateEntityMarkers(context).getUpdatedPersonnelId.first().toNotNull()
+                    val addedPersonnelIdsJson = AdditionEntityMarkers(context).getAddedPersonnelIds.first().toNotNull()
+                    val addedPersonnelIds = addedPersonnelIdsJson.toUniqueIds().plus(UniqueId(personnel.uniquePersonnelId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedPersonnelIds(addedPersonnelIds.toUniqueIdsJson())
+
+                    val updatedPersonnelIdsJson = ChangesEntityMarkers(context).getChangedPersonnelIds.first().toNotNull()
                     val updatedPersonnelIds = updatedPersonnelIdsJson.toUniqueIds().plus(UniqueId(personnel.uniquePersonnelId)).toSet().toList()
-                    UpdateEntityMarkers(context).saveUpdatedPersonnelIds(updatedPersonnelIds.toUniqueIdsJson())
+                    ChangesEntityMarkers(context).saveChangedPersonnelIds(updatedPersonnelIds.toUniqueIdsJson())
+
                     emit(Resource.Success("Password successfully changed to 1234"))
                 }
             }

@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.example.myshopmanagerapp.core.Constants.UpdateEntityMarkers
+import com.example.myshopmanagerapp.core.Constants.ChangesEntityMarkers
 import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.FormRelatedString.UniqueBankAccountId
 import com.example.myshopmanagerapp.core.FormRelatedString.UniqueCashInId
@@ -27,10 +27,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 
-class UpdateEntityMarkers(private val context: Context) {
+class ChangesEntityMarkers(private val context: Context) {
     // to make sure there's only one instance
     companion object {
-        private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(UpdateEntityMarkers)
+        private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(ChangesEntityMarkers)
         val UNIQUE_CUSTOMER_ID = stringPreferencesKey(UniqueCustomerId)
         val UNIQUE_BANK_ACCOUNT_ID = stringPreferencesKey(UniqueBankAccountId)
         val UNIQUE_CASH_IN_ID = stringPreferencesKey(UniqueCashInId)
@@ -51,147 +51,147 @@ class UpdateEntityMarkers(private val context: Context) {
 
 
 
-    //get Updated Customer
-    val getUpdatedCustomerId: Flow<String?> = context.dataStore.data
+    //get Changed Customer
+    val getChangedCustomerIds: Flow<String?> = context.dataStore.data
         .map { preferences -> preferences[UNIQUE_CUSTOMER_ID] ?: emptyString }
 
-    //save Updated Customer Ids
-    suspend fun saveUpdatedCustomerIds(value: String) {
+    //save Changed Customer Ids
+    suspend fun saveChangedCustomerIds(value: String) {
         context.dataStore.edit { preferences -> preferences[UNIQUE_CUSTOMER_ID] = value }
     }
 
-    //get Updated Bank Account
-    val getUpdatedBankAccountId: Flow<String?> = context.dataStore.data
+    //get Changed Bank Account
+    val getChangedBankAccountIds: Flow<String?> = context.dataStore.data
         .map { preferences -> preferences[UNIQUE_BANK_ACCOUNT_ID] ?: emptyString }
 
-    //save Updated Bank Account Ids
-    suspend fun saveUpdatedBankAccountIds(value: String) {
+    //save Changed Bank Account Ids
+    suspend fun saveChangedBankAccountIds(value: String) {
         context.dataStore.edit { preferences -> preferences[UNIQUE_BANK_ACCOUNT_ID] = value }
     }
 
-    //get Updated Cash In
-    val getUpdatedCashInId: Flow<String?> = context.dataStore.data
+    //get Changed Cash In
+    val getChangedCashInIds: Flow<String?> = context.dataStore.data
         .map { preferences -> preferences[UNIQUE_CASH_IN_ID] ?: emptyString }
 
-    //save Updated Cash In Ids
-    suspend fun saveUpdatedCashInIds(value: String) {
+    //save Changed Cash In Ids
+    suspend fun saveChangedCashInIds(value: String) {
         context.dataStore.edit { preferences -> preferences[UNIQUE_CASH_IN_ID] = value }
     }
 
-    //get Updated Debt
-    val getUpdatedDebtId: Flow<String?> = context.dataStore.data
+    //get Changed Debt
+    val getChangedDebtIds: Flow<String?> = context.dataStore.data
         .map { preferences -> preferences[UNIQUE_DEBT_ID] ?: emptyString }
 
-    //save Updated Debt Ids
-    suspend fun saveUpdatedDebtIds(value: String) {
+    //save Changed Debt Ids
+    suspend fun saveChangedDebtIds(value: String) {
         context.dataStore.edit { preferences -> preferences[UNIQUE_DEBT_ID] = value }
     }
 
-    //get Updated Debt Repayment
-    val getUpdatedDebtRepaymentId: Flow<String?> = context.dataStore.data
+    //get Changed Debt Repayment
+    val getChangedDebtRepaymentIds: Flow<String?> = context.dataStore.data
         .map { preferences -> preferences[UNIQUE_DEBT_REPAYMENT_ID] ?: emptyString }
 
-    //save Updated Debt Repayment Ids
-    suspend fun saveUpdatedDebtRepaymentIds(value: String) {
+    //save Changed Debt Repayment Ids
+    suspend fun saveChangedDebtRepaymentIds(value: String) {
         context.dataStore.edit { preferences -> preferences[UNIQUE_DEBT_REPAYMENT_ID] = value }
     }
 
-    //get Updated Expense
-    val getUpdatedExpenseId: Flow<String?> = context.dataStore.data
+    //get Changed Expense
+    val getChangedExpenseIds: Flow<String?> = context.dataStore.data
         .map { preferences -> preferences[UNIQUE_EXPENSE_ID] ?: emptyString }
 
-    //save Updated Expense Ids
-    suspend fun saveUpdatedExpenseIds(value: String) {
+    //save Changed Expense Ids
+    suspend fun saveChangedExpenseIds(value: String) {
         context.dataStore.edit { preferences -> preferences[UNIQUE_EXPENSE_ID] = value }
     }
 
-    //get Updated Inventory
-    val getUpdatedInventoryId: Flow<String?> = context.dataStore.data
+    //get Changed Inventory
+    val getChangedInventoryIds: Flow<String?> = context.dataStore.data
         .map { preferences -> preferences[UNIQUE_INVENTORY_ID] ?: emptyString }
 
-    //save Updated Inventory Ids
-    suspend fun saveUpdatedInventoryIds(value: String) {
+    //save Changed Inventory Ids
+    suspend fun saveChangedInventoryIds(value: String) {
         context.dataStore.edit { preferences -> preferences[UNIQUE_INVENTORY_ID] = value }
     }
 
-    //get Updated Personnel
-    val getUpdatedPersonnelId: Flow<String?> = context.dataStore.data
+    //get Changed Personnel
+    val getChangedPersonnelIds: Flow<String?> = context.dataStore.data
         .map { preferences -> preferences[UNIQUE_PERSONNEL_ID] ?: emptyString }
 
-    //save Updated Personnel Ids
-    suspend fun saveUpdatedPersonnelIds(value: String) {
+    //save Changed Personnel Ids
+    suspend fun saveChangedPersonnelIds(value: String) {
         context.dataStore.edit { preferences -> preferences[UNIQUE_PERSONNEL_ID] = value }
     }
 
-    //get Updated Receipt
-    val getUpdatedReceiptId: Flow<String?> = context.dataStore.data
+    //get Changed Receipt
+    val getChangedReceiptIds: Flow<String?> = context.dataStore.data
         .map { preferences -> preferences[UNIQUE_RECEIPT_ID] ?: emptyString }
 
-    //save Updated Receipt Ids
-    suspend fun saveUpdatedReceiptIds(value: String) {
+    //save Changed Receipt Ids
+    suspend fun saveChangedReceiptIds(value: String) {
         context.dataStore.edit { preferences -> preferences[UNIQUE_RECEIPT_ID] = value }
     }
 
-    //get Updated Revenue
-    val getUpdatedRevenueId: Flow<String?> = context.dataStore.data
+    //get Changed Revenue
+    val getChangedRevenueIds: Flow<String?> = context.dataStore.data
         .map { preferences -> preferences[UNIQUE_REVENUE_ID] ?: emptyString }
 
-    //save Updated Revenue Ids
-    suspend fun saveUpdatedRevenueIds(value: String) {
+    //save Changed Revenue Ids
+    suspend fun saveChangedRevenueIds(value: String) {
         context.dataStore.edit { preferences -> preferences[UNIQUE_REVENUE_ID] = value }
     }
 
-    //get Updated Savings
-    val getUpdatedSavingsId: Flow<String?> = context.dataStore.data
+    //get Changed Savings
+    val getChangedSavingsIds: Flow<String?> = context.dataStore.data
         .map { preferences -> preferences[UNIQUE_SAVINGS_ID] ?: emptyString }
 
-    //save Updated Savings Ids
-    suspend fun saveUpdatedSavingsIds(value: String) {
+    //save Changed Savings Ids
+    suspend fun saveChangedSavingsIds(value: String) {
         context.dataStore.edit { preferences -> preferences[UNIQUE_SAVINGS_ID] = value }
     }
 
-    //get Updated Stock
-    val getUpdatedStockId: Flow<String?> = context.dataStore.data
+    //get Changed Stock
+    val getChangedStockIds: Flow<String?> = context.dataStore.data
         .map { preferences -> preferences[UNIQUE_STOCK_ID] ?: emptyString }
 
-    //save Updated Stock Ids
-    suspend fun saveUpdatedStockIds(value: String) {
+    //save Changed Stock Ids
+    suspend fun saveChangedStockIds(value: String) {
         context.dataStore.edit { preferences -> preferences[UNIQUE_STOCK_ID] = value }
     }
 
-    //get Updated Withdrawal
-    val getUpdatedWithdrawalId: Flow<String?> = context.dataStore.data
+    //get Changed Withdrawal
+    val getChangedWithdrawalIds: Flow<String?> = context.dataStore.data
         .map { preferences -> preferences[UNIQUE_WITHDRAWAL_ID] ?: emptyString }
 
-    //save Updated Withdrawal Ids
-    suspend fun saveUpdatedWithdrawalIds(value: String) {
+    //save Changed Withdrawal Ids
+    suspend fun saveChangedWithdrawalIds(value: String) {
         context.dataStore.edit { preferences -> preferences[UNIQUE_WITHDRAWAL_ID] = value }
     }
 
-    //get Updated Supplier
-    val getUpdatedSupplierId: Flow<String?> = context.dataStore.data
+    //get Changed Supplier
+    val getChangedSupplierIds: Flow<String?> = context.dataStore.data
         .map { preferences -> preferences[UNIQUE_SUPPLIER_ID] ?: emptyString }
 
-    //save Updated Supplier Ids
-    suspend fun saveUpdatedSupplierIds(value: String) {
+    //save Changed Supplier Ids
+    suspend fun saveChangedSupplierIds(value: String) {
         context.dataStore.edit { preferences -> preferences[UNIQUE_SUPPLIER_ID] = value }
     }
 
-    //get Updated Inventory Stock
-    val getUpdatedInventoryStockId: Flow<String?> = context.dataStore.data
+    //get Changed Inventory Stock
+    val getChangedInventoryStockIds: Flow<String?> = context.dataStore.data
         .map { preferences -> preferences[UNIQUE_INVENTORY_STOCK_ID] ?: emptyString }
 
-    //save Updated Inventory Stock Ids
-    suspend fun saveUpdatedInventoryStockIds(value: String) {
+    //save Changed Inventory Stock Ids
+    suspend fun saveChangedInventoryStockIds(value: String) {
         context.dataStore.edit { preferences -> preferences[UNIQUE_INVENTORY_STOCK_ID] = value }
     }
 
-    //get Updated Inventory Item
-    val getUpdatedInventoryItemId: Flow<String?> = context.dataStore.data
+    //get Changed Inventory Item
+    val getChangedInventoryItemIds: Flow<String?> = context.dataStore.data
         .map { preferences -> preferences[UNIQUE_INVENTORY_ITEM_ID] ?: emptyString }
 
-    //save Updated Inventory Item Ids
-    suspend fun saveUpdatedInventoryItemIds(value: String) {
+    //save Changed Inventory Item Ids
+    suspend fun saveChangedInventoryItemIds(value: String) {
         context.dataStore.edit { preferences -> preferences[UNIQUE_INVENTORY_ITEM_ID] = value }
     }
 

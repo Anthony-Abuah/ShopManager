@@ -77,6 +77,9 @@ class InventoryItemRepositoryImpl(
                         sellingPrices = listOf(Price(Date().time, Unit, inventoryItem.currentSellingPrice.toNotNull())),
                         quantityCategorizations = categorizations)
                     )
+                    val addedInventoryItemIdsJson = AdditionEntityMarkers(context).getAddedInventoryItemIds.first().toNotNull()
+                    val addedInventoryItemIds = addedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(inventoryItem.uniqueInventoryItemId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedInventoryItemIds(addedInventoryItemIds.toUniqueIdsJson())
                     emit(Resource.Success("${inventoryItem.inventoryItemName} successfully added"))
                 }
             }
@@ -124,9 +127,14 @@ class InventoryItemRepositoryImpl(
                         inventoryItemName = inventoryItem.inventoryItemName.trim(),
                         quantityCategorizations = categorizations)
                     )
-                    val updatedInventoryItemIdsJson = UpdateEntityMarkers(context).getUpdatedInventoryItemId.first().toNotNull()
+
+                    val addedInventoryItemIdsJson = AdditionEntityMarkers(context).getAddedInventoryItemIds.first().toNotNull()
+                    val addedInventoryItemIds = addedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(inventoryItem.uniqueInventoryItemId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedInventoryItemIds(addedInventoryItemIds.toUniqueIdsJson())
+
+                    val updatedInventoryItemIdsJson = ChangesEntityMarkers(context).getChangedInventoryItemIds.first().toNotNull()
                     val updatedInventoryItemIds = updatedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(inventoryItem.uniqueInventoryItemId)).toSet().toList()
-                    UpdateEntityMarkers(context).saveUpdatedInventoryItemIds(updatedInventoryItemIds.toUniqueIdsJson())
+                    ChangesEntityMarkers(context).saveChangedInventoryItemIds(updatedInventoryItemIds.toUniqueIdsJson())
                     emit(Resource.Success("${inventoryItem.inventoryItemName} successfully updated"))
                 }
             }
@@ -178,9 +186,13 @@ class InventoryItemRepositoryImpl(
                 }
                 else ->{
                     appDatabase.inventoryItemDao.deleteInventoryItem(uniqueInventoryItemId)
-                    val deletedInventoryItemIdsJson = DeleteEntityMarkers(context).getDeletedInventoryItemId.first().toNotNull()
+                    val addedInventoryItemIdsJson = AdditionEntityMarkers(context).getAddedInventoryItemIds.first().toNotNull()
+                    val addedInventoryItemIds = addedInventoryItemIdsJson.toUniqueIds().filter{it.uniqueId != uniqueInventoryItemId}.toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedInventoryItemIds(addedInventoryItemIds.toUniqueIdsJson())
+
+                    val deletedInventoryItemIdsJson = ChangesEntityMarkers(context).getChangedInventoryItemIds.first().toNotNull()
                     val deletedInventoryItemIds = deletedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(uniqueInventoryItemId)).toSet().toList()
-                    DeleteEntityMarkers(context).saveDeletedInventoryItemIds(deletedInventoryItemIds.toUniqueIdsJson())
+                    ChangesEntityMarkers(context).saveChangedInventoryItemIds(deletedInventoryItemIds.toUniqueIdsJson())
                     emit(Resource.Success("Item successfully deleted"))
                 }
             }

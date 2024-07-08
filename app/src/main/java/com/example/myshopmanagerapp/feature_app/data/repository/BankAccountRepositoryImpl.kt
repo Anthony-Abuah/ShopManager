@@ -21,7 +21,7 @@ class BankAccountRepositoryImpl(
         emit(Resource.Loading())
         val allBanks: List<BankAccountEntity>?
         try {
-            allBanks = appDatabase.bankAccountDao.getAllBanks()?.sortedBy { it.bankAccountName }
+            allBanks = appDatabase.bankAccountDao.getAllBankAccounts()?.sortedBy { it.bankAccountName }
             emit(Resource.Success(allBanks))
         }catch (e: Exception){
             emit(Resource.Error(
@@ -62,6 +62,9 @@ class BankAccountRepositoryImpl(
                 }
                 else -> {
                     appDatabase.bankAccountDao.addBank(bankAccount)
+                    val addedBankAccountIdsJson = AdditionEntityMarkers(context).getAddedBankAccountIds.first().toNotNull()
+                    val addedBankAccountIds = addedBankAccountIdsJson.toUniqueIds().plus(UniqueId(bankAccount.uniqueBankAccountId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedBankAccountIds(addedBankAccountIds.toUniqueIdsJson())
                     emit(Resource.Success("${bankAccount.bankAccountName} has been successfully added"))
                 }
             }
@@ -74,7 +77,7 @@ class BankAccountRepositoryImpl(
 
     override suspend fun addBankAccounts(bankAccounts: BankAccountEntities) {
         try {
-            val allBankAccounts = appDatabase.bankAccountDao.getAllBanks() ?: emptyList()
+            val allBankAccounts = appDatabase.bankAccountDao.getAllBankAccounts() ?: emptyList()
             val allUniqueBankAccountIds = allBankAccounts.map { it.uniqueBankAccountId }
             val newBankAccounts = bankAccounts.filter { !allUniqueBankAccountIds.contains(it.uniqueBankAccountId) }
             appDatabase.bankAccountDao.addBankAccounts(newBankAccounts)
@@ -116,9 +119,13 @@ class BankAccountRepositoryImpl(
                 }
                 else -> {
                     appDatabase.bankAccountDao.updateBank(bankAccount)
-                    val updatedBankAccountIdsJson = UpdateEntityMarkers(context).getUpdatedBankAccountId.first().toNotNull()
-                    val updatedBankAccountIds = updatedBankAccountIdsJson.toUniqueIds().plus(UniqueId(bankAccount.uniqueBankAccountId))
-                    UpdateEntityMarkers(context).saveUpdatedBankAccountIds(updatedBankAccountIds.toUniqueIdsJson())
+                    val addedBankAccountIdsJson = AdditionEntityMarkers(context).getAddedBankAccountIds.first().toNotNull()
+                    val addedBankAccountIds = addedBankAccountIdsJson.toUniqueIds().plus(UniqueId(bankAccount.uniqueBankAccountId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedBankAccountIds(addedBankAccountIds.toUniqueIdsJson())
+
+                    val updatedBankAccountIdsJson = ChangesEntityMarkers(context).getChangedBankAccountIds.first().toNotNull()
+                    val updatedBankAccountIds = updatedBankAccountIdsJson.toUniqueIds().plus(UniqueId(bankAccount.uniqueBankAccountId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedBankAccountIds(updatedBankAccountIds.toUniqueIdsJson())
                     emit(Resource.Success("${bankAccount.bankAccountName} has been successfully updated"))
                 }
             }
@@ -169,9 +176,13 @@ class BankAccountRepositoryImpl(
                 }
                 else -> {
                     appDatabase.bankAccountDao.deleteBank(bankAccount.uniqueBankAccountId)
-                    val deletedBankAccountIdsJson = DeleteEntityMarkers(context).getDeletedBankAccountId.first().toNotNull()
-                    val deletedBankAccountIds = deletedBankAccountIdsJson.toUniqueIds().plus(UniqueId(uniqueBankAccountId))
-                    DeleteEntityMarkers(context).saveDeletedBankAccountIds(deletedBankAccountIds.toUniqueIdsJson())
+                    val addedBankAccountIdsJson = AdditionEntityMarkers(context).getAddedBankAccountIds.first().toNotNull()
+                    val addedBankAccountIds = addedBankAccountIdsJson.toUniqueIds().filter{it.uniqueId != uniqueBankAccountId}.toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedBankAccountIds(addedBankAccountIds.toUniqueIdsJson())
+
+                    val deletedBankAccountIdsJson = ChangesEntityMarkers(context).getChangedBankAccountIds.first().toNotNull()
+                    val deletedBankAccountIds = deletedBankAccountIdsJson.toUniqueIds().plus(UniqueId(uniqueBankAccountId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedBankAccountIds(deletedBankAccountIds.toUniqueIdsJson())
                     emit(Resource.Success("${bankAccount.bankAccountName} has been successfully deleted"))
                 }
             }

@@ -94,8 +94,8 @@ class InventoryViewModel @Inject constructor(
     val eventFlow = _eventFlow.asSharedFlow()
 
 
-    fun generateInventoryListPDF(context: Context, date: String, inventories: List<InventoryQuantityDisplayValues>,) = viewModelScope.launch {
-        generatePDFRepository.generateInventoryList(context, date, inventories).onEach { response->
+    fun generateInventoryListPDF(context: Context, date: String, inventories: List<InventoryQuantityDisplayValues>) = viewModelScope.launch {
+        inventoryRepository.generateInventoryList(context, date, inventories).onEach { response->
             when(response){
                 is Resource.Success ->{
                     _generateInventoryListState.value = generateInventoryListState.value.copy(

@@ -87,6 +87,19 @@ class WithdrawalRepositoryImpl(
                     val accountBalance = bankAccount.accountBalance ?: 0.0
                     val totalSavingsAmount = accountBalance.minus(withdrawal.withdrawalAmount)
                     appDatabase.withdrawalDao.insertWithdrawal(withdrawal.copy(uniquePersonnelId = uniquePersonnelId), bankAccount.uniqueBankAccountId, totalSavingsAmount)
+
+                    val addedWithdrawalIdsJson = AdditionEntityMarkers(context).getAddedWithdrawalIds.first().toNotNull()
+                    val addedWithdrawalIds = addedWithdrawalIdsJson.toUniqueIds().plus(UniqueId(withdrawal.uniqueWithdrawalId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedWithdrawalIds(addedWithdrawalIds.toUniqueIdsJson())
+
+                    val addedBankAccountIdsJson = AdditionEntityMarkers(context).getAddedBankAccountIds.first().toNotNull()
+                    val addedBankAccountIds = addedBankAccountIdsJson.toUniqueIds().plus(UniqueId(bankAccount.uniqueBankAccountId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedBankAccountIds(addedBankAccountIds.toUniqueIdsJson())
+
+                    val updatedBankAccountIdsJson = ChangesEntityMarkers(context).getChangedBankAccountIds.first().toNotNull()
+                    val updatedBankAccountIds = updatedBankAccountIdsJson.toUniqueIds().plus(UniqueId(bankAccount.uniqueBankAccountId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedBankAccountIds(updatedBankAccountIds.toUniqueIdsJson())
+
                     emit(Resource.Success("Withdrawal successfully added"))
                 }
             }
@@ -158,13 +171,22 @@ class WithdrawalRepositoryImpl(
                         bankAccount.uniqueBankAccountId,
                         totalSavingsAmount
                     )
-                    val updatedWithdrawalIdsJson = UpdateEntityMarkers(context).getUpdatedWithdrawalId.first().toNotNull()
-                    val updatedWithdrawalIds = updatedWithdrawalIdsJson.toUniqueIds().plus(UniqueId(withdrawal.uniqueWithdrawalId)).toSet().toList()
-                    UpdateEntityMarkers(context).saveUpdatedWithdrawalIds(updatedWithdrawalIds.toUniqueIdsJson())
 
-                    val updatedBankAccountIdsJson = UpdateEntityMarkers(context).getUpdatedBankAccountId.first().toNotNull()
+                    val addedWithdrawalIdsJson = AdditionEntityMarkers(context).getAddedWithdrawalIds.first().toNotNull()
+                    val addedWithdrawalIds = addedWithdrawalIdsJson.toUniqueIds().plus(UniqueId(withdrawal.uniqueWithdrawalId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedWithdrawalIds(addedWithdrawalIds.toUniqueIdsJson())
+
+                    val updatedWithdrawalIdsJson = ChangesEntityMarkers(context).getChangedWithdrawalIds.first().toNotNull()
+                    val updatedWithdrawalIds = updatedWithdrawalIdsJson.toUniqueIds().plus(UniqueId(withdrawal.uniqueWithdrawalId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedWithdrawalIds(updatedWithdrawalIds.toUniqueIdsJson())
+
+                    val addedBankAccountIdsJson = AdditionEntityMarkers(context).getAddedBankAccountIds.first().toNotNull()
+                    val addedBankAccountIds = addedBankAccountIdsJson.toUniqueIds().plus(UniqueId(bankAccount.uniqueBankAccountId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedBankAccountIds(addedBankAccountIds.toUniqueIdsJson())
+
+                    val updatedBankAccountIdsJson = ChangesEntityMarkers(context).getChangedBankAccountIds.first().toNotNull()
                     val updatedBankAccountIds = updatedBankAccountIdsJson.toUniqueIds().plus(UniqueId(bankAccount.uniqueBankAccountId)).toSet().toList()
-                    UpdateEntityMarkers(context).saveUpdatedBankAccountIds(updatedBankAccountIds.toUniqueIdsJson())
+                    ChangesEntityMarkers(context).saveChangedBankAccountIds(updatedBankAccountIds.toUniqueIdsJson())
 
                     emit(Resource.Success("Withdrawal successfully updated"))
                 }
@@ -222,13 +244,22 @@ class WithdrawalRepositoryImpl(
                         bankAccount.uniqueBankAccountId,
                         totalSavingsAmount
                     )
-                    val deletedWithdrawalIdsJson = DeleteEntityMarkers(context).getDeletedWithdrawalId.first().toNotNull()
-                    val deletedWithdrawalIds = deletedWithdrawalIdsJson.toUniqueIds().plus(UniqueId(uniqueWithdrawalId)).toSet().toList()
-                    DeleteEntityMarkers(context).saveDeletedWithdrawalIds(deletedWithdrawalIds.toUniqueIdsJson())
 
-                    val updatedBankAccountIdsJson = UpdateEntityMarkers(context).getUpdatedBankAccountId.first().toNotNull()
+                    val addedWithdrawalIdsJson = AdditionEntityMarkers(context).getAddedWithdrawalIds.first().toNotNull()
+                    val addedWithdrawalIds = addedWithdrawalIdsJson.toUniqueIds().filter { it.uniqueId != uniqueWithdrawalId }.toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedWithdrawalIds(addedWithdrawalIds.toUniqueIdsJson())
+
+                    val deletedWithdrawalIdsJson = ChangesEntityMarkers(context).getChangedWithdrawalIds.first().toNotNull()
+                    val deletedWithdrawalIds = deletedWithdrawalIdsJson.toUniqueIds().plus(UniqueId(withdrawal.uniqueWithdrawalId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedWithdrawalIds(deletedWithdrawalIds.toUniqueIdsJson())
+
+                    val addedBankAccountIdsJson = AdditionEntityMarkers(context).getAddedBankAccountIds.first().toNotNull()
+                    val addedBankAccountIds = addedBankAccountIdsJson.toUniqueIds().plus(UniqueId(bankAccount.uniqueBankAccountId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedBankAccountIds(addedBankAccountIds.toUniqueIdsJson())
+
+                    val updatedBankAccountIdsJson = ChangesEntityMarkers(context).getChangedBankAccountIds.first().toNotNull()
                     val updatedBankAccountIds = updatedBankAccountIdsJson.toUniqueIds().plus(UniqueId(bankAccount.uniqueBankAccountId)).toSet().toList()
-                    UpdateEntityMarkers(context).saveUpdatedBankAccountIds(updatedBankAccountIds.toUniqueIdsJson())
+                    ChangesEntityMarkers(context).saveChangedBankAccountIds(updatedBankAccountIds.toUniqueIdsJson())
 
                     emit(Resource.Success("Withdrawal successfully deleted"))
                 }

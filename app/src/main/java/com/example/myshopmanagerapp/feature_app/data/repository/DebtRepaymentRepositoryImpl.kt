@@ -19,7 +19,6 @@ import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
 import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIdsJson
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
-import com.example.myshopmanagerapp.feature_app.data.local.entities.customers.CustomerEntity
 import com.example.myshopmanagerapp.feature_app.data.local.entities.debt_repayment.DebtRepaymentEntity
 import com.example.myshopmanagerapp.feature_app.domain.model.UniqueId
 import com.example.myshopmanagerapp.feature_app.domain.repository.DebtRepaymentRepository
@@ -106,17 +105,21 @@ class DebtRepaymentRepositoryImpl(
                 }
                 else -> {
                     val customerDebt = outstandingDebt.minus(debtRepayment.debtRepaymentAmount)
-                    val updatedCustomer = CustomerEntity(
-                        customer.customerId,
-                        uniqueCustomerId = customer.uniqueCustomerId,
-                        customerName = customer.customerName,
-                        customerContact = customer.customerContact,
-                        customerLocation = customer.customerLocation,
-                        customerPhoto = customer.customerPhoto,
-                        otherInfo = customer.otherInfo,
-                        debtAmount = customerDebt,
-                    )
+                    val updatedCustomer = customer.copy(debtAmount = customerDebt)
                     appDatabase.debtRepaymentDao.insertDebtRepayment(debtRepayment.copy(uniquePersonnelId = uniquePersonnelId), updatedCustomer)
+
+                    val addedDebtRepaymentIdsJson = AdditionEntityMarkers(context).getAddedDebtRepaymentIds.first().toNotNull()
+                    val addedDebtRepaymentIds = addedDebtRepaymentIdsJson.toUniqueIds().plus(UniqueId(debtRepayment.uniqueDebtRepaymentId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedDebtRepaymentIds(addedDebtRepaymentIds.toUniqueIdsJson())
+
+                    val addedCustomerIdsJson = AdditionEntityMarkers(context).getAddedCustomerIds.first().toNotNull()
+                    val addedCustomerIds = addedCustomerIdsJson.toUniqueIds().plus(UniqueId(customer.uniqueCustomerId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedCustomerIds(addedCustomerIds.toUniqueIdsJson())
+
+                    val updatedCustomerIdsJson = ChangesEntityMarkers(context).getChangedCustomerIds.first().toNotNull()
+                    val updatedCustomerIds = updatedCustomerIdsJson.toUniqueIds().plus(UniqueId(customer.uniqueCustomerId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedCustomerIds(updatedCustomerIds.toUniqueIdsJson())
+
                     emit(Resource.Success("Debt repayment added successfully"))
                 }
             }
@@ -205,13 +208,21 @@ class DebtRepaymentRepositoryImpl(
                     val updatedCustomer = customer.copy(debtAmount = customerDebt)
                     appDatabase.debtRepaymentDao.updateDebtRepayment(debtRepayment.copy(uniquePersonnelId = uniquePersonnelId), updatedCustomer)
 
-                    val updatedDebtRepaymentIdsJson = UpdateEntityMarkers(context).getUpdatedDebtRepaymentId.first().toNotNull()
-                    val updatedDebtRepaymentIds = updatedDebtRepaymentIdsJson.toUniqueIds().plus(UniqueId(debtRepayment.uniqueDebtRepaymentId)).toSet().toList()
-                    UpdateEntityMarkers(context).saveUpdatedDebtRepaymentIds(updatedDebtRepaymentIds.toUniqueIdsJson())
+                    val addedDebtRepaymentIdsJson = AdditionEntityMarkers(context).getAddedDebtRepaymentIds.first().toNotNull()
+                    val addedDebtRepaymentIds = addedDebtRepaymentIdsJson.toUniqueIds().plus(UniqueId(debtRepayment.uniqueDebtRepaymentId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedDebtRepaymentIds(addedDebtRepaymentIds.toUniqueIdsJson())
 
-                    val updatedCustomerIdsJson = UpdateEntityMarkers(context).getUpdatedCustomerId.first().toNotNull()
+                    val updatedDebtRepaymentIdsJson = ChangesEntityMarkers(context).getChangedDebtRepaymentIds.first().toNotNull()
+                    val updatedDebtRepaymentIds = updatedDebtRepaymentIdsJson.toUniqueIds().plus(UniqueId(debtRepayment.uniqueDebtRepaymentId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedDebtRepaymentIds(updatedDebtRepaymentIds.toUniqueIdsJson())
+
+                    val addedCustomerIdsJson = AdditionEntityMarkers(context).getAddedCustomerIds.first().toNotNull()
+                    val addedCustomerIds = addedCustomerIdsJson.toUniqueIds().plus(UniqueId(customer.uniqueCustomerId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedCustomerIds(addedCustomerIds.toUniqueIdsJson())
+
+                    val updatedCustomerIdsJson = ChangesEntityMarkers(context).getChangedCustomerIds.first().toNotNull()
                     val updatedCustomerIds = updatedCustomerIdsJson.toUniqueIds().plus(UniqueId(customer.uniqueCustomerId)).toSet().toList()
-                    UpdateEntityMarkers(context).saveUpdatedCustomerIds(updatedCustomerIds.toUniqueIdsJson())
+                    ChangesEntityMarkers(context).saveChangedCustomerIds(updatedCustomerIds.toUniqueIdsJson())
 
                     emit(Resource.Success("Debt repayment updated successfully"))
                 }
@@ -272,13 +283,21 @@ class DebtRepaymentRepositoryImpl(
                     val updatedCustomer = customer.copy(debtAmount = outstandingDebt)
                     appDatabase.debtRepaymentDao.deleteDebtRepayment(uniqueDebtRepaymentId, updatedCustomer)
 
-                    val deletedDebtRepaymentIdsJson = DeleteEntityMarkers(context).getDeletedDebtRepaymentId.first().toNotNull()
-                    val deletedDebtRepaymentIds = deletedDebtRepaymentIdsJson.toUniqueIds().plus(UniqueId(uniqueDebtRepaymentId)).toSet().toList()
-                    DeleteEntityMarkers(context).saveDeletedDebtRepaymentIds(deletedDebtRepaymentIds.toUniqueIdsJson())
+                    val addedDebtRepaymentIdsJson = AdditionEntityMarkers(context).getAddedDebtRepaymentIds.first().toNotNull()
+                    val addedDebtRepaymentIds = addedDebtRepaymentIdsJson.toUniqueIds().filter { it.uniqueId != uniqueDebtRepaymentId }.toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedDebtRepaymentIds(addedDebtRepaymentIds.toUniqueIdsJson())
 
-                    val updatedCustomerIdsJson = UpdateEntityMarkers(context).getUpdatedCustomerId.first().toNotNull()
-                    val updatedCustomerIds = updatedCustomerIdsJson.toUniqueIds().plus(UniqueId(uniqueCustomerId)).toSet().toList()
-                    UpdateEntityMarkers(context).saveUpdatedCustomerIds(updatedCustomerIds.toUniqueIdsJson())
+                    val deletedDebtRepaymentIdsJson = ChangesEntityMarkers(context).getChangedDebtRepaymentIds.first().toNotNull()
+                    val deletedDebtRepaymentIds = deletedDebtRepaymentIdsJson.toUniqueIds().plus(UniqueId(debtRepayment.uniqueDebtRepaymentId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedDebtRepaymentIds(deletedDebtRepaymentIds.toUniqueIdsJson())
+
+                    val addedCustomerIdsJson = AdditionEntityMarkers(context).getAddedCustomerIds.first().toNotNull()
+                    val addedCustomerIds = addedCustomerIdsJson.toUniqueIds().plus(UniqueId(customer.uniqueCustomerId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedCustomerIds(addedCustomerIds.toUniqueIdsJson())
+
+                    val updatedCustomerIdsJson = ChangesEntityMarkers(context).getChangedCustomerIds.first().toNotNull()
+                    val updatedCustomerIds = updatedCustomerIdsJson.toUniqueIds().plus(UniqueId(customer.uniqueCustomerId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedCustomerIds(updatedCustomerIds.toUniqueIdsJson())
 
                     emit(Resource.Success("Debt repayment deleted successfully"))
                 }

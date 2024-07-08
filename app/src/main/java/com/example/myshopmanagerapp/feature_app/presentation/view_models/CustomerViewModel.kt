@@ -183,7 +183,7 @@ class CustomerViewModel @Inject constructor(
 
 
     fun generateCustomerListPDF(context: Context, customers: CustomerEntities) = viewModelScope.launch {
-        generatePDFRepository.generateCustomerList(context, customers).onEach { response->
+        customerRepository.generateCustomerList(context, customers).onEach { response->
             when(response){
                 is Resource.Success ->{
                     _generateCustomerListState.value = generateCustomerListState.value.copy(

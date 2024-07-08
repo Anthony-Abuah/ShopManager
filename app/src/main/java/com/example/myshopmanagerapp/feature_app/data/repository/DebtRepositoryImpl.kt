@@ -94,17 +94,21 @@ class DebtRepositoryImpl(
                     val customerDebtRepaymentAmount = customerDebtRepayments.sumOf { it.debtRepaymentAmount }
                     val currentOutstandingDebt = customerDebtAmount.minus(customerDebtRepaymentAmount)
                     val customerDebt = debt.debtAmount.plus(currentOutstandingDebt)
-                    val updatedCustomer = CustomerEntity(
-                        customerId = customer.customerId,
-                        uniqueCustomerId = customer.uniqueCustomerId,
-                        customerName = customer.customerName,
-                        customerContact = customer.customerContact,
-                        customerLocation = customer.customerLocation,
-                        customerPhoto = customer.customerPhoto,
-                        otherInfo = customer.otherInfo,
-                        debtAmount = customerDebt,
-                    )
+                    val updatedCustomer = customer.copy(debtAmount = customerDebt)
                     appDatabase.debtDao.insertDebt(debt.copy(uniquePersonnelId = uniquePersonnelId), updatedCustomer)
+
+                    val addedDebtIdsJson = AdditionEntityMarkers(context).getAddedDebtIds.first().toNotNull()
+                    val addedDebtIds = addedDebtIdsJson.toUniqueIds().plus(UniqueId(debt.uniqueDebtId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedDebtIds(addedDebtIds.toUniqueIdsJson())
+
+                    val addedCustomerIdsJson = AdditionEntityMarkers(context).getAddedCustomerIds.first().toNotNull()
+                    val addedCustomerIds = addedCustomerIdsJson.toUniqueIds().plus(UniqueId(customer.uniqueCustomerId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedCustomerIds(addedCustomerIds.toUniqueIdsJson())
+
+                    val updatedCustomerIdsJson = ChangesEntityMarkers(context).getChangedCustomerIds.first().toNotNull()
+                    val updatedCustomerIds = updatedCustomerIdsJson.toUniqueIds().plus(UniqueId(customer.uniqueCustomerId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedCustomerIds(updatedCustomerIds.toUniqueIdsJson())
+
                     emit(Resource.Success("Debt added successfully"))
                 }
             }
@@ -199,13 +203,21 @@ class DebtRepositoryImpl(
                     val updatedCustomer = customer.copy(debtAmount = customerDebt)
                     appDatabase.debtDao.updateDebt(debt.copy(uniquePersonnelId = uniquePersonnelId), updatedCustomer)
 
-                    val updatedDebtIdsJson = UpdateEntityMarkers(context).getUpdatedDebtId.first().toNotNull()
-                    val updatedDebtIds = updatedDebtIdsJson.toUniqueIds().plus(UniqueId(debt.uniqueDebtId)).toSet().toList()
-                    UpdateEntityMarkers(context).saveUpdatedDebtIds(updatedDebtIds.toUniqueIdsJson())
+                    val addedDebtIdsJson = AdditionEntityMarkers(context).getAddedDebtIds.first().toNotNull()
+                    val addedDebtIds = addedDebtIdsJson.toUniqueIds().plus(UniqueId(debt.uniqueDebtId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedDebtIds(addedDebtIds.toUniqueIdsJson())
 
-                    val updatedCustomerIdsJson = UpdateEntityMarkers(context).getUpdatedCustomerId.first().toNotNull()
+                    val updatedDebtIdsJson = ChangesEntityMarkers(context).getChangedDebtIds.first().toNotNull()
+                    val updatedDebtIds = updatedDebtIdsJson.toUniqueIds().plus(UniqueId(debt.uniqueDebtId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedDebtIds(updatedDebtIds.toUniqueIdsJson())
+
+                    val addedCustomerIdsJson = AdditionEntityMarkers(context).getAddedCustomerIds.first().toNotNull()
+                    val addedCustomerIds = addedCustomerIdsJson.toUniqueIds().plus(UniqueId(customer.uniqueCustomerId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedCustomerIds(addedCustomerIds.toUniqueIdsJson())
+
+                    val updatedCustomerIdsJson = ChangesEntityMarkers(context).getChangedCustomerIds.first().toNotNull()
                     val updatedCustomerIds = updatedCustomerIdsJson.toUniqueIds().plus(UniqueId(customer.uniqueCustomerId)).toSet().toList()
-                    UpdateEntityMarkers(context).saveUpdatedCustomerIds(updatedCustomerIds.toUniqueIdsJson())
+                    ChangesEntityMarkers(context).saveChangedCustomerIds(updatedCustomerIds.toUniqueIdsJson())
 
                     emit(Resource.Success("Debt updated successfully"))
                 }
@@ -269,13 +281,21 @@ class DebtRepositoryImpl(
                     val updatedCustomer = customer.copy(debtAmount = customerDebt)
                     appDatabase.debtDao.deleteDebt(debt.uniqueDebtId, updatedCustomer)
 
-                    val deletedDebtIdsJson = DeleteEntityMarkers(context).getDeletedDebtId.first().toNotNull()
-                    val deletedDebtIds = deletedDebtIdsJson.toUniqueIds().plus(UniqueId(uniqueDebtId)).toSet().toList()
-                    DeleteEntityMarkers(context).saveDeletedDebtIds(deletedDebtIds.toUniqueIdsJson())
+                    val addedDebtIdsJson = AdditionEntityMarkers(context).getAddedDebtIds.first().toNotNull()
+                    val addedDebtIds = addedDebtIdsJson.toUniqueIds().filter { it.uniqueId != uniqueDebtId }.toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedDebtIds(addedDebtIds.toUniqueIdsJson())
 
-                    val updatedCustomerIdsJson = UpdateEntityMarkers(context).getUpdatedCustomerId.first().toNotNull()
-                    val updatedCustomerIds = updatedCustomerIdsJson.toUniqueIds().plus(UniqueId(uniqueCustomerId)).toSet().toList()
-                    UpdateEntityMarkers(context).saveUpdatedCustomerIds(updatedCustomerIds.toUniqueIdsJson())
+                    val deletedDebtIdsJson = ChangesEntityMarkers(context).getChangedDebtIds.first().toNotNull()
+                    val deletedDebtIds = deletedDebtIdsJson.toUniqueIds().plus(UniqueId(debt.uniqueDebtId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedDebtIds(deletedDebtIds.toUniqueIdsJson())
+
+                    val addedCustomerIdsJson = AdditionEntityMarkers(context).getAddedCustomerIds.first().toNotNull()
+                    val addedCustomerIds = addedCustomerIdsJson.toUniqueIds().plus(UniqueId(customer.uniqueCustomerId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedCustomerIds(addedCustomerIds.toUniqueIdsJson())
+
+                    val updatedCustomerIdsJson = ChangesEntityMarkers(context).getChangedCustomerIds.first().toNotNull()
+                    val updatedCustomerIds = updatedCustomerIdsJson.toUniqueIds().plus(UniqueId(customer.uniqueCustomerId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedCustomerIds(updatedCustomerIds.toUniqueIdsJson())
 
                     emit(Resource.Success("Debt deleted successfully"))
                 }

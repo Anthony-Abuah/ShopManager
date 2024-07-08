@@ -3,7 +3,7 @@ package com.example.myshopmanagerapp.feature_app.data.remote.dto.bank
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.feature_app.data.local.entities.banks.BankAccountEntity
 
-data class BankInfoDto(
+data class BankAccountInfoDto(
     val uniqueBankAccountId: String,
     val uniqueCompanyId: String,
     val bankAccountName: String?,

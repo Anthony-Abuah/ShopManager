@@ -57,6 +57,9 @@ class SupplierRepositoryImpl(
                 }
                 else -> {
                     appDatabase.supplierDao.addSupplier(supplier)
+                    val addedSupplierIdsJson = AdditionEntityMarkers(context).getAddedSupplierIds.first().toNotNull()
+                    val addedSupplierIds = addedSupplierIdsJson.toUniqueIds().plus(UniqueId(supplier.uniqueSupplierId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedSupplierIds(addedSupplierIds.toUniqueIdsJson())
                     emit(Resource.Success("Supplier add successfully"))
                 }
             }
@@ -112,9 +115,13 @@ class SupplierRepositoryImpl(
                 }
                 else->{
                     appDatabase.supplierDao.updateSupplier(supplier)
-                    val updatedSupplierIdsJson = UpdateEntityMarkers(context).getUpdatedSupplierId.first().toNotNull()
+                    val addedSupplierIdsJson = AdditionEntityMarkers(context).getAddedSupplierIds.first().toNotNull()
+                    val addedSupplierIds = addedSupplierIdsJson.toUniqueIds().plus(UniqueId(supplier.uniqueSupplierId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedSupplierIds(addedSupplierIds.toUniqueIdsJson())
+
+                    val updatedSupplierIdsJson = ChangesEntityMarkers(context).getChangedSupplierIds.first().toNotNull()
                     val updatedSupplierIds = updatedSupplierIdsJson.toUniqueIds().plus(UniqueId(supplier.uniqueSupplierId)).toSet().toList()
-                    UpdateEntityMarkers(context).saveUpdatedSupplierIds(updatedSupplierIds.toUniqueIdsJson())
+                    ChangesEntityMarkers(context).saveChangedSupplierIds(updatedSupplierIds.toUniqueIdsJson())
                     emit(Resource.Success("Supplier updated successfully"))
                 }
             }
@@ -158,9 +165,13 @@ class SupplierRepositoryImpl(
                 }
                 else ->{
                     appDatabase.supplierDao.deleteSupplier(uniqueSupplierId)
-                    val deletedSupplierIdsJson = DeleteEntityMarkers(context).getDeletedSupplierId.first().toNotNull()
+                    val addedSupplierIdsJson = AdditionEntityMarkers(context).getAddedSupplierIds.first().toNotNull()
+                    val addedSupplierIds = addedSupplierIdsJson.toUniqueIds().filter{it.uniqueId != uniqueSupplierId}.toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedSupplierIds(addedSupplierIds.toUniqueIdsJson())
+
+                    val deletedSupplierIdsJson = ChangesEntityMarkers(context).getChangedSupplierIds.first().toNotNull()
                     val deletedSupplierIds = deletedSupplierIdsJson.toUniqueIds().plus(UniqueId(uniqueSupplierId)).toSet().toList()
-                    DeleteEntityMarkers(context).saveDeletedSupplierIds(deletedSupplierIds.toUniqueIdsJson())
+                    ChangesEntityMarkers(context).saveChangedSupplierIds(deletedSupplierIds.toUniqueIdsJson())
                     emit(Resource.Success(
                         "Supplier successfully deleted"
                     ))

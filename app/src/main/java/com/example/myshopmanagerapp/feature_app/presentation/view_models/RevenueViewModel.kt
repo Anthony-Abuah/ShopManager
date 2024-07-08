@@ -32,7 +32,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RevenueViewModel @Inject constructor(
-    private val revenueRepository: RevenueRepository,
+    private val revenueRepository: RevenueRepository
 ): ViewModel() {
 
     private val SALES = "Sales"
@@ -564,11 +564,6 @@ class RevenueViewModel @Inject constructor(
             dayOfWeek = dayOfWeek
         )
     }
-    fun updateRevenueDayOfWeek(dayOfWeek: String) {
-        revenueInfo = revenueInfo.copy(
-            dayOfWeek = dayOfWeek
-        )
-    }
     fun updateRevenueType(type: String) {
         addRevenueInfo = addRevenueInfo.copy(
             revenueType = type
@@ -589,18 +584,7 @@ class RevenueViewModel @Inject constructor(
             revenueAmount = amount
         )
     }
-    fun updatePersonnelId(id: String) {
-        revenueInfo = revenueInfo.copy(
-            uniquePersonnelId = id
-        )
-    }
 
-
-    fun addUniqueRevenueId(id: String) {
-        addRevenueInfo = addRevenueInfo.copy(
-            uniqueRevenueId = id
-        )
-    }
     fun addRevenueDate(date: Long, dayOfWeek: String) {
         addRevenueInfo = addRevenueInfo.copy(
             date = date,
@@ -625,11 +609,6 @@ class RevenueViewModel @Inject constructor(
     fun addRevenueAmount(amount: Double) {
         addRevenueInfo = addRevenueInfo.copy(
             revenueAmount = amount
-        )
-    }
-    fun addRevenueUniquePersonnelId(id: String) {
-        addRevenueInfo = addRevenueInfo.copy(
-            uniquePersonnelId = id
         )
     }
 
