@@ -12,7 +12,6 @@ import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
 import com.example.myshopmanagerapp.core.UserPreferences
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.personnel.PersonnelNavScreens
-import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.home.personnel.screens.ViewPersonnelScreen
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.start_app.login_personnel.screens.LoginPersonnelScreen
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.start_app.register_personnel.screens.RegisterPersonnelScreen
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.CompanyViewModel

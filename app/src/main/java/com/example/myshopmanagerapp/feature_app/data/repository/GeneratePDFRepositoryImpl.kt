@@ -6,7 +6,7 @@ import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import android.graphics.pdf.PdfDocument.PageInfo
 import com.example.myshopmanagerapp.R
-import com.example.myshopmanagerapp.core.DeleteEntityMarkers
+import com.example.myshopmanagerapp.core.ChangesEntityMarkers
 import com.example.myshopmanagerapp.core.Functions.generateReceiptId
 import com.example.myshopmanagerapp.core.Functions.shortened
 import com.example.myshopmanagerapp.core.Functions.toDate
@@ -17,7 +17,7 @@ import com.example.myshopmanagerapp.core.ReceiptEntities
 import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
 import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIdsJson
-import com.example.myshopmanagerapp.core.UpdateEntityMarkers
+import com.example.myshopmanagerapp.core.AdditionEntityMarkers
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.entities.receipt.ReceiptDao
 import com.example.myshopmanagerapp.feature_app.data.local.entities.receipt.ReceiptEntity
@@ -65,6 +65,10 @@ class GeneratePDFRepositoryImpl(
             }else{
                 val receiptInfo = receipt.copy(uniqueReceiptId = uniqueReceiptId)
                 receiptDao.addReceipt(receiptInfo)
+                val context = MyShopManagerApp.applicationContext()
+                val addedReceiptIdsJson = AdditionEntityMarkers(context).getAddedReceiptIds.first().toNotNull()
+                val addedReceiptIds = addedReceiptIdsJson.toUniqueIds().plus(UniqueId(receipt.uniqueReceiptId)).toSet().toList()
+                AdditionEntityMarkers(context).saveAddedReceiptIds(addedReceiptIds.toUniqueIdsJson())
                 emit(Resource.Success("Receipt successfully saved"))
             }
         }catch (e: Exception){
@@ -93,9 +97,13 @@ class GeneratePDFRepositoryImpl(
             }else{
                 val receiptInfo = receipt.copy(uniqueReceiptId = uniqueReceiptId)
                 receiptDao.updateReceipt(receiptInfo)
-                val updatedReceiptIdsJson = UpdateEntityMarkers(context).getUpdatedReceiptId.first().toNotNull()
+                val addedReceiptIdsJson = AdditionEntityMarkers(context).getAddedReceiptIds.first().toNotNull()
+                val addedReceiptIds = addedReceiptIdsJson.toUniqueIds().plus(UniqueId(receipt.uniqueReceiptId)).toSet().toList()
+                AdditionEntityMarkers(context).saveAddedReceiptIds(addedReceiptIds.toUniqueIdsJson())
+
+                val updatedReceiptIdsJson = ChangesEntityMarkers(context).getChangedReceiptIds.first().toNotNull()
                 val updatedReceiptIds = updatedReceiptIdsJson.toUniqueIds().plus(UniqueId(receipt.uniqueReceiptId)).toSet().toList()
-                UpdateEntityMarkers(context).saveUpdatedReceiptIds(updatedReceiptIds.toUniqueIdsJson())
+                ChangesEntityMarkers(context).saveChangedReceiptIds(updatedReceiptIds.toUniqueIdsJson())
                 emit(Resource.Success("Receipt successfully updated"))
             }
         }catch (e: Exception){
@@ -111,9 +119,13 @@ class GeneratePDFRepositoryImpl(
         try {
             val context = MyShopManagerApp.applicationContext()
             receiptDao.deleteReceipt(uniqueReceiptId)
-            val deletedReceiptIdsJson = DeleteEntityMarkers(context).getDeletedReceiptId.first().toNotNull()
+            val addedReceiptIdsJson = AdditionEntityMarkers(context).getAddedReceiptIds.first().toNotNull()
+            val addedReceiptIds = addedReceiptIdsJson.toUniqueIds().filter{it.uniqueId != uniqueReceiptId}.toSet().toList()
+            AdditionEntityMarkers(context).saveAddedReceiptIds(addedReceiptIds.toUniqueIdsJson())
+
+            val deletedReceiptIdsJson = ChangesEntityMarkers(context).getChangedReceiptIds.first().toNotNull()
             val deletedReceiptIds = deletedReceiptIdsJson.toUniqueIds().plus(UniqueId(uniqueReceiptId)).toSet().toList()
-            DeleteEntityMarkers(context).saveDeletedReceiptIds(deletedReceiptIds.toUniqueIdsJson())
+            ChangesEntityMarkers(context).saveChangedReceiptIds(deletedReceiptIds.toUniqueIdsJson())
             emit(Resource.Success("Receipt successfully deleted"))
 
         }catch (e: Exception){

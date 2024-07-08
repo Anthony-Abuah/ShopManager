@@ -26,11 +26,17 @@ class BackupViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UIEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    private val _remoteBackupState = mutableStateOf(AddCompanyState())
-    val remoteBackupState: State<AddCompanyState> = _remoteBackupState
+    private val _absoluteRemoteBackupState = mutableStateOf(AddCompanyState())
+    val absoluteRemoteBackupState: State<AddCompanyState> = _absoluteRemoteBackupState
 
-    private val _syncDataState = mutableStateOf(AddCompanyState())
-    val syncDataState: State<AddCompanyState> = _syncDataState
+    private val _smartRemoteBackupState = mutableStateOf(AddCompanyState())
+    val smartRemoteBackupState: State<AddCompanyState> = _smartRemoteBackupState
+
+    private val _absoluteSyncDataState = mutableStateOf(AddCompanyState())
+    val absoluteSyncDataState: State<AddCompanyState> = _absoluteSyncDataState
+
+    private val _smartSyncDataState = mutableStateOf(AddCompanyState())
+    val smartSyncDataState: State<AddCompanyState> = _smartSyncDataState
 
     private val _backupDatabaseState = mutableStateOf(AddCompanyState())
     val backupDatabaseState: State<AddCompanyState> = _backupDatabaseState
@@ -38,11 +44,11 @@ class BackupViewModel @Inject constructor(
     private val _restoreDatabaseState = mutableStateOf(AddCompanyState())
     val restoreDatabaseState: State<AddCompanyState> = _restoreDatabaseState
 
-    fun remoteBackup() = viewModelScope.launch {
-        backupRepository.backupCompanyInfo(this).onEach { response->
+    fun absoluteRemoteBackup() = viewModelScope.launch {
+        backupRepository.absoluteBackup(this).onEach { response->
             when(response){
                 is Resource.Success ->{
-                    _remoteBackupState.value = remoteBackupState.value.copy(
+                    _absoluteRemoteBackupState.value = absoluteRemoteBackupState.value.copy(
                         data = response.data ,
                         isSuccessful = true,
                         message = response.message,
@@ -51,7 +57,7 @@ class BackupViewModel @Inject constructor(
                     _eventFlow.emit(UIEvent.ShowSnackBar(response.data ?: "Success"))
                 }
                 is Resource.Loading ->{
-                    _remoteBackupState.value = remoteBackupState.value.copy(
+                    _absoluteRemoteBackupState.value = absoluteRemoteBackupState.value.copy(
                         data = response.data ,
                         isSuccessful = false,
                         message = response.message,
@@ -60,7 +66,40 @@ class BackupViewModel @Inject constructor(
                     _eventFlow.emit(UIEvent.ShowSnackBar(response.data ?: "Backing up data"))
                 }
                 is Resource.Error ->{
-                    _remoteBackupState.value = remoteBackupState.value.copy(
+                    _absoluteRemoteBackupState.value = absoluteRemoteBackupState.value.copy(
+                        data = response.data ,
+                        isSuccessful = false,
+                        message = response.message ?: "Unknown Error",
+                        isLoading = false
+                    )
+                    _eventFlow.emit(UIEvent.ShowSnackBar(response.message ?: "Unknown Error"))
+                }
+            }
+        }.launchIn(this)
+    }
+    fun smartRemoteBackup() = viewModelScope.launch {
+        backupRepository.smartBackup(this).onEach { response->
+            when(response){
+                is Resource.Success ->{
+                    _smartRemoteBackupState.value = smartRemoteBackupState.value.copy(
+                        data = response.data ,
+                        isSuccessful = true,
+                        message = response.message,
+                        isLoading = false
+                    )
+                    _eventFlow.emit(UIEvent.ShowSnackBar(response.data ?: "Success"))
+                }
+                is Resource.Loading ->{
+                    _smartRemoteBackupState.value = smartRemoteBackupState.value.copy(
+                        data = response.data ,
+                        isSuccessful = false,
+                        message = response.message,
+                        isLoading = true
+                    )
+                    _eventFlow.emit(UIEvent.ShowSnackBar(response.data ?: "Backing up data"))
+                }
+                is Resource.Error ->{
+                    _smartRemoteBackupState.value = smartRemoteBackupState.value.copy(
                         data = response.data ,
                         isSuccessful = false,
                         message = response.message ?: "Unknown Error",
@@ -72,11 +111,11 @@ class BackupViewModel @Inject constructor(
         }.launchIn(this)
     }
 
-    fun syncData() = viewModelScope.launch {
-        backupRepository.syncCompanyInfo(this).onEach { response->
+    fun absoluteSyncData() = viewModelScope.launch {
+        backupRepository.absoluteSyncCompanyInfo(this).onEach { response->
             when(response){
                 is Resource.Success ->{
-                    _syncDataState.value = syncDataState.value.copy(
+                    _absoluteSyncDataState.value = absoluteSyncDataState.value.copy(
                         data = response.data ,
                         isSuccessful = true,
                         message = response.message,
@@ -85,7 +124,7 @@ class BackupViewModel @Inject constructor(
                     _eventFlow.emit(UIEvent.ShowSnackBar(response.data ?: "Success"))
                 }
                 is Resource.Loading ->{
-                    _syncDataState.value = syncDataState.value.copy(
+                    _absoluteSyncDataState.value = absoluteSyncDataState.value.copy(
                         data = response.data,
                         isSuccessful = false,
                         message = response.message,
@@ -94,7 +133,41 @@ class BackupViewModel @Inject constructor(
                     _eventFlow.emit(UIEvent.ShowSnackBar(response.data ?: "Backing up data"))
                 }
                 is Resource.Error ->{
-                    _syncDataState.value = syncDataState.value.copy(
+                    _absoluteSyncDataState.value = absoluteSyncDataState.value.copy(
+                        data = response.data,
+                        isSuccessful = false,
+                        message = response.message ?: "Unknown Error",
+                        isLoading = false
+                    )
+                    _eventFlow.emit(UIEvent.ShowSnackBar(response.message ?: "Unknown Error"))
+                }
+            }
+        }.launchIn(this)
+    }
+
+    fun smartSyncData() = viewModelScope.launch {
+        backupRepository.smartSyncCompanyInfo(this).onEach { response->
+            when(response){
+                is Resource.Success ->{
+                    _smartSyncDataState.value = smartSyncDataState.value.copy(
+                        data = response.data ,
+                        isSuccessful = true,
+                        message = response.message,
+                        isLoading = false
+                    )
+                    _eventFlow.emit(UIEvent.ShowSnackBar(response.data ?: "Success"))
+                }
+                is Resource.Loading ->{
+                    _smartSyncDataState.value = smartSyncDataState.value.copy(
+                        data = response.data,
+                        isSuccessful = false,
+                        message = response.message,
+                        isLoading = true
+                    )
+                    _eventFlow.emit(UIEvent.ShowSnackBar(response.data ?: "Backing up data"))
+                }
+                is Resource.Error ->{
+                    _smartSyncDataState.value = smartSyncDataState.value.copy(
                         data = response.data,
                         isSuccessful = false,
                         message = response.message ?: "Unknown Error",

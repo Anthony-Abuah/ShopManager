@@ -37,6 +37,45 @@ object FormRelatedString{
     const val ShortNotesPlaceholder = "Any other information you'd like to add"
     const val StartDate = "Start date"
     const val EndDate = "End date"
+    const val AbsoluteRemoteBackUp = "Absolute remote backup"
+    const val SmartRemoteBackUp = "Smart remote backup"
+    const val AbsoluteSync = "Absolute data sync"
+    const val SmartSync = "Smart data sync"
+    const val ConfirmBackup = "Confirm backup"
+    const val ConfirmRestore = "Confirm restore"
+    const val ConfirmSync = "Confirm sync"
+    const val LocalBackUp = "Local backup"
+    const val RestoreData = "Restore data from local backup"
+    const val ClickToSaveDatabaseToFile = "Click to save database to file"
+    const val ClickToRestoreDatabaseToFile = "Click to restore database from file"
+    const val ClickToBackupDataRemotely = "Click to backup data remotely"
+    const val ClickToSyncData = "Click to sync remote data with local data"
+
+
+    const val LocalBackUpDialogMessage = "This will save a copy of your database to your local storage file so that you can restore it later." +
+            "\n\nAre you sure want to back up database locally?"
+
+    const val AbsoluteBackUpDialogMessage = "This will add all your current data to your remote data if it doesn't exist already. " +
+            "This is recommended if it is the first time you're backing up your data remotely" +
+            "\n\nAre you sure want to back up database remotely?"
+
+    const val SmartBackUpDialogMessage = "This will preserve already existing remote data but only add changes to it if there have been any." +
+            "New records, updated records and deleted records will be added appropriately. This is recommended if you already have backed up data remotely" +
+            "\n\nAre you sure want to back up database remotely?"
+
+    const val AbsoluteSyncDialogMessage = "This will fetch all your remote data and overwrite the current data with it. " +
+            "This is recommended if it is the first time you're loading from your remote data source" +
+            "\n\nAre you sure want to sync data?"
+
+    const val SmartSyncDialogMessage = "This will fetch all your remote data and add the ones that do not exist in the current data to the current database. " +
+            "This is recommended if it another personnel has already backed up data and you want to sync that data with the current data on this device" +
+            "\n\nAre you sure want to sync data?"
+
+    const val RestoreBackedUpDataDialogMessage = "If you have already backed up database to file, this action will load that data and replace it with the current data." +
+            "\nNB: This process is irreversible" +
+            "\n\nAre you sure want to back up database locally?"
+
+
 
     // Add Debt Questions
     const val SelectDebtDate = "Select the date"

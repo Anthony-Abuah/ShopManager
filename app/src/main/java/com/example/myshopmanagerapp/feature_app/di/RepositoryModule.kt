@@ -180,7 +180,7 @@ object RepositoryModule {
         db: AppDatabase,
         shopManagerDatabaseApi: ShopManagerDatabaseApi
     ): BackupRepository {
-        return BackupRepositoryImpl(db, db.customerDao, db.debtDao, db.debtRepaymentDao, db.expenseDao, db.inventoryDao, db.inventoryItemDao, db.personnelDao, db.supplierDao, db.inventoryStockDao, db.revenueDao, db.withdrawalDao, db.savingsDao, db.bankAccountDao, db.stockDao, db.cashInDao, shopManagerDatabaseApi)
+        return BackupRepositoryImpl(db, shopManagerDatabaseApi)
     }
 
 }

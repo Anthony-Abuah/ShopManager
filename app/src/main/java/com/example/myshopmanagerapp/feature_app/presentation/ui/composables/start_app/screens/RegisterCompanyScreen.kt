@@ -14,7 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myshopmanagerapp.core.Constants
 import com.example.myshopmanagerapp.core.UserPreferences
-import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.settings.register.RegisterContent
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.register.RegisterContent
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenTopBar
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.CompanyViewModel
 import kotlinx.coroutines.launch

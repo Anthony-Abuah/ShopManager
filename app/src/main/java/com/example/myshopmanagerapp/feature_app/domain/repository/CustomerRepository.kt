@@ -1,5 +1,6 @@
 package com.example.myshopmanagerapp.feature_app.domain.repository
 
+import android.content.Context
 import com.example.myshopmanagerapp.core.CustomerEntities
 import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.feature_app.data.local.entities.customers.CustomerEntity
@@ -29,6 +30,11 @@ interface CustomerRepository {
     suspend fun deleteCustomer(uniqueCustomerId: String): Flow<Resource<String?>>
 
     suspend fun deleteAllCustomers()
+
+    suspend fun generateCustomerList(
+        context: Context,
+        customers: CustomerEntities
+    ): Flow<Resource<String?>>
 
 
 

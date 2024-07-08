@@ -86,6 +86,9 @@ class RevenueRepositoryImpl(
                 }
                 else->{
                     appDatabase.revenueDao.addRevenue(revenue.copy(uniquePersonnelId = uniquePersonnelId))
+                    val addedRevenueIdsJson = AdditionEntityMarkers(context).getAddedRevenueIds.first().toNotNull()
+                    val addedRevenueIds = addedRevenueIdsJson.toUniqueIds().plus(UniqueId(revenue.uniqueRevenueId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedRevenueIds(addedRevenueIds.toUniqueIdsJson())
                     emit(Resource.Success("Revenue successfully added"))
                 }
             }
@@ -334,9 +337,13 @@ class RevenueRepositoryImpl(
                 }
                 else -> {
                     appDatabase.revenueDao.updateRevenue(revenue.copy(uniquePersonnelId = uniquePersonnelId))
-                    val updatedRevenueIdsJson = UpdateEntityMarkers(context).getUpdatedRevenueId.first().toNotNull()
+                    val addedRevenueIdsJson = AdditionEntityMarkers(context).getAddedRevenueIds.first().toNotNull()
+                    val addedRevenueIds = addedRevenueIdsJson.toUniqueIds().plus(UniqueId(revenue.uniqueRevenueId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedRevenueIds(addedRevenueIds.toUniqueIdsJson())
+
+                    val updatedRevenueIdsJson = ChangesEntityMarkers(context).getChangedRevenueIds.first().toNotNull()
                     val updatedRevenueIds = updatedRevenueIdsJson.toUniqueIds().plus(UniqueId(revenue.uniqueRevenueId)).toSet().toList()
-                    UpdateEntityMarkers(context).saveUpdatedRevenueIds(updatedRevenueIds.toUniqueIdsJson())
+                    ChangesEntityMarkers(context).saveChangedRevenueIds(updatedRevenueIds.toUniqueIdsJson())
                     emit(Resource.Success("Revenue successfully updated"))
                 }
             }
@@ -383,9 +390,13 @@ class RevenueRepositoryImpl(
                 }
                 else->{
                     appDatabase.revenueDao.deleteRevenue(uniqueRevenueId)
-                    val deletedRevenueIdsJson = DeleteEntityMarkers(context).getDeletedRevenueId.first().toNotNull()
+                    val addedRevenueIdsJson = AdditionEntityMarkers(context).getAddedRevenueIds.first().toNotNull()
+                    val addedRevenueIds = addedRevenueIdsJson.toUniqueIds().filter{it.uniqueId != uniqueRevenueId}.toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedRevenueIds(addedRevenueIds.toUniqueIdsJson())
+
+                    val deletedRevenueIdsJson = ChangesEntityMarkers(context).getChangedRevenueIds.first().toNotNull()
                     val deletedRevenueIds = deletedRevenueIdsJson.toUniqueIds().plus(UniqueId(uniqueRevenueId)).toSet().toList()
-                    DeleteEntityMarkers(context).saveDeletedRevenueIds(deletedRevenueIds.toUniqueIdsJson())
+                    ChangesEntityMarkers(context).saveChangedRevenueIds(deletedRevenueIds.toUniqueIdsJson())
                     emit(Resource.Success("Revenue successfully deleted"))
                 }
             }

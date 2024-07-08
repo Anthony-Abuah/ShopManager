@@ -10,9 +10,9 @@ sealed class BottomNavScreens(
     val unfocused_icon: Int,
 ){
 
-    object Home: BottomNavScreens(
-        name = "Home",
-        route = "to_home",
+    object Records: BottomNavScreens(
+        name = "Records",
+        route = "to_records",
         focused_icon = R.drawable.ic_home,
         unfocused_icon = R.drawable.ic_home
     )
@@ -22,9 +22,9 @@ sealed class BottomNavScreens(
         focused_icon = R.drawable.ic_report,
         unfocused_icon = R.drawable.ic_report
     )
-    object Settings: BottomNavScreens(
-        name = "Settings",
-        route = "to_settings",
+    object Actions: BottomNavScreens(
+        name = "Actions",
+        route = "to_actions",
         focused_icon = R.drawable.ic_settings,
         unfocused_icon = R.drawable.ic_settings
     )

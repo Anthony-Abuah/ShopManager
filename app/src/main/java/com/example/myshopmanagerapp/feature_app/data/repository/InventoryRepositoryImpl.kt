@@ -1,5 +1,10 @@
 package com.example.myshopmanagerapp.feature_app.data.repository
 
+import android.content.Context
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.pdf.PdfDocument
+import com.example.myshopmanagerapp.R
 import com.example.myshopmanagerapp.core.*
 import com.example.myshopmanagerapp.core.Constants.Unit
 import com.example.myshopmanagerapp.core.Constants.ZERO
@@ -7,9 +12,12 @@ import com.example.myshopmanagerapp.core.Functions.addItemQuantities
 import com.example.myshopmanagerapp.core.Functions.dateToTimestamp
 import com.example.myshopmanagerapp.core.Functions.generateUniqueStockId
 import com.example.myshopmanagerapp.core.Functions.getTotalNumberOfUnits
+import com.example.myshopmanagerapp.core.Functions.shortened
 import com.example.myshopmanagerapp.core.Functions.subtractItemQuantities
+import com.example.myshopmanagerapp.core.Functions.toCompanyEntity
 import com.example.myshopmanagerapp.core.Functions.toDate
 import com.example.myshopmanagerapp.core.Functions.toDateString
+import com.example.myshopmanagerapp.core.Functions.toEllipses
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
 import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
@@ -20,14 +28,15 @@ import com.example.myshopmanagerapp.feature_app.data.local.entities.inventory.In
 import com.example.myshopmanagerapp.feature_app.data.local.entities.inventory_items.InventoryItemEntity
 import com.example.myshopmanagerapp.feature_app.data.local.entities.inventory_stock.InventoryStockEntity
 import com.example.myshopmanagerapp.feature_app.data.local.entities.stock.StockEntity
-import com.example.myshopmanagerapp.feature_app.domain.model.ItemValue
-import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
-import com.example.myshopmanagerapp.feature_app.domain.model.Price
-import com.example.myshopmanagerapp.feature_app.domain.model.UniqueId
+import com.example.myshopmanagerapp.feature_app.domain.model.*
 import com.example.myshopmanagerapp.feature_app.domain.repository.InventoryRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 import java.time.LocalDate
 
 class InventoryRepositoryImpl(
@@ -139,6 +148,27 @@ class InventoryRepositoryImpl(
                         inventoryStock,
                         thisInventoryItem
                     )
+
+                    val addedStockIdsJson = AdditionEntityMarkers(context).getAddedStockIds.first().toNotNull()
+                    val addedStockIds = addedStockIdsJson.toUniqueIds().plus(UniqueId(stock.uniqueStockId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedStockIds(addedStockIds.toUniqueIdsJson())
+
+                    val addedInventoryIdsJson = AdditionEntityMarkers(context).getAddedInventoryIds.first().toNotNull()
+                    val addedInventoryIds = addedInventoryIdsJson.toUniqueIds().plus(UniqueId(inventory.uniqueInventoryId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedInventoryIds(addedInventoryIds.toUniqueIdsJson())
+
+                    val addedInventoryStockIdsJson = AdditionEntityMarkers(context).getAddedInventoryStockIds.first().toNotNull()
+                    val addedInventoryStockIds = addedInventoryStockIdsJson.toUniqueIds().plus(UniqueId(inventoryStock.uniqueInventoryStockId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedInventoryStockIds(addedInventoryStockIds.toUniqueIdsJson())
+
+                    val addedInventoryItemIdsJson = AdditionEntityMarkers(context).getAddedInventoryItemIds.first().toNotNull()
+                    val addedInventoryItemIds = addedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(inventoryItem.uniqueInventoryItemId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedInventoryItemIds(addedInventoryItemIds.toUniqueIdsJson())
+
+                    val updatedInventoryItemIdsJson = ChangesEntityMarkers(context).getChangedInventoryItemIds.first().toNotNull()
+                    val updatedInventoryItemIds = updatedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(inventoryItem.uniqueInventoryItemId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedInventoryItemIds(updatedInventoryItemIds.toUniqueIdsJson())
+
                     emit(Resource.Success("Inventory successfully added"))
                 }
             }
@@ -267,17 +297,30 @@ class InventoryRepositoryImpl(
                         inventory.copy(uniquePersonnelId = uniquePersonnelId),
                         updatedInventoryItem
                     )
-                    val updatedStockIdsJson = UpdateEntityMarkers(context).getUpdatedStockId.first().toNotNull()
+
+                    val addedStockIdsJson = AdditionEntityMarkers(context).getAddedStockIds.first().toNotNull()
+                    val addedStockIds = addedStockIdsJson.toUniqueIds().plus(UniqueId(updatedStock.uniqueStockId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedStockIds(addedStockIds.toUniqueIdsJson())
+
+                    val updatedStockIdsJson = ChangesEntityMarkers(context).getChangedStockIds.first().toNotNull()
                     val updatedStockIds = updatedStockIdsJson.toUniqueIds().plus(UniqueId(updatedStock.uniqueStockId)).toSet().toList()
-                    UpdateEntityMarkers(context).saveUpdatedStockIds(updatedStockIds.toUniqueIdsJson())
+                    ChangesEntityMarkers(context).saveChangedStockIds(updatedStockIds.toUniqueIdsJson())
 
-                    val updatedInventoryIdsJson = UpdateEntityMarkers(context).getUpdatedInventoryId.first().toNotNull()
+                    val addedInventoryIdsJson = AdditionEntityMarkers(context).getAddedInventoryIds.first().toNotNull()
+                    val addedInventoryIds = addedInventoryIdsJson.toUniqueIds().plus(UniqueId(inventory.uniqueInventoryId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedInventoryIds(addedInventoryIds.toUniqueIdsJson())
+
+                    val updatedInventoryIdsJson = ChangesEntityMarkers(context).getChangedInventoryIds.first().toNotNull()
                     val updatedInventoryIds = updatedInventoryIdsJson.toUniqueIds().plus(UniqueId(inventory.uniqueInventoryId)).toSet().toList()
-                    UpdateEntityMarkers(context).saveUpdatedInventoryIds(updatedInventoryIds.toUniqueIdsJson())
+                    ChangesEntityMarkers(context).saveChangedInventoryIds(updatedInventoryIds.toUniqueIdsJson())
 
-                    val updatedInventoryItemIdsJson = UpdateEntityMarkers(context).getUpdatedInventoryItemId.first().toNotNull()
-                    val updatedInventoryItemIds = updatedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(updatedInventoryItem.uniqueInventoryItemId)).toSet().toList()
-                    UpdateEntityMarkers(context).saveUpdatedInventoryItemIds(updatedInventoryItemIds.toUniqueIdsJson())
+                    val addedInventoryItemIdsJson = AdditionEntityMarkers(context).getAddedInventoryItemIds.first().toNotNull()
+                    val addedInventoryItemIds = addedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(inventoryItem.uniqueInventoryItemId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedInventoryItemIds(addedInventoryItemIds.toUniqueIdsJson())
+
+                    val updatedInventoryItemIdsJson = ChangesEntityMarkers(context).getChangedInventoryItemIds.first().toNotNull()
+                    val updatedInventoryItemIds = updatedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(inventoryItem.uniqueInventoryItemId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedInventoryItemIds(updatedInventoryItemIds.toUniqueIdsJson())
 
                     emit(Resource.Success("Inventory successfully updated"))
                 }
@@ -379,21 +422,38 @@ class InventoryRepositoryImpl(
                         uniqueInventoryStockId,
                         updatedInventoryItem
                     )
-                    val deletedInventoryStockIdsJson = DeleteEntityMarkers(context).getDeletedInventoryStockId.first().toNotNull()
+
+                    val addedInventoryStockIdsJson = AdditionEntityMarkers(context).getAddedInventoryStockIds.first().toNotNull()
+                    val addedInventoryStockIds = addedInventoryStockIdsJson.toUniqueIds().filter { it.uniqueId != uniqueInventoryStockId }.toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedInventoryStockIds(addedInventoryStockIds.toUniqueIdsJson())
+
+                    val deletedInventoryStockIdsJson = ChangesEntityMarkers(context).getChangedInventoryStockIds.first().toNotNull()
                     val deletedInventoryStockIds = deletedInventoryStockIdsJson.toUniqueIds().plus(UniqueId(uniqueInventoryStockId)).toSet().toList()
-                    DeleteEntityMarkers(context).saveDeletedInventoryStockIds(deletedInventoryStockIds.toUniqueIdsJson())
+                    ChangesEntityMarkers(context).saveChangedInventoryStockIds(deletedInventoryStockIds.toUniqueIdsJson())
 
-                    val deletedInventoryIdsJson = DeleteEntityMarkers(context).getDeletedInventoryId.first().toNotNull()
-                    val deletedInventoryIds = deletedInventoryIdsJson.toUniqueIds().plus(UniqueId(uniqueInventoryId)).toSet().toList()
-                    DeleteEntityMarkers(context).saveDeletedInventoryIds(deletedInventoryIds.toUniqueIdsJson())
+                    val addedStockIdsJson = AdditionEntityMarkers(context).getAddedStockIds.first().toNotNull()
+                    val addedStockIds = addedStockIdsJson.toUniqueIds().filter { it.uniqueId != oldStock.uniqueStockId }.toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedStockIds(addedStockIds.toUniqueIdsJson())
 
-                    val deletedStockIdsJson = DeleteEntityMarkers(context).getDeletedStockId.first().toNotNull()
+                    val deletedStockIdsJson = ChangesEntityMarkers(context).getChangedStockIds.first().toNotNull()
                     val deletedStockIds = deletedStockIdsJson.toUniqueIds().plus(UniqueId(oldStock.uniqueStockId)).toSet().toList()
-                    DeleteEntityMarkers(context).saveDeletedStockIds(deletedStockIds.toUniqueIdsJson())
+                    ChangesEntityMarkers(context).saveChangedStockIds(deletedStockIds.toUniqueIdsJson())
 
-                    val updatedInventoryItemIdsJson = UpdateEntityMarkers(context).getUpdatedInventoryItemId.first().toNotNull()
-                    val updatedInventoryItemIds = updatedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(updatedInventoryItem.uniqueInventoryItemId)).toSet().toList()
-                    UpdateEntityMarkers(context).saveUpdatedInventoryItemIds(updatedInventoryItemIds.toUniqueIdsJson())
+                    val addedInventoryIdsJson = AdditionEntityMarkers(context).getAddedInventoryIds.first().toNotNull()
+                    val addedInventoryIds = addedInventoryIdsJson.toUniqueIds().filter { it.uniqueId != inventory.uniqueInventoryId }.toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedInventoryIds(addedInventoryIds.toUniqueIdsJson())
+
+                    val deletedInventoryIdsJson = ChangesEntityMarkers(context).getChangedInventoryIds.first().toNotNull()
+                    val deletedInventoryIds = deletedInventoryIdsJson.toUniqueIds().plus(UniqueId(inventory.uniqueInventoryId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedInventoryIds(deletedInventoryIds.toUniqueIdsJson())
+
+                    val addedInventoryItemIdsJson = AdditionEntityMarkers(context).getAddedInventoryItemIds.first().toNotNull()
+                    val addedInventoryItemIds = addedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(inventoryItem.uniqueInventoryItemId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedInventoryItemIds(addedInventoryItemIds.toUniqueIdsJson())
+
+                    val updatedInventoryItemIdsJson = ChangesEntityMarkers(context).getChangedInventoryItemIds.first().toNotNull()
+                    val updatedInventoryItemIds = updatedInventoryItemIdsJson.toUniqueIds().plus(UniqueId(inventoryItem.uniqueInventoryItemId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedInventoryItemIds(updatedInventoryItemIds.toUniqueIdsJson())
 
                     emit(Resource.Success("Inventory successfully deleted"))
                 }
@@ -569,4 +629,162 @@ class InventoryRepositoryImpl(
             ))
         }
     }
+
+    override suspend fun generateInventoryList(
+        context: Context,
+        date: String,
+        inventories: List<InventoryQuantityDisplayValues>,
+    ): Flow<Resource<String?>> = flow{
+        val pageHeight = inventories.size.plus(8).times(50)
+        val pageWidth = 800
+        val pdfDocument = PdfDocument()
+        val paint = Paint()
+        val title = Paint()
+        val body = Paint()
+        val pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create()
+        val page = pdfDocument.startPage(pageInfo)
+        val canvas = page.canvas
+        val centerWidth = canvas.width.div(2f)
+
+        val userPreferences = UserPreferences(context)
+        val company = userPreferences.getShopInfo.first().toCompanyEntity()
+        val shopName = company?.companyName ?: "Shop route"
+        val shopContact = company?.companyName ?: "Contact"
+        val shopLocation = company?.companyLocation ?: "Location"
+
+
+        // Write Shop route
+        title.color = Color.BLACK
+        title.textSize = 40f
+        title.textAlign = Paint.Align.CENTER
+        canvas.drawText(shopName.toEllipses(25), centerWidth, 60f, title)
+
+        // Write Location
+        body.color = Color.BLACK
+        body.textSize = 25f
+        body.textAlign = Paint.Align.CENTER
+        canvas.drawText("Location: ${shopLocation.toEllipses(50)}", centerWidth, 95f, body)
+
+        // Write Contact
+        body.color = Color.BLACK
+        body.textSize = 25f
+        body.textAlign = Paint.Align.CENTER
+        canvas.drawText("Contact: ${shopContact.toEllipses(50)}", centerWidth, 130f, body)
+
+        // Draw line
+        paint.color = Color.rgb(180, 180, 180)
+        canvas.drawLine(20f, 140f, canvas.width.minus(20f), 141f, paint)
+
+
+        // Draw Rectangle
+        paint.color = Color.rgb(150, 50, 50)
+        canvas.drawRect(20f, 140f, canvas.width.minus(20f), 190f, paint)
+
+
+        // Write Inventory List
+        body.color = Color.WHITE
+        body.textSize = 25f
+        body.textAlign = Paint.Align.CENTER
+        canvas.drawText("Inventory List", centerWidth, 177f, body)
+
+
+        // Draw Start Border
+        paint.color = Color.rgb(150, 50, 50)
+        canvas.drawRect(20f, 190f, 21f, 240f, paint)
+
+        // Draw End Border
+        paint.color = Color.rgb(150, 50, 50)
+        canvas.drawRect(canvas.width.minus(21f), 190f, canvas.width.minus(20f), 240f, paint)
+
+
+        // Write Date
+        body.color = Color.BLACK
+        body.textSize = 25f
+        body.textAlign = Paint.Align.LEFT
+        canvas.drawText("Date: ", 25f, 227f, body)
+        canvas.drawText(date.toEllipses(23), 150f, 227f, body)
+
+
+        // Draw Rectangle
+        paint.color = Color.rgb(150, 50, 50)
+        canvas.drawRect(20f, 240f, canvas.width.minus(20f), 290f, paint)
+
+
+        // Write Invoice title
+        body.color = Color.WHITE
+        body.textSize = 25f
+        body.textAlign = Paint.Align.LEFT
+        canvas.drawText("Qty", 25f, 277f, body)
+        canvas.drawText("Item Name", 150f, 277f, body)
+        canvas.drawText("Unit Cost", canvas.width.minus(300f), 277f, body)
+        canvas.drawText("Amount", canvas.width.minus(150f), 277f, body)
+
+        inventories.forEachIndexed { index, inventory->
+            val newLine = index.plus(1).times(50f)
+
+            // Draw Start Border
+            paint.color = Color.rgb(150, 50, 50)
+            canvas.drawRect(20f, newLine.plus(240f), 21f, newLine.plus(290f), paint)
+
+            // Draw End Border
+            paint.color = Color.rgb(150, 50, 50)
+            canvas.drawRect(canvas.width.minus(21f), newLine.plus(240f), canvas.width.minus(20f), newLine.plus(290f), paint)
+
+
+            // Write Invoice title
+            body.color = Color.BLACK
+            body.textSize = 25f
+            body.textAlign = Paint.Align.LEFT
+            canvas.drawText(inventory.totalUnits.toString().toEllipses(10), 25f, newLine.plus(277f), body)
+            canvas.drawText(inventory.inventoryItemEntity.inventoryItemName.toEllipses(30), 150f, newLine.plus(277f), body)
+            canvas.drawText(inventory.unitCost.shortened().toEllipses(10), canvas.width.minus(300f), newLine.plus(277f), body)
+            canvas.drawText(inventory.totalCost.shortened().toEllipses(10), canvas.width.minus(150f), newLine.plus(277f), body)
+
+        }
+
+        val nextLine = inventories.size.plus(1).times(50f)
+        // Draw Rectangle
+        paint.color = Color.rgb(150, 50, 50)
+        canvas.drawRect(20f, nextLine.plus(240f), canvas.width.minus(20f), nextLine.plus(290f), paint)
+
+
+        // Write Invoice total
+        val totalInventoryCost = inventories.sumOf { it.totalCost }
+        body.color = Color.WHITE
+        body.textSize = 25f
+        body.textAlign = Paint.Align.LEFT
+        canvas.drawText("Total", 25f, nextLine.plus(277f), body)
+        body.textAlign = Paint.Align.RIGHT
+        canvas.drawText("GHS ${totalInventoryCost.shortened()}", canvas.width.minus(30f), nextLine.plus(277f), body)
+
+
+        // Write Invoice total
+        body.color = Color.BLACK
+        body.textSize = 25f
+        body.textAlign = Paint.Align.LEFT
+        canvas.drawText("Prepared by: ", 25f, nextLine.plus(327f), body)
+
+
+
+
+
+        pdfDocument.finishPage(page)
+        val directory = getDirectory(context)
+        val file = File(directory, "inventory.pdf")
+
+        withContext(Dispatchers.IO) {
+            pdfDocument.writeTo(FileOutputStream(file))
+        }
+        pdfDocument.close()
+        emit(Resource.Success("Pdf document successfully created"))
+
+    }
+
+    private fun getDirectory(context: Context): File{
+        val mediaDir = context.externalMediaDirs.firstOrNull()?.let {
+            File(it, context.resources.getString(R.string.app_name)).apply { mkdirs() }
+        }
+        return if (mediaDir != null && mediaDir.exists()) mediaDir else context.filesDir
+    }
+
 }

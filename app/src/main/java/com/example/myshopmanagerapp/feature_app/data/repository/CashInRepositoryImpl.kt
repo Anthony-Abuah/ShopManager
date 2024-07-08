@@ -1,13 +1,13 @@
 package com.example.myshopmanagerapp.feature_app.data.repository
 
 import com.example.myshopmanagerapp.core.CashInEntities
-import com.example.myshopmanagerapp.core.DeleteEntityMarkers
+import com.example.myshopmanagerapp.core.ChangesEntityMarkers
 import com.example.myshopmanagerapp.core.Functions.toDate
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
 import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIdsJson
-import com.example.myshopmanagerapp.core.UpdateEntityMarkers
+import com.example.myshopmanagerapp.core.AdditionEntityMarkers
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
 import com.example.myshopmanagerapp.feature_app.data.local.entities.cash_in.CashInEntity
@@ -57,6 +57,10 @@ class CashInRepositoryImpl(
                 }
                 else->{
                     appDatabase.cashInDao.addCashIn(cashIn)
+                    val context = MyShopManagerApp.applicationContext()
+                    val addedCashInIdsJson = AdditionEntityMarkers(context).getAddedCashInIds.first().toNotNull()
+                    val addedCashInIds = addedCashInIdsJson.toUniqueIds().plus(UniqueId(cashIn.uniqueCashInId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedCashInIds(addedCashInIds.toUniqueIdsJson())
                     emit(Resource.Success("Successfully added"))
                 }
             }
@@ -101,10 +105,14 @@ class CashInRepositoryImpl(
                     emit(Resource.Error("Unable to update\nSince this is a loan, please ensure that either the interestAmount or the payment amount is not empty"))
                 }
                 else -> {
-                    appDatabase.cashInDao.addCashIn(cashIn)
-                    val updatedCashInIdsJson = UpdateEntityMarkers(context).getUpdatedCashInId.first().toNotNull()
-                    val updatedCashInIds = updatedCashInIdsJson.toUniqueIds().plus(UniqueId(cashIn.uniqueCashInId))
-                    UpdateEntityMarkers(context).saveUpdatedCashInIds(updatedCashInIds.toUniqueIdsJson())
+                    appDatabase.cashInDao.updateCashIn(cashIn)
+                    val addedCashInIdsJson = AdditionEntityMarkers(context).getAddedCashInIds.first().toNotNull()
+                    val addedCashInIds = addedCashInIdsJson.toUniqueIds().plus(UniqueId(cashIn.uniqueCashInId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedCashInIds(addedCashInIds.toUniqueIdsJson())
+
+                    val updatedCashInIdsJson = ChangesEntityMarkers(context).getChangedCashInIds.first().toNotNull()
+                    val updatedCashInIds = updatedCashInIdsJson.toUniqueIds().plus(UniqueId(cashIn.uniqueCashInId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedCashInIds(updatedCashInIds.toUniqueIdsJson())
                     emit(Resource.Success("Successfully updated"))
                 }
             }
@@ -123,9 +131,13 @@ class CashInRepositoryImpl(
                 emit(Resource.Error("Unable to delete\nCould not load the details of this cash in entity"))
             }else{
                 appDatabase.cashInDao.deleteCashIn(uniqueCashInId)
-                val deletedCashInIdsJson = DeleteEntityMarkers(context).getDeletedCashInId.first().toNotNull()
-                val deletedCashInIds = deletedCashInIdsJson.toUniqueIds().plus(UniqueId(uniqueCashInId))
-                DeleteEntityMarkers(context).saveDeletedCashInIds(deletedCashInIds.toUniqueIdsJson())
+                val addedCashInIdsJson = AdditionEntityMarkers(context).getAddedCashInIds.first().toNotNull()
+                val addedCashInIds = addedCashInIdsJson.toUniqueIds().filter{it.uniqueId != uniqueCashInId}.toSet().toList()
+                AdditionEntityMarkers(context).saveAddedCashInIds(addedCashInIds.toUniqueIdsJson())
+
+                val deletedCashInIdsJson = ChangesEntityMarkers(context).getChangedCashInIds.first().toNotNull()
+                val deletedCashInIds = deletedCashInIdsJson.toUniqueIds().plus(UniqueId(uniqueCashInId)).toSet().toList()
+                ChangesEntityMarkers(context).saveChangedCashInIds(deletedCashInIds.toUniqueIdsJson())
                 emit(Resource.Success("Successfully deleted"))
             }
 

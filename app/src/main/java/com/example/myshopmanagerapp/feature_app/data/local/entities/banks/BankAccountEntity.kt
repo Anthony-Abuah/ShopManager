@@ -3,7 +3,7 @@ package com.example.myshopmanagerapp.feature_app.data.local.entities.banks
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.myshopmanagerapp.core.Constants.BankAccount_Table
-import com.example.myshopmanagerapp.feature_app.data.remote.dto.bank.BankInfoDto
+import com.example.myshopmanagerapp.feature_app.data.remote.dto.bank.BankAccountInfoDto
 
 @Entity(tableName = BankAccount_Table)
 data class BankAccountEntity(
@@ -16,8 +16,8 @@ data class BankAccountEntity(
     val otherInfo: String?,
     val accountBalance: Double?
 ){
-    fun toBankInfoDto(uniqueCompanyId: String): BankInfoDto{
-        return BankInfoDto(
+    fun toBankAccountInfoDto(uniqueCompanyId: String): BankAccountInfoDto{
+        return BankAccountInfoDto(
             uniqueBankAccountId = uniqueBankAccountId,
             uniqueCompanyId = uniqueCompanyId,
             bankAccountName = bankAccountName,

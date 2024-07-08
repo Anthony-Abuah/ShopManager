@@ -8,7 +8,6 @@ import com.example.myshopmanagerapp.feature_app.domain.model.ListNumberDropDownI
 import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
 import com.example.myshopmanagerapp.feature_app.domain.model.QuantityCategorization
 import java.time.LocalDate
-import kotlin.math.absoluteValue
 
 
 object Constants{
@@ -76,8 +75,8 @@ object Constants{
     const val Delete = "Delete"
     val editDelete = listOf(Edit, Delete)
 
-    const val DeleteEntityMarkers = "Delete Markers"
-    const val UpdateEntityMarkers = "Update Entity Markers"
+    const val ChangesEntityMarkers = "Changes Markers"
+    const val AdditionEntityMarkers = "Addition Entity Markers"
     const val UserPreferences = "User Preferences"
     const val StringValue = "String Value"
     const val SupplierRole = "Supplier Role"

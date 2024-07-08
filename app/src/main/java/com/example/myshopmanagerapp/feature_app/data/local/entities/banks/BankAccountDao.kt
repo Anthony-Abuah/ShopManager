@@ -20,7 +20,7 @@ interface BankAccountDao {
 
 
     @Query ("SELECT * FROM $BankAccount_Table")
-    suspend fun getAllBanks(): BankAccountEntities?
+    suspend fun getAllBankAccounts(): BankAccountEntities?
 
     @Query ("SELECT * FROM $BankAccount_Table WHERE uniqueBankAccountId LIKE :uniqueBankAccountId")
     suspend fun getBankAccount(uniqueBankAccountId: String): BankAccountEntity?

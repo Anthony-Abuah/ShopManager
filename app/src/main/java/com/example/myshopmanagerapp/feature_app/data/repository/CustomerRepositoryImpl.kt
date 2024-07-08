@@ -1,6 +1,14 @@
 package com.example.myshopmanagerapp.feature_app.data.repository
 
+import android.content.Context
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.pdf.PdfDocument
+import com.example.myshopmanagerapp.R
 import com.example.myshopmanagerapp.core.*
+import com.example.myshopmanagerapp.core.Functions.shortened
+import com.example.myshopmanagerapp.core.Functions.toCompanyEntity
+import com.example.myshopmanagerapp.core.Functions.toEllipses
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
 import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
@@ -10,9 +18,13 @@ import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
 import com.example.myshopmanagerapp.feature_app.data.local.entities.customers.CustomerEntity
 import com.example.myshopmanagerapp.feature_app.domain.model.UniqueId
 import com.example.myshopmanagerapp.feature_app.domain.repository.CustomerRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 
 class CustomerRepositoryImpl(
@@ -64,6 +76,9 @@ class CustomerRepositoryImpl(
                 }
                 else->{
                     appDatabase.customerDao.addCustomer(customer)
+                    val addedCustomerIdsJson = AdditionEntityMarkers(context).getAddedCustomerIds.first().toNotNull()
+                    val addedCustomerIds = addedCustomerIdsJson.toUniqueIds().plus(UniqueId(customer.uniqueCustomerId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedCustomerIds(addedCustomerIds.toUniqueIdsJson())
                     emit(Resource.Success("Customer successfully added"))
                 }
             }
@@ -129,9 +144,13 @@ class CustomerRepositoryImpl(
                 }
                 else->{
                     appDatabase.customerDao.updateCustomer(customer)
-                    val updatedCustomerIdsJson = UpdateEntityMarkers(context).getUpdatedCustomerId.first().toNotNull()
+                    val addedCustomerIdsJson = AdditionEntityMarkers(context).getAddedCustomerIds.first().toNotNull()
+                    val addedCustomerIds = addedCustomerIdsJson.toUniqueIds().plus(UniqueId(customer.uniqueCustomerId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedCustomerIds(addedCustomerIds.toUniqueIdsJson())
+
+                    val updatedCustomerIdsJson = ChangesEntityMarkers(context).getChangedCustomerIds.first().toNotNull()
                     val updatedCustomerIds = updatedCustomerIdsJson.toUniqueIds().plus(UniqueId(customer.uniqueCustomerId)).toSet().toList()
-                    UpdateEntityMarkers(context).saveUpdatedCustomerIds(updatedCustomerIds.toUniqueIdsJson())
+                    ChangesEntityMarkers(context).saveChangedCustomerIds(updatedCustomerIds.toUniqueIdsJson())
                     emit(Resource.Success("Customer successfully updated"))
                 }
             }
@@ -189,9 +208,13 @@ class CustomerRepositoryImpl(
                 }
                 else->{
                     appDatabase.customerDao.deleteCustomer(uniqueCustomerId)
-                    val deletedCustomerIdsJson = DeleteEntityMarkers(context).getDeletedCustomerId.first().toNotNull()
+                    val addedCustomerIdsJson = AdditionEntityMarkers(context).getAddedCustomerIds.first().toNotNull()
+                    val addedCustomerIds = addedCustomerIdsJson.toUniqueIds().filter{it.uniqueId != uniqueCustomerId}.toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedCustomerIds(addedCustomerIds.toUniqueIdsJson())
+
+                    val deletedCustomerIdsJson = ChangesEntityMarkers(context).getChangedCustomerIds.first().toNotNull()
                     val deletedCustomerIds = deletedCustomerIdsJson.toUniqueIds().plus(UniqueId(uniqueCustomerId)).toSet().toList()
-                    DeleteEntityMarkers(context).saveDeletedCustomerIds(deletedCustomerIds.toUniqueIdsJson())
+                    ChangesEntityMarkers(context).saveChangedCustomerIds(deletedCustomerIds.toUniqueIdsJson())
                     emit(Resource.Success("Customer successfully deleted"))
                 }
             }
@@ -204,4 +227,121 @@ class CustomerRepositoryImpl(
     override suspend fun deleteAllCustomers() {
         appDatabase.customerDao.deleteAllCustomers()
     }
+
+
+    override suspend fun generateCustomerList(
+        context: Context,
+        customers: CustomerEntities
+    ): Flow<Resource<String?>> = flow{
+        val pageHeight = customers.size.plus(8).times(50)
+        val pageWidth = 800
+        val pdfDocument = PdfDocument()
+        val paint = Paint()
+        val title = Paint()
+        val body = Paint()
+        val pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 2).create()
+        val page = pdfDocument.startPage(pageInfo)
+        val canvas = page.canvas
+        val centerWidth = canvas.width.div(2f)
+        val userPreferences = UserPreferences(context)
+        val company = userPreferences.getShopInfo.first().toCompanyEntity()
+        val shopName = company?.companyName ?: "Shop route"
+        val shopContact = company?.companyName ?: "Contact"
+        val shopLocation = company?.companyLocation ?: "Location"
+
+        // Write Shop route
+        title.color = Color.BLACK
+        title.textSize = 40f
+        title.textAlign = Paint.Align.CENTER
+        canvas.drawText(shopName.toEllipses(25), centerWidth, 60f, title)
+
+        // Write Location
+        body.color = Color.BLACK
+        body.textSize = 25f
+        body.textAlign = Paint.Align.CENTER
+        canvas.drawText("Location: ${shopLocation.toEllipses(50)}", centerWidth, 95f, body)
+
+        // Write Contact
+        body.color = Color.BLACK
+        body.textSize = 25f
+        body.textAlign = Paint.Align.CENTER
+        canvas.drawText("Contact: ${shopContact.toEllipses(50)}", centerWidth, 130f, body)
+
+
+        // Draw Rectangle
+        paint.color = Color.rgb(150, 50, 50)
+        canvas.drawRect(20f, 140f, canvas.width.minus(20f), 190f, paint)
+
+
+
+        // Write Invoice title
+        body.color = Color.WHITE
+        body.textSize = 25f
+        body.textAlign = Paint.Align.LEFT
+        canvas.drawText("No.", 25f, 183f, body)
+        canvas.drawText("Customer Name", 100f, 183f, body)
+        canvas.drawText("Contact", canvas.width.minus(350f), 183f, body)
+        canvas.drawText("Debt Amount", canvas.width.minus(175f), 183f, body)
+
+        customers.forEachIndexed { index, customer->
+            val newLine = index.plus(1).times(50f)
+
+            // Draw Start Border
+            paint.color = Color.rgb(150, 50, 50)
+            canvas.drawRect(20f, newLine.plus(140f), 21f, newLine.plus(190f), paint)
+
+            // Draw End Border
+            paint.color = Color.rgb(150, 50, 50)
+            canvas.drawRect(canvas.width.minus(21f), newLine.plus(140f), canvas.width.minus(20f), newLine.plus(190f), paint)
+
+
+            val debtAmount = customer.debtAmount?.shortened() ?: "0.00"
+            // Write Invoice title
+            body.color = Color.BLACK
+            body.textSize = 25f
+            body.textAlign = Paint.Align.LEFT
+            title.color = if ((customer.debtAmount ?: 0.0) > 0) Color.RED else Color.BLACK
+            title.textSize = 25f
+            title.textAlign = Paint.Align.RIGHT
+            canvas.drawText(index.plus(1).toString().toEllipses(3), 25f, newLine.plus(183f), body)
+            canvas.drawText(customer.customerName.toEllipses(30), 100f, newLine.plus(183f), body)
+            canvas.drawText(customer.customerContact.toEllipses(15), canvas.width.minus(360f), newLine.plus(183f), body)
+            canvas.drawText(debtAmount.toEllipses(10), canvas.width.minus(30f), newLine.plus(183f), title)
+
+        }
+
+        val nextLine = customers.size.plus(1).times(50f)
+        // Draw Rectangle
+        paint.color = Color.rgb(150, 50, 50)
+        canvas.drawRect(20f, nextLine.plus(140f), canvas.width.minus(20f), nextLine.plus(190f), paint)
+
+
+        // Write Invoice total
+        body.color = Color.WHITE
+        body.textSize = 25f
+        body.textAlign = Paint.Align.LEFT
+        canvas.drawText("Total Debt Amount", 25f, nextLine.plus(175f), body)
+        body.textAlign = Paint.Align.RIGHT
+        canvas.drawText("GHS ${customers.sumOf { it.debtAmount?: 0.0 }.shortened()}", canvas.width.minus(30f), nextLine.plus(175f), body)
+
+
+        pdfDocument.finishPage(page)
+        val directory = getDirectory(context)
+        val file = File(directory, "customers.pdf")
+
+        withContext(Dispatchers.IO) {
+            pdfDocument.writeTo(FileOutputStream(file))
+        }
+        pdfDocument.close()
+        emit(Resource.Success("Pdf document successfully created"))
+
+    }
+
+    private fun getDirectory(context: Context): File{
+        val mediaDir = context.externalMediaDirs.firstOrNull()?.let {
+            File(it, context.resources.getString(R.string.app_name)).apply { mkdirs() }
+        }
+        return if (mediaDir != null && mediaDir.exists()) mediaDir else context.filesDir
+    }
+
 }
