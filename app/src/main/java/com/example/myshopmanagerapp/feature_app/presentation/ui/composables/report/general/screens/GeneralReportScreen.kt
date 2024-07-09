@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.Constants.listOfPeriods
+import com.example.myshopmanagerapp.core.FormRelatedString.GHS
 import com.example.myshopmanagerapp.core.Functions.toCompanyEntity
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.Functions.toTwoDecimalPlaces
@@ -59,6 +60,7 @@ fun GeneralReportScreen(
     }
     val shopInfoJson = userPreferences.getShopInfo.collectAsState(initial = emptyString).value
     val shopInfo = shopInfoJson.toCompanyEntity()
+    val currency =  userPreferences.getCurrency.collectAsState(initial = emptyString).value ?: GHS
 
 
     Scaffold(
@@ -99,21 +101,18 @@ fun GeneralReportScreen(
             val maxDebtCustomer = if (allCustomers.isNotEmpty())allCustomers.maxBy { it.debtAmount.toNotNull() }
             else CustomerEntity(0, emptyString, emptyString, emptyString, emptyString, emptyString,  emptyString, 0.0)
 
-
             GeneralReportContent(
-                currency = "GHS",
+                currency = currency,
                 numberOfInventoryItems = "$numberOfInventoryItems",
                 totalSavings = "$totalSavings",
                 numberOfOwingCustomers = "$numberOfOwingCustomers",
                 totalWithdrawals = "$totalWithdrawals",
                 numberOfPersonnel = "$numberOfPersonnel",
-                numberOfBanks = "$numberOfBanks",
+                numberOfBankAccounts = "$numberOfBanks",
                 shopName = shopInfo?.companyName ?: "Not Registered",
                 productsSold = shopInfo?.companyProductsAndServices ?: "Not Registered",
-                totalDebtAmount = "$debtAmount",
+                totalOutstandingDebtAmount = "$debtAmount",
                 shopValue = "$inventoryCost",
-                maxDebtCustomerName = maxDebtCustomer.customerName,
-                maxDebtCustomerAmount = maxDebtCustomer.debtAmount.toNotNull().toTwoDecimalPlaces().toString(),
             )
         }
     }

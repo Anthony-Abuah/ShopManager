@@ -7,6 +7,8 @@ sealed class ReportScreens(val route: String){
     object ViewInventoryReportNavGraph: ReportScreens("to_view_inventory_report_nav_graph")
     object GeneralReportNavGraph: ReportScreens("to_general_report_nav_graph")
 
+    object ViewCashInReportNavGraph: ReportScreens("to_cash_in_report_nav_graph")
+
 
     fun withArgs(vararg args: String): String {
         return buildString {

@@ -1,18 +1,27 @@
 package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.report.general
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
+import com.example.myshopmanagerapp.core.Constants.emptyString
+import com.example.myshopmanagerapp.core.FormRelatedString.ItemsSold
+import com.example.myshopmanagerapp.core.FormRelatedString.NumberOfBankAccounts
+import com.example.myshopmanagerapp.core.FormRelatedString.NumberOfInventoryItems
+import com.example.myshopmanagerapp.core.FormRelatedString.NumberOfOwingCustomers
+import com.example.myshopmanagerapp.core.FormRelatedString.NumberOfPersonnel
+import com.example.myshopmanagerapp.core.FormRelatedString.ShopName
+import com.example.myshopmanagerapp.core.FormRelatedString.ShopValueInfo
+import com.example.myshopmanagerapp.core.FormRelatedString.TotalOutstandingDebtAmount
+import com.example.myshopmanagerapp.core.FormRelatedString.TotalSavingsAmount
+import com.example.myshopmanagerapp.core.FormRelatedString.TotalWithdrawals
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenColumnWithoutBottomBar
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.ConfirmationInfoDialog
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.ViewTextValueRow
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
-import java.util.*
 
 @Composable
 fun GeneralReportContent(
@@ -22,496 +31,112 @@ fun GeneralReportContent(
     numberOfOwingCustomers: String,
     totalWithdrawals: String,
     numberOfPersonnel: String,
-    numberOfBanks: String,
+    numberOfBankAccounts: String,
     shopName: String,
     productsSold: String,
-    totalDebtAmount: String,
+    totalOutstandingDebtAmount: String,
     shopValue: String,
-    maxDebtCustomerName: String,
-    maxDebtCustomerAmount: String,
 ){
+    var openShowValueInfo by remember {
+        mutableStateOf(false)
+    }
     BasicScreenColumnWithoutBottomBar{
 
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = LocalSpacing.current.small),
-            color = MaterialTheme.colorScheme.onBackground,
-            thickness = 0.25.dp
-        )
+        HorizontalDivider()
+        // Shop name
+        ViewTextValueRow(viewTitle = ShopName, viewValue = shopName)
 
-        
-        // Shop route
-        Column(modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = LocalSpacing.current.small),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "Shop route",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Light
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = LocalSpacing.current.small),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = shopName,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Normal
-                )
-            }
-        }
-
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = LocalSpacing.current.small),
-            color = MaterialTheme.colorScheme.onBackground,
-            thickness = 0.25.dp
-        )
-
+        HorizontalDivider()
 
         // Items sold
-        Column(modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = LocalSpacing.current.small),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "Items/Products that we sell",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Light
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = LocalSpacing.current.small),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = productsSold,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Normal
-                )
-            }
-        }
+        ViewTextValueRow(viewTitle = ItemsSold, viewValue = productsSold)
 
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = LocalSpacing.current.small),
-            color = MaterialTheme.colorScheme.onBackground,
-            thickness = 0.25.dp
-        )
-
+        HorizontalDivider()
 
         // Number of inventory items
-        Column(modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = LocalSpacing.current.small),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "Number of inventory items",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Light
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = LocalSpacing.current.small),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "$numberOfInventoryItems item(s)",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Normal
-                )
-            }
-        }
-
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = LocalSpacing.current.small),
-            color = MaterialTheme.colorScheme.onBackground,
-            thickness = 0.25.dp
+        ViewTextValueRow(
+            viewTitle = NumberOfInventoryItems,
+            viewValue = "$numberOfInventoryItems item(s)",
+            icon = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            showInfo = true
         )
+
+        HorizontalDivider()
 
         // Number Of Personnel
-        Column(modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = LocalSpacing.current.small),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "Number of personnel",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Light
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = LocalSpacing.current.small),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "$numberOfPersonnel personnel",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Normal
-                )
-            }
-        }
-
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = LocalSpacing.current.small),
-            color = MaterialTheme.colorScheme.onBackground,
-            thickness = 0.25.dp
+        ViewTextValueRow(
+            viewTitle = NumberOfPersonnel,
+            viewValue = "$numberOfPersonnel personnel",
+            icon = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            showInfo = true
         )
 
-        // Number Of customers  owing
-        Column(modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = LocalSpacing.current.small),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "Number of owing customers",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Light
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = LocalSpacing.current.small),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "$numberOfOwingCustomers customer(s)",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Normal
-                )
-            }
-        }
+        HorizontalDivider()
 
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = LocalSpacing.current.small),
-            color = MaterialTheme.colorScheme.onBackground,
-            thickness = 0.25.dp
+        // Number of owing customers
+        ViewTextValueRow(
+            viewTitle = NumberOfOwingCustomers,
+            viewValue = "$numberOfOwingCustomers customer(s)",
+            icon = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            showInfo = true
         )
 
-        // Number of banks we're saving at
-        Column(modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = LocalSpacing.current.small),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "Number of banks",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Light
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = LocalSpacing.current.small),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "$numberOfBanks bank(s)",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Normal
-                )
-            }
-        }
+        HorizontalDivider()
 
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = LocalSpacing.current.small),
-            color = MaterialTheme.colorScheme.onBackground,
-            thickness = 0.25.dp
+        // Number of bank accounts
+        ViewTextValueRow(
+            viewTitle = NumberOfBankAccounts,
+            viewValue = "$numberOfBankAccounts bank account(s)",
+            icon = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            showInfo = true
         )
+        HorizontalDivider()
 
         // Total Savings Amount
-        Column(modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = LocalSpacing.current.small),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "Total savings",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Light
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = LocalSpacing.current.small),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "$currency $totalSavings",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Normal
-                )
-            }
-        }
-
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = LocalSpacing.current.small),
-            color = MaterialTheme.colorScheme.onBackground,
-            thickness = 0.25.dp
+        ViewTextValueRow(
+            viewTitle = TotalSavingsAmount,
+            viewValue = "$currency $totalSavings"
         )
+
+        HorizontalDivider()
 
         // Total Withdrawal
-        Column(modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = LocalSpacing.current.small),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "Total withdrawals",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Light
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = LocalSpacing.current.small),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "$currency $totalWithdrawals",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Normal
-                )
-            }
-        }
-
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = LocalSpacing.current.small),
-            color = MaterialTheme.colorScheme.onBackground,
-            thickness = 0.25.dp
+        ViewTextValueRow(
+            viewTitle = TotalWithdrawals,
+            viewValue = "$currency $totalWithdrawals"
         )
+        HorizontalDivider()
 
         // Debt Amount
-        Column(modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = LocalSpacing.current.small),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "Total debt amount",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Light
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = LocalSpacing.current.small),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "$currency $totalDebtAmount",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Normal
-                )
-            }
-        }
-
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = LocalSpacing.current.small),
-            color = MaterialTheme.colorScheme.onBackground,
-            thickness = 0.25.dp
+        ViewTextValueRow(
+            viewTitle = TotalOutstandingDebtAmount,
+            viewValue = "$currency $totalOutstandingDebtAmount"
         )
+        HorizontalDivider()
 
-        // Customer with highest debt
-        Column(modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = LocalSpacing.current.small),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "Customer with highest debt",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Light
-                )
+        //Shop value
+        ViewTextValueRow(
+            viewTitle = TotalOutstandingDebtAmount,
+            viewValue = "$currency $shopValue",
+            showInfo = true,
+            onClick = {
+                openShowValueInfo = !openShowValueInfo
             }
-
-            Row(modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .weight(2f)
-                        .padding(end = LocalSpacing.current.small),
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    Text(
-                        text = maxDebtCustomerName.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() },
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        overflow = TextOverflow.Ellipsis,
-                        fontWeight = FontWeight.Normal
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = LocalSpacing.current.small),
-                    contentAlignment = Alignment.CenterEnd
-                ) {
-                    Text(
-                        text = "$currency $maxDebtCustomerAmount",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        overflow = TextOverflow.Ellipsis,
-                        fontWeight = FontWeight.Normal
-                    )
-                }
-            }
-        }
-
-
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = LocalSpacing.current.small),
-            color = MaterialTheme.colorScheme.onBackground,
-            thickness = 0.25.dp
         )
+        HorizontalDivider()
 
-        // Total Debt Repayment Amount
-        Column(modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = LocalSpacing.current.small),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "Shop value based on last stock",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Light
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = LocalSpacing.current.small),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "$currency $shopValue",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Normal
-                )
-            }
-        }
+        Spacer(modifier = Modifier.height(LocalSpacing.current.small))
 
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = LocalSpacing.current.small),
-            color = MaterialTheme.colorScheme.onBackground,
-            thickness = 0.25.dp
-        )
+    }
+    ConfirmationInfoDialog(
+        openDialog = openShowValueInfo,
+        isLoading = false,
+        title = emptyString,
+        textContent = ShopValueInfo,
+        unconfirmedDeletedToastText = null,
+        confirmedDeleteToastText = null
+    ) {
+        openShowValueInfo = false
     }
 
 }

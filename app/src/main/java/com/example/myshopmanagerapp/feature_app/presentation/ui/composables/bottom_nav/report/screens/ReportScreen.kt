@@ -20,6 +20,7 @@ fun ReportScreen(
     navHostController: NavHostController,
     navigateToViewRevenueReportScreen: ()-> Unit,
     navigateToStockReportScreen: ()-> Unit,
+    navigateToCashInReportScreen: ()-> Unit,
     navigateToViewGeneralReportScreen: ()-> Unit,
     navigateToInventoryReportScreen: ()-> Unit,
 ) {
@@ -28,7 +29,6 @@ fun ReportScreen(
         topBar = { ReportScreenTopBar(topBarTitleText = "Report") },
         bottomBar = { BottomBar(navHostController) }
     ) {
-        it
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -36,6 +36,7 @@ fun ReportScreen(
         ) {
             ReportContent(
                 navigateToViewRevenueReportScreen = navigateToViewRevenueReportScreen,
+                navigateToCashInReportScreen = navigateToCashInReportScreen,
                 navigateToViewStockReportScreen = navigateToStockReportScreen,
                 navigateToViewGeneralReportScreen = navigateToViewGeneralReportScreen,
             ) {

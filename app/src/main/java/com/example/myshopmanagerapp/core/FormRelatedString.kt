@@ -51,6 +51,22 @@ object FormRelatedString{
     const val ClickToBackupDataRemotely = "Click to backup data remotely"
     const val ClickToSyncData = "Click to sync remote data with local data"
 
+    const val ShopName = "Shop Name"
+    const val ItemsSold = "Products/Items Sold"
+    const val NumberOfInventoryItems = "Number of inventory items"
+    const val NumberOfPersonnel = "Number of personnel"
+    const val NumberOfOwingCustomers = "Number of owing customers"
+    const val NumberOfBankAccounts = "Number of bank accounts"
+    const val TotalSavingsAmount = "Total savings amount"
+    const val TotalWithdrawals = "Total withdrawals"
+    const val TotalDebtAmount = "Total debt amount"
+    const val TotalDebtRepaymentAmount = "Total debt repayment amount"
+    const val TotalOutstandingDebtAmount = "Total outstanding debt amount"
+    const val ShopValue = "Shop value"
+    const val ShopValueInfo = "Shop value is based on the total value(cost price) of the last stock or inventory taken for an inventory item. " +
+            "If no inventory or stock is taken for an item, the value will be zero"
+    const val GHS = "GHS"
+
 
     const val LocalBackUpDialogMessage = "This will save a copy of your database to your local storage file so that you can restore it later." +
             "\n\nAre you sure want to back up database locally?"
@@ -408,6 +424,7 @@ object FormRelatedString{
     const val CurrencyPlaceholder = "Eg: GHS"
 
     val listOfCurrencies = listOf(
+        "GHS Ghana Cedi Ghana",
         "AED UAE Dirham United Arab Emirates",
         "AFN Afghani Afghanistan",
         "ALL Lek Albania",

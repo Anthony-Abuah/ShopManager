@@ -14,6 +14,7 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.*
 fun ReportContent(
     navigateToViewRevenueReportScreen: ()-> Unit,
     navigateToViewStockReportScreen: ()-> Unit,
+    navigateToCashInReportScreen: ()-> Unit,
     navigateToViewGeneralReportScreen: ()-> Unit,
     navigateToViewInventoryReportScreen: ()-> Unit
 ) {
@@ -27,12 +28,31 @@ fun ReportContent(
             ReportCard(
                 title = "General Shop Report",
                 semiTitle = "View all your shop info",
-                description = "You can see all your basic shop information and records here revenue",
+                description = "You can see all your basic shop information and records here",
                 icon = R.drawable.ic_money_filled,
                 contentColor = if (isSystemInDarkTheme()) DarkViolet10 else DarkViolet95,
                 cardContainerColor = if (isSystemInDarkTheme()) DarkViolet80 else DarkViolet40,
                 onOpenCard = {
                     navigateToViewGeneralReportScreen()
+                }
+            )
+        }
+
+        //General Report Card
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(LocalSpacing.current.small),
+        ) {
+            ReportCard(
+                title = "Cash flow",
+                semiTitle = "View all your cash flows",
+                description = "You can see all your cash flow information and records here",
+                icon = R.drawable.ic_money_filled,
+                contentColor = if (isSystemInDarkTheme()) YellowishGreen10 else YellowishGreen95,
+                cardContainerColor = if (isSystemInDarkTheme()) YellowishGreen80 else YellowishGreen40,
+                onOpenCard = {
+                    navigateToCashInReportScreen()
                 }
             )
         }
