@@ -3,7 +3,6 @@ package com.example.myshopmanagerapp.core
 import com.example.myshopmanagerapp.feature_app.data.local.entities.personnel.PersonnelEntity
 import com.example.myshopmanagerapp.feature_app.data.util.GsonParser
 import com.example.myshopmanagerapp.feature_app.data.util.JsonParser
-import com.example.myshopmanagerapp.feature_app.domain.model.QuantityCategorization
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 

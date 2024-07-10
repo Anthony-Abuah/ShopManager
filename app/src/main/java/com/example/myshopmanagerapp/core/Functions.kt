@@ -446,29 +446,37 @@ object Functions {
     }
 
     fun ItemQuantities.addItemQuantities(itemQuantities: ItemQuantities): ItemQuantities{
-        val thisItemQuantities = mutableListOf<ItemQuantity>()
-        this.forEach { itemQuantity ->
-            itemQuantities.forEach{ _itemQuantity ->
-                if ((itemQuantity.sizeName == _itemQuantity.sizeName) && (itemQuantity.unitsPerSize == _itemQuantity.unitsPerSize)){
-                    thisItemQuantities.add(itemQuantity.addQuantity(_itemQuantity))
+        if (itemQuantities.isEmpty()){
+            return this
+        }else {
+            val thisItemQuantities = mutableListOf<ItemQuantity>()
+            this.forEach { itemQuantity ->
+                itemQuantities.forEach { _itemQuantity ->
+                    if ((itemQuantity.sizeName == _itemQuantity.sizeName) && (itemQuantity.unitsPerSize == _itemQuantity.unitsPerSize)) {
+                        thisItemQuantities.add(itemQuantity.addQuantity(_itemQuantity))
+                    }
                 }
             }
-        }
-        this.forEach { itemQuantity ->
-            val nameIsContained = thisItemQuantities.map { it.sizeName }.contains(itemQuantity.sizeName)
-            val unitQuantityIsContained = thisItemQuantities.map { it.unitsPerSize }.contains(itemQuantity.unitsPerSize)
-            if (!(nameIsContained && unitQuantityIsContained)){
-                thisItemQuantities.add(itemQuantity)
+            this.forEach { itemQuantity ->
+                val nameIsContained =
+                    thisItemQuantities.map { it.sizeName }.contains(itemQuantity.sizeName)
+                val unitQuantityIsContained =
+                    thisItemQuantities.map { it.unitsPerSize }.contains(itemQuantity.unitsPerSize)
+                if (!(nameIsContained && unitQuantityIsContained)) {
+                    thisItemQuantities.add(itemQuantity)
+                }
             }
-        }
-        itemQuantities.forEach { itemQuantity ->
-            val nameIsContained = thisItemQuantities.map { it.sizeName }.contains(itemQuantity.sizeName)
-            val unitQuantityIsContained = thisItemQuantities.map { it.unitsPerSize }.contains(itemQuantity.unitsPerSize)
-            if (!(nameIsContained && unitQuantityIsContained)){
-                thisItemQuantities.add(itemQuantity)
+            itemQuantities.forEach { itemQuantity ->
+                val nameIsContained =
+                    thisItemQuantities.map { it.sizeName }.contains(itemQuantity.sizeName)
+                val unitQuantityIsContained =
+                    thisItemQuantities.map { it.unitsPerSize }.contains(itemQuantity.unitsPerSize)
+                if (!(nameIsContained && unitQuantityIsContained)) {
+                    thisItemQuantities.add(itemQuantity)
+                }
             }
+            return thisItemQuantities
         }
-        return thisItemQuantities
     }
 
     fun ItemQuantities.subtractItemQuantities(itemQuantities: ItemQuantities): ItemQuantities{
@@ -489,12 +497,7 @@ object Functions {
     private val jsonParser: JsonParser = GsonParser(Gson())
 
 
-    fun fromRolesJson(roles: String?): List<PersonnelRole> {
-        return roles?.let {
-            jsonParser.fromJson<List<PersonnelRole>>(
-                it, object : TypeToken<List<PersonnelRole>>(){}.type)
-        } ?: emptyList()
-    }
+
     fun toRolesJson(personnelRoles: List<PersonnelRole>?): String{
         return jsonParser.toJson(
             personnelRoles,
@@ -508,12 +511,7 @@ object Functions {
                 it, object : TypeToken<List<Manufacturer>>(){}.type)
         } ?: emptyList()
     }
-    fun toManufacturersJson(manufacturers: List<Manufacturer>?): String{
-        return jsonParser.toJson(
-            manufacturers,
-            object : TypeToken<List<Manufacturer>>(){}.type
-        ) ?: "[]"
-    }
+
 
     fun fromCategoriesJson(categories: String?): List<ItemCategory> {
         return categories?.let {
@@ -521,20 +519,10 @@ object Functions {
                 it, object : TypeToken<List<ItemCategory>>(){}.type)
         } ?: emptyList()
     }
-    fun toCategoriesJson(categories: List<ItemCategory>?): String{
-        return jsonParser.toJson(
-            categories,
-            object : TypeToken<List<ItemCategory>>(){}.type
-        ) ?: "[]"
-    }
 
 
-    fun CompanyInfoDto.toCompanyInfoJson(): String{
-        return jsonParser.toJson(
-            this,
-            object : TypeToken<CompanyInfoDto>(){}.type
-        ) ?: "[]"
-    }
+
+
 
     fun CompanyEntity.toCompanyEntityJson(): String?{
         return jsonParser.toJson(
@@ -543,12 +531,7 @@ object Functions {
         )
     }
 
-    fun String?.toStockEntity(): StockEntity {
-        return this?.let {
-            jsonParser.fromJson<StockEntity>(
-                it, object : TypeToken<StockEntity>(){}.type)
-        } ?: StockEntity(0, emptyString, Date().time, emptyString, emptyString, emptyString, emptyList(), 0, Date().time, 0, false, emptyString)
-    }
+
 
     fun String?.toCompanyInfoDto(): CompanyInfoDto? {
         return this?.let {
@@ -580,19 +563,7 @@ object Functions {
         } ?: emptyList()
     }
 
-    fun String?.toPrice(): Price {
-        return this?.let {
-            jsonParser.fromJson<Price>(
-                it, object : TypeToken<Price>(){}.type)
-        } ?: Price(LocalDate.now().toTimestamp(), emptyString, 0.0)
-    }
 
-    fun Price?.toPriceJson(): String{
-        return jsonParser.toJson(
-            this,
-            object : TypeToken<Price>(){}.type
-        ) ?: "[]"
-    }
 
     fun Prices?.toPricesJson(): String{
         return jsonParser.toJson(

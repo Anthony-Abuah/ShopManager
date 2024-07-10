@@ -22,7 +22,9 @@ data class StockEntity(
     val totalNumberOfUnits: Int,
     val dateOfLastStock: Long?,
     val changeInNumberOfUnits: Int?,
-    val isInventoryStock: Boolean,
+    val unitCostPrice: Double? = null,
+    val totalCostPrice: Double? = null,
+    val isInventoryStock: Boolean = false,
     val otherInfo: String?
 ){
     fun toStockInfoDto(uniqueCompanyId: String): StockInfoDto{

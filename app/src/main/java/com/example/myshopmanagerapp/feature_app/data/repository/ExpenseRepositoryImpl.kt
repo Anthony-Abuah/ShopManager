@@ -13,12 +13,15 @@ import com.example.myshopmanagerapp.core.Functions.toDate
 import com.example.myshopmanagerapp.core.Functions.toDateString
 import com.example.myshopmanagerapp.core.Functions.toEllipses
 import com.example.myshopmanagerapp.core.Functions.toNotNull
+import com.example.myshopmanagerapp.core.Functions.toTimestamp
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
 import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
 import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIdsJson
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
 import com.example.myshopmanagerapp.feature_app.data.local.entities.expenses.ExpenseEntity
+import com.example.myshopmanagerapp.feature_app.domain.model.ItemValue
+import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
 import com.example.myshopmanagerapp.feature_app.domain.model.UniqueId
 import com.example.myshopmanagerapp.feature_app.domain.repository.ExpenseRepository
 import kotlinx.coroutines.Dispatchers
@@ -221,6 +224,25 @@ class ExpenseRepositoryImpl(
 
     override suspend fun deleteAllExpenses() {
         appDatabase.expenseDao.deleteAllExpenses()
+    }
+
+    override suspend fun getShopExpenses(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>> = flow{
+        emit(Resource.Loading())
+        try {
+            val allExpenses = appDatabase.expenseDao.getAllExpenses() ?: emptyList()
+            if (periodDropDownItem.isAllTime) {
+                val totalRevenue = allExpenses.sumOf { it.expenseAmount }
+                emit(Resource.Success(ItemValue("Total Expenses", totalRevenue)))
+            }else{
+                val firstDate = periodDropDownItem.firstDate.toTimestamp()
+                val lastDate = periodDropDownItem.lastDate.toTimestamp()
+                val allFilteredExpenses = allExpenses.filter { it.date in firstDate .. lastDate }
+                val totalExpenses = allFilteredExpenses.sumOf { it.expenseAmount }
+                emit(Resource.Success(ItemValue("Total Expenses", totalExpenses)))
+            }
+        }catch (e:Exception){
+            emit(Resource.Error("Could not get value"))
+        }
     }
 
 

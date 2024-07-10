@@ -10,7 +10,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import co.yml.charts.common.extensions.roundTwoDecimal
 import com.example.myshopmanagerapp.core.Constants.listOfPeriods
 import com.example.myshopmanagerapp.core.Functions.toTimestamp
 import com.example.myshopmanagerapp.core.Functions.toTwoDecimalPlaces
@@ -48,7 +47,7 @@ fun MainRevenueReportScreen(
         revenueViewModel.getExpenseAmount(period)
         revenueViewModel.getDebtAmount(period)
         revenueViewModel.getDebtRepaymentAmount(period)
-        revenueViewModel.getInventoryCost(period)
+        revenueViewModel.getShopRevenue(period)
         revenueViewModel.getRevenueDays(period)
         revenueViewModel.getRevenueHours(period)
     }
@@ -92,7 +91,7 @@ fun MainRevenueReportScreen(
             val debtPercentage = totalDebtAmount.div(revenueAmount).times(100.0).toTwoDecimalPlaces()
             val debtBalance = totalDebtAmount.minus(totalDebtRepaymentAmount).toTwoDecimalPlaces()
             val expensePercentage = expenseAmount.div(revenueAmount).times(100.0).toTwoDecimalPlaces()
-            val inventoryCost = revenueViewModel.inventoryCost.value.itemValue.value.toTwoDecimalPlaces()
+            val inventoryCost = revenueViewModel.shopRevenueAmount.value.itemValue.value.toTwoDecimalPlaces()
 
             val allRevenues = revenueViewModel.revenueEntitiesState.value.revenueEntities ?: emptyList()
             val allFilteredRevenue = allRevenues.filter {revenue->

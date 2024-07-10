@@ -3,21 +3,13 @@ package com.example.myshopmanagerapp.feature_app.data.local
 
 import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
-import com.example.myshopmanagerapp.core.Constants.ONE
-import com.example.myshopmanagerapp.core.Constants.Unit
 import com.example.myshopmanagerapp.core.ItemQuantities
 import com.example.myshopmanagerapp.core.Prices
 import com.example.myshopmanagerapp.core.QuantityCategorizations
 import com.example.myshopmanagerapp.core.StockEntities
 import com.example.myshopmanagerapp.feature_app.data.util.JsonParser
-import com.example.myshopmanagerapp.feature_app.domain.model.ItemQuantityCategorization
 import com.example.myshopmanagerapp.feature_app.domain.model.ItemQuantityInfo
-import com.example.myshopmanagerapp.feature_app.domain.model.Price
-import com.example.myshopmanagerapp.feature_app.domain.model.QuantityCategorization
 import com.google.gson.reflect.TypeToken
-import java.util.*
-
-private val date = Date().time
 
 @ProvidedTypeConverter
 class Converters(
@@ -77,41 +69,8 @@ class Converters(
     }
 
 
-    //Quantity Categorization
-    @TypeConverter
-    fun fromQuantityCategorizationJson(quantityCategorization: String?): QuantityCategorization {
-        return quantityCategorization?.let {
-            jsonParser.fromJson<QuantityCategorization>(
-                it, object : TypeToken<QuantityCategorization>(){}.type)
-        } ?: QuantityCategorization(Unit, ONE)
-    }
-    @TypeConverter
-    fun toQuantityCategorizationJson(quantityCategorization: QuantityCategorization?): String{
-        return jsonParser.toJson(
-            quantityCategorization,
-            object : TypeToken<QuantityCategorization>(){}.type
-        ) ?: "[]"
-    }
-
 
     //Price
-    @TypeConverter
-    fun fromPriceJson(price: String?): Price {
-        return price?.let {
-            jsonParser.fromJson<Price>(
-                it, object : TypeToken<Price>(){}.type)
-        } ?: Price(date, Unit, 0.0)
-    }
-    @TypeConverter
-    fun toPriceJson(price: Price?): String{
-        return jsonParser.toJson(
-            price,
-            object : TypeToken<Price>(){}.type
-        ) ?: "[]"
-    }
-
-
-//Price
     @TypeConverter
     fun fromItemQuantityInfoListJson(itemQuantityInfoList: String?): List<ItemQuantityInfo> {
         return itemQuantityInfoList?.let {
@@ -146,20 +105,5 @@ class Converters(
         ) ?: "[]"
     }
 
-    //ItemQuantityCategorization
-    @TypeConverter
-    fun fromItemQuantityCategorizationJson(itemQuantityCategorization: String?): ItemQuantityCategorization {
-        return itemQuantityCategorization?.let {
-            jsonParser.fromJson<ItemQuantityCategorization>(
-                it,
-                object : TypeToken<ItemQuantityCategorization>(){}.type)
-        } ?: ItemQuantityCategorization(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)    }
-    @TypeConverter
-    fun toItemQuantityCategorizationJson(itemQuantityCategorization: ItemQuantityCategorization?): String{
-        return jsonParser.toJson(
-            itemQuantityCategorization,
-            object : TypeToken<ItemQuantityCategorization>(){}.type
-        ) ?: "[]"
-    }
 
 }

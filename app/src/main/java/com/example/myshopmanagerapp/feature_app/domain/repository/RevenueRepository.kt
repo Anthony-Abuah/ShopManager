@@ -40,6 +40,6 @@ interface RevenueRepository {
     suspend fun getMinimumRevenueDay(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
     suspend fun getMaximumExpenseDay(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
     suspend fun getMinimumExpenseDay(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
-    suspend fun getCostOfInventory(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
+    suspend fun getShopRevenue(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
 
 }

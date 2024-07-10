@@ -17,7 +17,6 @@ import com.example.myshopmanagerapp.core.Functions.toCompanyEntity
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.Functions.toTwoDecimalPlaces
 import com.example.myshopmanagerapp.core.UserPreferences
-import com.example.myshopmanagerapp.feature_app.data.local.entities.customers.CustomerEntity
 import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.StockReportScreenTopBar
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.report.general.GeneralReportContent
@@ -26,8 +25,9 @@ import java.time.LocalDate
 
 @Composable
 fun GeneralReportScreen(
-    revenueViewModel: RevenueViewModel = hiltViewModel(),
     expenseViewModel: ExpenseViewModel = hiltViewModel(),
+    stockViewModel: StockViewModel = hiltViewModel(),
+    revenueViewModel: RevenueViewModel = hiltViewModel(),
     customerViewModel: CustomerViewModel = hiltViewModel(),
     personnelViewModel: PersonnelViewModel = hiltViewModel(),
     inventoryViewModel: InventoryViewModel = hiltViewModel(),
@@ -35,7 +35,7 @@ fun GeneralReportScreen(
     withdrawalViewModel: WithdrawalViewModel = hiltViewModel(),
     savingsViewModel: SavingsViewModel = hiltViewModel(),
     bankAccountViewModel: BankAccountViewModel = hiltViewModel(),
-    navigateBack: ()-> Unit
+    navigateBack: () -> Unit
 ) {
     val context = LocalContext.current
     val userPreferences = UserPreferences(context)
@@ -55,8 +55,10 @@ fun GeneralReportScreen(
         personnelViewModel.getAllPersonnel()
         savingsViewModel.getAllSavings()
         bankAccountViewModel.getAllBanks()
-        revenueViewModel.getInventoryCost(period)
+        revenueViewModel.getShopRevenue(period)
         withdrawalViewModel.getAllWithdrawals()
+        expenseViewModel.getShopExpense(period)
+        stockViewModel.getShopValue(period)
     }
     val shopInfoJson = userPreferences.getShopInfo.collectAsState(initial = emptyString).value
     val shopInfo = shopInfoJson.toCompanyEntity()
@@ -92,27 +94,30 @@ fun GeneralReportScreen(
             val numberOfOwingCustomers = allCustomers.count {customer-> customer.debtAmount.toNotNull() > 0.0 }
             val allPersonnel = personnelViewModel.personnelEntitiesState.value.personnelEntities ?: emptyList()
             val numberOfPersonnel = allPersonnel.count()
-            val allBanks = bankAccountViewModel.bankAccountEntitiesState.value.bankAccountEntities ?: emptyList()
-            val numberOfBanks = allBanks.count()
+            val allBankAccounts = bankAccountViewModel.bankAccountEntitiesState.value.bankAccountEntities ?: emptyList()
+            val numberOfBankAccounts = allBankAccounts.count()
             val allInventoryItems = inventoryItemViewModel.inventoryItemEntitiesState.value.inventoryItemEntities ?: emptyList()
             val numberOfInventoryItems = allInventoryItems.count()
             val debtAmount = allCustomers.sumOf { it.debtAmount.toNotNull() }
-            val inventoryCost = revenueViewModel.inventoryCost.value.itemValue.value.toTwoDecimalPlaces()
-            val maxDebtCustomer = if (allCustomers.isNotEmpty())allCustomers.maxBy { it.debtAmount.toNotNull() }
-            else CustomerEntity(0, emptyString, emptyString, emptyString, emptyString, emptyString,  emptyString, 0.0)
+
+            val shopValue = stockViewModel.shopValue.value.itemValue.value.toTwoDecimalPlaces()
+            val totalRevenue = revenueViewModel.shopRevenueAmount.value.itemValue.value.toTwoDecimalPlaces()
+            val totalExpense = expenseViewModel.shopExpenseAmount.value.itemValue.value.toTwoDecimalPlaces()
 
             GeneralReportContent(
                 currency = currency,
                 numberOfInventoryItems = "$numberOfInventoryItems",
                 totalSavings = "$totalSavings",
                 numberOfOwingCustomers = "$numberOfOwingCustomers",
+                totalRevenues = "$totalRevenue",
+                totalExpenses = "$totalExpense",
                 totalWithdrawals = "$totalWithdrawals",
                 numberOfPersonnel = "$numberOfPersonnel",
-                numberOfBankAccounts = "$numberOfBanks",
+                numberOfBankAccounts = "$numberOfBankAccounts",
                 shopName = shopInfo?.companyName ?: "Not Registered",
                 productsSold = shopInfo?.companyProductsAndServices ?: "Not Registered",
                 totalOutstandingDebtAmount = "$debtAmount",
-                shopValue = "$inventoryCost",
+                shopValue = "$shopValue",
             )
         }
     }

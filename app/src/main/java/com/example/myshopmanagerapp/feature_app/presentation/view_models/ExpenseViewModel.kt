@@ -14,6 +14,8 @@ import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.UIEvent
 import com.example.myshopmanagerapp.feature_app.data.local.entities.expenses.ExpenseEntity
+import com.example.myshopmanagerapp.feature_app.domain.model.ItemValue
+import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
 import com.example.myshopmanagerapp.feature_app.domain.repository.ExpenseRepository
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.company.AddCompanyState
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.expense.ExpenseEntitiesState
@@ -62,6 +64,9 @@ class ExpenseViewModel @Inject constructor(
 
     private val _expenseEntitiesState = mutableStateOf(ExpenseEntitiesState())
     val expenseEntitiesState: State<ExpenseEntitiesState> = _expenseEntitiesState
+
+    private val _shopExpenseAmount = mutableStateOf(ItemValueState())
+    val shopExpenseAmount: State<ItemValueState> = _shopExpenseAmount
 
 
     private val _eventFlow = MutableSharedFlow<UIEvent>()
@@ -217,6 +222,36 @@ class ExpenseViewModel @Inject constructor(
             isLoading = false
         )
     }
+
+
+    fun getShopExpense(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
+        expenseRepository.getShopExpenses(periodDropDownItem).onEach { response->
+            when(response){
+                is Resource.Success ->{
+                    _shopExpenseAmount.value = shopExpenseAmount.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+                is Resource.Loading ->{
+                    _shopExpenseAmount.value = shopExpenseAmount.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = true
+                    )
+                }
+                is Resource.Error ->{
+                    _shopExpenseAmount.value = shopExpenseAmount.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+            }
+        }.launchIn(this)
+    }
+
 
 
     fun updateExpenseDate(date: Long, dayOfWeek: String) {

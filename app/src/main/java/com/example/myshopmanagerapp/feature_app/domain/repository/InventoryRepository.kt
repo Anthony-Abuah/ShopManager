@@ -43,6 +43,8 @@ interface InventoryRepository {
 
     suspend fun getTotalNumberOfItems(period: PeriodDropDownItem): Flow<Resource<ItemValue>>
 
+    suspend fun getShopValue(period: PeriodDropDownItem): Flow<Resource<ItemValue>>
+
     suspend fun getTotalCostValue(period: PeriodDropDownItem): Flow<Resource<ItemValue>>
 
     suspend fun getTotalExpectedSalesValue(period: PeriodDropDownItem): Flow<Resource<ItemValue>>

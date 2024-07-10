@@ -81,8 +81,8 @@ class RevenueViewModel @Inject constructor(
     private val _minExpense = mutableStateOf(ItemValueState())
     val minExpense: State<ItemValueState> = _minExpense
 
-    private val _inventoryCost = mutableStateOf(ItemValueState())
-    val inventoryCost: State<ItemValueState> = _inventoryCost
+    private val _shopRevenueAmount = mutableStateOf(ItemValueState())
+    val shopRevenueAmount: State<ItemValueState> = _shopRevenueAmount
 
 
     private val _insertRevenueState = mutableStateOf(ItemValueState())
@@ -415,25 +415,25 @@ class RevenueViewModel @Inject constructor(
         }.launchIn(this)
     }
 
-    fun getInventoryCost(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
-        revenueRepository.getCostOfInventory(periodDropDownItem).onEach { response->
+    fun getShopRevenue(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
+        revenueRepository.getShopRevenue(periodDropDownItem).onEach { response->
             when(response){
                 is Resource.Success ->{
-                    _inventoryCost.value = inventoryCost.value.copy(
+                    _shopRevenueAmount.value = shopRevenueAmount.value.copy(
                         itemValue = response.data ?: ItemValue(emptyString, 0.0),
                         message = response.message,
                         isLoading = false
                     )
                 }
                 is Resource.Loading ->{
-                    _inventoryCost.value = inventoryCost.value.copy(
+                    _shopRevenueAmount.value = shopRevenueAmount.value.copy(
                         itemValue = response.data ?: ItemValue(emptyString, 0.0),
                         message = response.message,
                         isLoading = true
                     )
                 }
                 is Resource.Error ->{
-                    _inventoryCost.value = inventoryCost.value.copy(
+                    _shopRevenueAmount.value = shopRevenueAmount.value.copy(
                         itemValue = response.data ?: ItemValue(emptyString, 0.0),
                         message = response.message,
                         isLoading = false

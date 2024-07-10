@@ -59,6 +59,8 @@ object FormRelatedString{
     const val NumberOfBankAccounts = "Number of bank accounts"
     const val TotalSavingsAmount = "Total savings amount"
     const val TotalWithdrawals = "Total withdrawals"
+    const val TotalRevenues = "Total revenues"
+    const val TotalExpenses = "Total expenes"
     const val TotalDebtAmount = "Total debt amount"
     const val TotalDebtRepaymentAmount = "Total debt repayment amount"
     const val TotalOutstandingDebtAmount = "Total outstanding debt amount"

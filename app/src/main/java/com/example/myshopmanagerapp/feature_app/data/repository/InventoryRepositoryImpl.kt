@@ -19,6 +19,7 @@ import com.example.myshopmanagerapp.core.Functions.toDate
 import com.example.myshopmanagerapp.core.Functions.toDateString
 import com.example.myshopmanagerapp.core.Functions.toEllipses
 import com.example.myshopmanagerapp.core.Functions.toNotNull
+import com.example.myshopmanagerapp.core.Functions.toTimestamp
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
 import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
 import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIdsJson
@@ -103,10 +104,11 @@ class InventoryRepositoryImpl(
                             "\nThis helps the app to determine which personnel is entering the information"))
                 }
                 else->{
-                    val quantityInfo = inventory.quantityInfo
+                    val thisInventoryQuantity = inventory.quantityInfo
                     val dateString = inventory.date.toDateString()
                     val uniqueStockId = generateUniqueStockId("${inventoryItem.inventoryItemName}-${dateString}_")
-
+                    val lastStockQuantityInfo = lastStock?.stockQuantityInfo ?: emptyList()
+                    val quantityInfo = thisInventoryQuantity.addItemQuantities(lastStockQuantityInfo)
                     val stock = StockEntity(
                         0,
                         uniqueStockId = uniqueStockId,
@@ -116,6 +118,8 @@ class InventoryRepositoryImpl(
                         uniqueInventoryItemId = inventory.uniqueInventoryItemId,
                         stockQuantityInfo = quantityInfo,
                         totalNumberOfUnits = quantityInfo.getTotalNumberOfUnits(),
+                        unitCostPrice = inventory.unitCostPrice,
+                        totalCostPrice = inventory.unitCostPrice.times(quantityInfo.getTotalNumberOfUnits()),
                         dateOfLastStock = lastStock?.date,
                         changeInNumberOfUnits = inventory.totalNumberOfUnits,
                         isInventoryStock = true,
@@ -137,8 +141,8 @@ class InventoryRepositoryImpl(
 
                     val thisInventoryItem = inventoryItem.copy(
                         stockInfo = stockInfo,
-                        itemQuantityInfo = thisInventoryItemQuantityInfo.addItemQuantities(quantityInfo),
-                        totalNumberOfUnits = thisInventoryItemQuantityInfo.addItemQuantities(quantityInfo).getTotalNumberOfUnits(),
+                        itemQuantityInfo = thisInventoryItemQuantityInfo.addItemQuantities(thisInventoryQuantity),
+                        totalNumberOfUnits = thisInventoryItemQuantityInfo.addItemQuantities(thisInventoryQuantity).getTotalNumberOfUnits(),
                         costPrices = costPrices,
                         currentCostPrice = inventory.unitCostPrice
                     )
@@ -266,12 +270,18 @@ class InventoryRepositoryImpl(
                             "\nThis helps the app to determine which personnel is entering the information"))
                 }
                 else -> {
+                    val thisInventoryQuantity = inventory.quantityInfo
+                    val lastStockQuantityInfo = penultimateStock?.stockQuantityInfo ?: emptyList()
+                    val quantityInfo = thisInventoryQuantity.addItemQuantities(lastStockQuantityInfo)
+
                     val updatedStock = oldStock.copy(
                         date = inventory.date,
                         uniquePersonnelId = uniquePersonnelId,
                         dayOfWeek = inventory.dayOfWeek,
-                        stockQuantityInfo = inventory.quantityInfo,
-                        totalNumberOfUnits = inventory.quantityInfo.getTotalNumberOfUnits(),
+                        stockQuantityInfo = quantityInfo,
+                        totalNumberOfUnits = quantityInfo.getTotalNumberOfUnits(),
+                        unitCostPrice = inventory.unitCostPrice,
+                        totalCostPrice = quantityInfo.getTotalNumberOfUnits().times(inventory.unitCostPrice),
                         changeInNumberOfUnits = inventory.totalNumberOfUnits,
                         otherInfo = inventory.otherInfo
                     )
@@ -522,6 +532,46 @@ class InventoryRepositoryImpl(
                 message = "Unknown error",
                 data = null
             ))
+        }
+    }
+
+    override suspend fun getShopValue(period: PeriodDropDownItem): Flow<Resource<ItemValue>> = flow{
+        emit(Resource.Loading())
+        try {
+            val latestInventoryStocks = mutableListOf<ItemValue>()
+            val allInventories = appDatabase.inventoryDao.getAllInventories()?.sortedBy { it.date } ?: emptyList()
+            val allStocks = appDatabase.stockDao.getAllStocks()?.sortedBy { it.date } ?: emptyList()
+            val latestStocks = allStocks.groupBy { it.uniqueInventoryItemId }.mapValues { it.value.maxByOrNull { _stock-> _stock.date } }
+            val latestInventories = allInventories.groupBy { it.uniqueInventoryItemId }.mapValues { it.value.maxByOrNull { _inventory-> _inventory.date } }
+
+            latestInventories.keys.forEach { uniqueInventoryItemId->
+                latestInventoryStocks.add(
+                    ItemValue(uniqueInventoryItemId,
+                        latestInventories[uniqueInventoryItemId]?.totalCostPrice.toNotNull()
+                    )
+                )
+            }
+            latestStocks.keys.forEach { uniqueInventoryItemId->
+                latestInventoryStocks.add(
+                    ItemValue(uniqueInventoryItemId,
+                        latestInventories[uniqueInventoryItemId]?.totalCostPrice.toNotNull()
+                    )
+                )
+            }
+            val lastInventories = allInventories.groupBy { it.uniqueInventoryId }.mapValues { it.value.maxByOrNull { _inventory-> _inventory.date } }.values.filterNotNull()
+            if (period.isAllTime) {
+                val totalCost = lastInventories.sumOf { it.totalCostPrice }
+                emit(Resource.Success(ItemValue("Total Inventory Cost", totalCost)))
+            }else{
+                val firstDate = period.firstDate.toTimestamp()
+                val lastDate = period.lastDate.toTimestamp()
+                val allFilteredInventories = allInventories.filter { it.date in firstDate .. lastDate }
+                val latestFilteredInventories = allFilteredInventories.groupBy { it.uniqueInventoryId }.mapValues { it.value.maxByOrNull { _inventory-> _inventory.date } }.values.filterNotNull()
+                val totalCost = latestFilteredInventories.sumOf { it.totalCostPrice }
+                emit(Resource.Success(ItemValue("Total Inventory Cost", totalCost)))
+            }
+        }catch (e:Exception){
+            emit(Resource.Error("Could not get value"))
         }
     }
 

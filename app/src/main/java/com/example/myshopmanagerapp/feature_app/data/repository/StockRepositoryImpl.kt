@@ -7,6 +7,7 @@ import com.example.myshopmanagerapp.core.Functions.getTotalNumberOfUnits
 import com.example.myshopmanagerapp.core.Functions.subtractItemQuantities
 import com.example.myshopmanagerapp.core.Functions.toDateString
 import com.example.myshopmanagerapp.core.Functions.toNotNull
+import com.example.myshopmanagerapp.core.Functions.toTimestamp
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
 import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
 import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIdsJson
@@ -14,6 +15,8 @@ import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
 import com.example.myshopmanagerapp.feature_app.data.local.entities.stock.StockEntity
 import com.example.myshopmanagerapp.feature_app.domain.model.AddStockInfo
+import com.example.myshopmanagerapp.feature_app.domain.model.ItemValue
+import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
 import com.example.myshopmanagerapp.feature_app.domain.model.UniqueId
 import com.example.myshopmanagerapp.feature_app.domain.repository.StockRepository
 import kotlinx.coroutines.flow.Flow
@@ -91,15 +94,19 @@ class StockRepositoryImpl(
                 }
                 else -> {
                     val changeInNumberOfUnits = ZERO.minus(stock.totalNumberOfUnits)
+                    val latestInventoryStock = itemStocks.filter { it.isInventoryStock }.maxByOrNull { it.date }
 
                     val thisStock = stock.copy(
                         uniquePersonnelId = uniquePersonnelId,
                         totalNumberOfUnits = stock.stockQuantityInfo.getTotalNumberOfUnits(),
                         dateOfLastStock = lastStock?.date,
                         changeInNumberOfUnits = changeInNumberOfUnits,
+                        unitCostPrice = latestInventoryStock?.unitCostPrice.toNotNull(),
+                        totalCostPrice = stock.stockQuantityInfo.getTotalNumberOfUnits().times(latestInventoryStock?.unitCostPrice.toNotNull()),
                         isInventoryStock = false,
                     )
                     val stockInfo = itemStocks.sortedByDescending { it.date }.plus(thisStock)
+
                     val updatedInventoryItem = inventoryItem.copy(
                         stockInfo = stockInfo,
                         itemQuantityInfo = stock.stockQuantityInfo,
@@ -343,6 +350,28 @@ class StockRepositoryImpl(
             }
         }catch (e: Exception){
             emit(Resource.Error("Unknown error! Couldn't delete stock"))
+        }
+    }
+
+
+    override suspend fun getShopValue(period: PeriodDropDownItem): Flow<Resource<ItemValue>> = flow{
+        emit(Resource.Loading())
+        try {
+            val allStocks = appDatabase.stockDao.getAllStocks()?.sortedBy { it.date } ?: emptyList()
+            if (period.isAllTime) {
+                val lastStocks = allStocks.groupBy { it.uniqueInventoryItemId }.mapValues { it.value.maxByOrNull { _stock-> _stock.date } }.values.filterNotNull()
+                val totalCost = lastStocks.sumOf { it.totalCostPrice.toNotNull() }
+                emit(Resource.Success(ItemValue("Total Inventory Cost", totalCost)))
+            }else{
+                val firstDate = period.firstDate.toTimestamp()
+                val lastDate = period.lastDate.toTimestamp()
+                val allFilteredStocks = allStocks.filter { it.date in firstDate .. lastDate }
+                val lastFilteredStocks = allFilteredStocks.groupBy { it.uniqueInventoryItemId }.mapValues { it.value.maxByOrNull { _stock-> _stock.date } }.values.filterNotNull()
+                val totalCost = lastFilteredStocks.sumOf { it.totalCostPrice.toNotNull() }
+                emit(Resource.Success(ItemValue("Total Inventory Cost", totalCost)))
+            }
+        }catch (e:Exception){
+            emit(Resource.Error("Could not get value"))
         }
     }
 

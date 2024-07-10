@@ -4,7 +4,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.capitalize
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myshopmanagerapp.core.Constants.emptyString
@@ -13,7 +12,10 @@ import com.example.myshopmanagerapp.core.ItemQuantities
 import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.UIEvent
 import com.example.myshopmanagerapp.feature_app.data.local.entities.stock.StockEntity
+import com.example.myshopmanagerapp.feature_app.domain.model.ItemValue
+import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
 import com.example.myshopmanagerapp.feature_app.domain.repository.StockRepository
+import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.revenue.ItemValueState
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.stock.AddStockState
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.stock.StockEntitiesState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,10 +36,10 @@ class StockViewModel @Inject constructor(
     private val dayOfWeek = LocalDate.now().dayOfWeek.toString().lowercase(Locale.ROOT)
         .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
 
-    var stockInfo by mutableStateOf(StockEntity(0, emptyString, date, dayOfWeek, emptyString, emptyString, emptyList(), 0, date, 0, false, emptyString))
+    var stockInfo by mutableStateOf(StockEntity(0, emptyString, date, dayOfWeek, emptyString, emptyString, emptyList(), 0, date, 0, 0.0, 0.0,false, emptyString))
         private set
 
-    var addStockInfo by mutableStateOf(StockEntity(0, emptyString, date, dayOfWeek, emptyString, emptyString, emptyList(), 0, date, 0, false, emptyString))
+    var addStockInfo by mutableStateOf(StockEntity(0, emptyString, date, dayOfWeek, emptyString, emptyString, emptyList(), 0, date, 0, 0.0, 0.0,false, emptyString))
         private set
 
     private val _addStockState = mutableStateOf(AddStockState())
@@ -53,8 +55,43 @@ class StockViewModel @Inject constructor(
     val stockEntitiesState: State<StockEntitiesState> = _stockEntitiesState
 
 
+    private val _shopValue = mutableStateOf(ItemValueState())
+    val shopValue: State<ItemValueState> = _shopValue
+
+
+
     private val _eventFlow = MutableSharedFlow<UIEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
+
+
+
+    fun getShopValue(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
+        stockRepository.getShopValue(periodDropDownItem).onEach { response->
+            when(response){
+                is Resource.Success ->{
+                    _shopValue.value = shopValue.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+                is Resource.Loading ->{
+                    _shopValue.value = shopValue.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = true
+                    )
+                }
+                is Resource.Error ->{
+                    _shopValue.value = shopValue.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+            }
+        }.launchIn(this)
+    }
 
     fun getAllStocks() = viewModelScope.launch {
         stockRepository.getAllStocks().onEach { response->
@@ -83,7 +120,7 @@ class StockViewModel @Inject constructor(
     }
 
     fun getStock(uniqueStockId: String) = viewModelScope.launch {
-        stockInfo = stockRepository.getStock(uniqueStockId) ?: StockEntity(0, emptyString, date, dayOfWeek, emptyString, emptyString, emptyList(), 0, date, 0, false, emptyString)
+        stockInfo = stockRepository.getStock(uniqueStockId) ?: StockEntity(0, emptyString, date, dayOfWeek, emptyString, emptyString, emptyList(), 0, date, 0,  0.0, 0.0,false, emptyString)
 
     }
 

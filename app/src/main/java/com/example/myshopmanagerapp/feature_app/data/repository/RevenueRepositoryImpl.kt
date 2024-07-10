@@ -527,19 +527,19 @@ class RevenueRepositoryImpl(
         }
     }
 
-    override suspend fun getCostOfInventory(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>> = flow{
+    override suspend fun getShopRevenue(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>> = flow{
         emit(Resource.Loading())
         try {
-            val allInventories = appDatabase.inventoryDao.getAllInventories() ?: emptyList()
+            val allRevenues = appDatabase.revenueDao.getAllRevenues() ?: emptyList()
             if (periodDropDownItem.isAllTime) {
-                val totalRevenue = allInventories.sumOf { it.totalCostPrice }
-                emit(Resource.Success(ItemValue("Total Inventory Cost", totalRevenue)))
+                val totalRevenue = allRevenues.sumOf { it.revenueAmount }
+                emit(Resource.Success(ItemValue("Total Revenue", totalRevenue)))
             }else{
                 val firstDate = periodDropDownItem.firstDate.toTimestamp()
                 val lastDate = periodDropDownItem.lastDate.toTimestamp()
-                val allFilteredInventories = allInventories.filter { it.date in firstDate .. lastDate }
-                val totalRevenue = allFilteredInventories.sumOf { it.totalCostPrice }
-                emit(Resource.Success(ItemValue("Total Inventory Cost", totalRevenue)))
+                val allFilteredRevenues = allRevenues.filter { it.date in firstDate .. lastDate }
+                val totalRevenue = allFilteredRevenues.sumOf { it.revenueAmount }
+                emit(Resource.Success(ItemValue("Total Revenue", totalRevenue)))
             }
         }catch (e:Exception){
             emit(Resource.Error("Could not get value"))

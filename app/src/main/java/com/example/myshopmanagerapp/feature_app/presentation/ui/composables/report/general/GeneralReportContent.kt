@@ -15,7 +15,9 @@ import com.example.myshopmanagerapp.core.FormRelatedString.NumberOfOwingCustomer
 import com.example.myshopmanagerapp.core.FormRelatedString.NumberOfPersonnel
 import com.example.myshopmanagerapp.core.FormRelatedString.ShopName
 import com.example.myshopmanagerapp.core.FormRelatedString.ShopValueInfo
+import com.example.myshopmanagerapp.core.FormRelatedString.TotalExpenses
 import com.example.myshopmanagerapp.core.FormRelatedString.TotalOutstandingDebtAmount
+import com.example.myshopmanagerapp.core.FormRelatedString.TotalRevenues
 import com.example.myshopmanagerapp.core.FormRelatedString.TotalSavingsAmount
 import com.example.myshopmanagerapp.core.FormRelatedString.TotalWithdrawals
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenColumnWithoutBottomBar
@@ -29,6 +31,8 @@ fun GeneralReportContent(
     numberOfInventoryItems: String,
     totalSavings: String,
     numberOfOwingCustomers: String,
+    totalRevenues: String,
+    totalExpenses: String,
     totalWithdrawals: String,
     numberOfPersonnel: String,
     numberOfBankAccounts: String,
@@ -41,7 +45,6 @@ fun GeneralReportContent(
         mutableStateOf(false)
     }
     BasicScreenColumnWithoutBottomBar{
-
         HorizontalDivider()
         // Shop name
         ViewTextValueRow(viewTitle = ShopName, viewValue = shopName)
@@ -69,6 +72,21 @@ fun GeneralReportContent(
             viewValue = "$numberOfPersonnel personnel",
             icon = Icons.AutoMirrored.Filled.KeyboardArrowRight,
             showInfo = true
+        )
+
+        HorizontalDivider()
+
+        // Total Revenue
+        ViewTextValueRow(
+            viewTitle = TotalRevenues,
+            viewValue = "$currency $totalRevenues"
+        )
+        HorizontalDivider()
+
+        // Total Expense
+        ViewTextValueRow(
+            viewTitle = TotalExpenses,
+            viewValue = "$currency $totalExpenses"
         )
 
         HorizontalDivider()
@@ -112,6 +130,7 @@ fun GeneralReportContent(
             viewTitle = TotalOutstandingDebtAmount,
             viewValue = "$currency $totalOutstandingDebtAmount"
         )
+
         HorizontalDivider()
 
         //Shop value

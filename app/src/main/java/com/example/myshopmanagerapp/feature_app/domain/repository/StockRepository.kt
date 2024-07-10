@@ -4,6 +4,8 @@ import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.StockEntities
 import com.example.myshopmanagerapp.feature_app.data.local.entities.stock.StockEntity
 import com.example.myshopmanagerapp.feature_app.domain.model.AddStockInfo
+import com.example.myshopmanagerapp.feature_app.domain.model.ItemValue
+import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
 import kotlinx.coroutines.flow.Flow
 
 
@@ -30,5 +32,7 @@ interface StockRepository {
     suspend fun deleteStock(uniqueStockId: String): Flow<Resource<String>>
 
     suspend fun deleteAllStocks()
+
+    suspend fun getShopValue(period: PeriodDropDownItem): Flow<Resource<ItemValue>>
 
 }
