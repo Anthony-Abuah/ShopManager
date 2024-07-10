@@ -14,6 +14,7 @@ import com.example.myshopmanagerapp.core.FormRelatedString.NumberOfInventoryItem
 import com.example.myshopmanagerapp.core.FormRelatedString.NumberOfOwingCustomers
 import com.example.myshopmanagerapp.core.FormRelatedString.NumberOfPersonnel
 import com.example.myshopmanagerapp.core.FormRelatedString.ShopName
+import com.example.myshopmanagerapp.core.FormRelatedString.ShopValue
 import com.example.myshopmanagerapp.core.FormRelatedString.ShopValueInfo
 import com.example.myshopmanagerapp.core.FormRelatedString.TotalExpenses
 import com.example.myshopmanagerapp.core.FormRelatedString.TotalOutstandingDebtAmount
@@ -40,6 +41,10 @@ fun GeneralReportContent(
     productsSold: String,
     totalOutstandingDebtAmount: String,
     shopValue: String,
+    navigateToViewInventoryItemsScreen: ()-> Unit,
+    navigateToViewOwingCustomersScreen: ()-> Unit,
+    navigateToViewPersonnelScreen: ()-> Unit,
+    navigateToViewBankAccountsScreen: ()-> Unit,
 ){
     var openShowValueInfo by remember {
         mutableStateOf(false)
@@ -61,7 +66,8 @@ fun GeneralReportContent(
             viewTitle = NumberOfInventoryItems,
             viewValue = "$numberOfInventoryItems item(s)",
             icon = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-            showInfo = true
+            showInfo = true,
+            onClick = navigateToViewInventoryItemsScreen
         )
 
         HorizontalDivider()
@@ -71,7 +77,8 @@ fun GeneralReportContent(
             viewTitle = NumberOfPersonnel,
             viewValue = "$numberOfPersonnel personnel",
             icon = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-            showInfo = true
+            showInfo = true,
+            onClick = navigateToViewPersonnelScreen
         )
 
         HorizontalDivider()
@@ -96,7 +103,8 @@ fun GeneralReportContent(
             viewTitle = NumberOfOwingCustomers,
             viewValue = "$numberOfOwingCustomers customer(s)",
             icon = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-            showInfo = true
+            showInfo = true,
+            onClick = navigateToViewOwingCustomersScreen
         )
 
         HorizontalDivider()
@@ -106,7 +114,8 @@ fun GeneralReportContent(
             viewTitle = NumberOfBankAccounts,
             viewValue = "$numberOfBankAccounts bank account(s)",
             icon = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-            showInfo = true
+            showInfo = true,
+            onClick = navigateToViewBankAccountsScreen
         )
         HorizontalDivider()
 
@@ -135,7 +144,7 @@ fun GeneralReportContent(
 
         //Shop value
         ViewTextValueRow(
-            viewTitle = TotalOutstandingDebtAmount,
+            viewTitle = ShopValue,
             viewValue = "$currency $shopValue",
             showInfo = true,
             onClick = {

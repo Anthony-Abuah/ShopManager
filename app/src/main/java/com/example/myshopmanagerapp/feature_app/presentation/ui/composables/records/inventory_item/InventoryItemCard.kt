@@ -21,6 +21,7 @@ import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.*
 import com.example.myshopmanagerapp.R
 
+
 @Composable
 fun InventoryItemCard(
     inventoryItemName: String,
@@ -215,6 +216,126 @@ fun InventoryItemCard(
                 }
             }
 
+            Box(modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                Text(text = number,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Light,
+                    maxLines = 1,
+                    color = contentColor,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+fun InventoryItemReportCard(
+    inventoryItemName: String,
+    sellingPrice: String,
+    costPrice: String,
+    number: String,
+    currency: String,
+){
+    val contentColor = MaterialTheme.colorScheme.onSurface
+    val cardContainerColor = MaterialTheme.colorScheme.surface
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(80.dp)
+            .background(Color.Transparent),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Card(
+            modifier = Modifier
+                .padding(LocalSpacing.current.default)
+                .width(LocalSpacing.current.extraLarge)
+                .fillMaxHeight(),
+            shape = MaterialTheme.shapes.small,
+            colors = CardDefaults.cardColors(
+                containerColor = cardContainerColor
+            ),
+            elevation = CardDefaults.cardElevation(LocalSpacing.current.smallMedium)
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    modifier = Modifier.fillMaxSize(),
+                    painter = painterResource(id = R.drawable.ic_inventory),
+                    contentDescription = emptyString,
+                    tint = contentColor
+                )
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(LocalSpacing.current.extraSmall),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Text(
+                    text = inventoryItemName,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = contentColor
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(LocalSpacing.current.extraSmall),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Text(
+                    text = "Cost Price: $currency $costPrice",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Normal,
+                    color = contentColor,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(LocalSpacing.current.extraSmall),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Text(
+                    text = "Selling Price: $currency $sellingPrice",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = contentColor,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+
+        Column(modifier = Modifier
+            .width(LocalSpacing.current.medium)
+            .fillMaxHeight(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
             Box(modifier = Modifier.weight(1f),
                 contentAlignment = Alignment.BottomCenter
             ) {

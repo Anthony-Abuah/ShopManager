@@ -35,7 +35,11 @@ fun GeneralReportScreen(
     withdrawalViewModel: WithdrawalViewModel = hiltViewModel(),
     savingsViewModel: SavingsViewModel = hiltViewModel(),
     bankAccountViewModel: BankAccountViewModel = hiltViewModel(),
-    navigateBack: () -> Unit
+    navigateToViewInventoryItemsScreen: ()-> Unit,
+    navigateToViewOwingCustomersScreen: ()-> Unit,
+    navigateToViewPersonnelScreen: ()-> Unit,
+    navigateToViewBankAccountsScreen: ()-> Unit,
+    navigateBack: () -> Unit,
 ) {
     val context = LocalContext.current
     val userPreferences = UserPreferences(context)
@@ -54,7 +58,7 @@ fun GeneralReportScreen(
         customerViewModel.getAllCustomers()
         personnelViewModel.getAllPersonnel()
         savingsViewModel.getAllSavings()
-        bankAccountViewModel.getAllBanks()
+        bankAccountViewModel.getAllBankAccounts()
         revenueViewModel.getShopRevenue(period)
         withdrawalViewModel.getAllWithdrawals()
         expenseViewModel.getShopExpense(period)
@@ -118,6 +122,10 @@ fun GeneralReportScreen(
                 productsSold = shopInfo?.companyProductsAndServices ?: "Not Registered",
                 totalOutstandingDebtAmount = "$debtAmount",
                 shopValue = "$shopValue",
+                navigateToViewInventoryItemsScreen,
+                navigateToViewOwingCustomersScreen,
+                navigateToViewPersonnelScreen,
+                navigateToViewBankAccountsScreen
             )
         }
     }

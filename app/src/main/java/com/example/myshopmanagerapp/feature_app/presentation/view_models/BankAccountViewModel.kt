@@ -48,7 +48,7 @@ class BankAccountViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UIEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    fun getAllBanks() = viewModelScope.launch {
+    fun getAllBankAccounts() = viewModelScope.launch {
         bankAccountRepository.getAllBanks().onEach { response->
             when(response){
                 is Resource.Success ->{

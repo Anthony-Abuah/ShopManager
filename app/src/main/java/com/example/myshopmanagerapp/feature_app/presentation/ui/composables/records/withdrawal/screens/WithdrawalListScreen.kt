@@ -33,7 +33,7 @@ fun WithdrawalListScreen(
     val context = LocalContext.current
     LaunchedEffect(Unit){
         withdrawalViewModel.getAllWithdrawals()
-        bankAccountViewModel.getAllBanks()
+        bankAccountViewModel.getAllBankAccounts()
         personnelViewModel.getAllPersonnel()
     }
 

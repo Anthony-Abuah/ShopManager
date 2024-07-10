@@ -39,8 +39,118 @@ fun GeneralReportNavGraph(
                         easing = LinearOutSlowInEasing
                     )
                 ) + fadeOut(animationSpec = tween(500))
-            }){
-            GeneralReportScreen {
+            }
+        ){
+            GeneralReportScreen (
+                navigateToViewBankAccountsScreen = {
+                    navController.navigate(GeneralReportScreens.BankAccountsReportScreen.route)
+                },
+                navigateToViewInventoryItemsScreen = {
+                    navController.navigate(GeneralReportScreens.InventoryItemsReportScreen.route)
+                },
+                navigateToViewOwingCustomersScreen = {
+                    navController.navigate(GeneralReportScreens.OwingCustomersReportScreen.route)
+                },
+                navigateToViewPersonnelScreen = {
+                    navController.navigate(GeneralReportScreens.PersonnelReportScreen.route)
+                },
+            ){
+                navHostController.popBackStack()
+            }
+        }
+        composable(route = GeneralReportScreens.InventoryItemsReportScreen.route,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { 500 },
+                    animationSpec = tween(
+                        durationMillis = 500,
+                        easing = LinearOutSlowInEasing
+                    )
+                ) + fadeIn(animationSpec = tween(500))
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { -500 },
+                    animationSpec = tween(
+                        durationMillis = 500,
+                        easing = LinearOutSlowInEasing
+                    )
+                ) + fadeOut(animationSpec = tween(500))
+            }
+        ){
+            InventoryItemsReportScreen {
+                navHostController.popBackStack()
+            }
+        }
+        composable(route = GeneralReportScreens.OwingCustomersReportScreen.route,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { 500 },
+                    animationSpec = tween(
+                        durationMillis = 500,
+                        easing = LinearOutSlowInEasing
+                    )
+                ) + fadeIn(animationSpec = tween(500))
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { -500 },
+                    animationSpec = tween(
+                        durationMillis = 500,
+                        easing = LinearOutSlowInEasing
+                    )
+                ) + fadeOut(animationSpec = tween(500))
+            }
+        ){
+            OwingCustomersReportScreen {
+                navHostController.popBackStack()
+            }
+        }
+        composable(route = GeneralReportScreens.BankAccountsReportScreen.route,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { 500 },
+                    animationSpec = tween(
+                        durationMillis = 500,
+                        easing = LinearOutSlowInEasing
+                    )
+                ) + fadeIn(animationSpec = tween(500))
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { -500 },
+                    animationSpec = tween(
+                        durationMillis = 500,
+                        easing = LinearOutSlowInEasing
+                    )
+                ) + fadeOut(animationSpec = tween(500))
+            }
+        ){
+            BankAccountsReportScreen {
+                navHostController.popBackStack()
+            }
+        }
+        composable(route = GeneralReportScreens.PersonnelReportScreen.route,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { 500 },
+                    animationSpec = tween(
+                        durationMillis = 500,
+                        easing = LinearOutSlowInEasing
+                    )
+                ) + fadeIn(animationSpec = tween(500))
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { -500 },
+                    animationSpec = tween(
+                        durationMillis = 500,
+                        easing = LinearOutSlowInEasing
+                    )
+                ) + fadeOut(animationSpec = tween(500))
+            }
+        ){
+            PersonnelReportScreen {
                 navHostController.popBackStack()
             }
         }

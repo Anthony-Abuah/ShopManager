@@ -26,7 +26,7 @@ fun BankAccountListScreen(
     navigateBack: () -> Unit
 ) {
     LaunchedEffect(Unit){
-        bankAccountViewModel.getAllBanks()
+        bankAccountViewModel.getAllBankAccounts()
     }
     var openPDFDialog by remember {
         mutableStateOf(false)
@@ -91,7 +91,7 @@ fun BankAccountListScreen(
                 bankDeletingIsSuccessful = bankAccountViewModel.deleteBankState.value.isSuccessful,
                 bankDeletingMessage = bankAccountViewModel.deleteBankState.value.message,
                 isDeletingBank = bankAccountViewModel.deleteBankState.value.isLoading,
-                reloadBankInfo = { bankAccountViewModel.getAllBanks() },
+                reloadBankInfo = { bankAccountViewModel.getAllBankAccounts() },
             ) {uniqueBankId->
                 navigateToViewBankScreen(uniqueBankId)
             }

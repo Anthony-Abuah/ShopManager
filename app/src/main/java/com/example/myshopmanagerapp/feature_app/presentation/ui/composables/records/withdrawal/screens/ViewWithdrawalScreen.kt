@@ -31,7 +31,7 @@ fun ViewWithdrawalScreen(
     LaunchedEffect(Unit) {
         withdrawalViewModel.getWithdrawal(uniqueWithdrawalId)
         personnelViewModel.getAllPersonnel()
-        bankAccountViewModel.getAllBanks()
+        bankAccountViewModel.getAllBankAccounts()
     }
     Scaffold(
         topBar = {

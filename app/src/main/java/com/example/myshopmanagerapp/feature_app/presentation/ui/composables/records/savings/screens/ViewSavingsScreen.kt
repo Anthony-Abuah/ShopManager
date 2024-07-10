@@ -31,7 +31,7 @@ fun ViewSavingsScreen(
     LaunchedEffect(Unit) {
         savingsViewModel.getSavings(uniqueSavingsId)
         personnelViewModel.getAllPersonnel()
-        bankAccountViewModel.getAllBanks()
+        bankAccountViewModel.getAllBankAccounts()
     }
     Scaffold(
         topBar = {

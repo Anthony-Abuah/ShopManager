@@ -33,7 +33,7 @@ fun SavingsListScreen(
     val context = LocalContext.current
     LaunchedEffect(Unit){
         savingsViewModel.getAllSavings()
-        bankAccountViewModel.getAllBanks()
+        bankAccountViewModel.getAllBankAccounts()
         personnelViewModel.getAllPersonnel()
     }
     var openPDFDialog by remember {

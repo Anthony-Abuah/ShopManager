@@ -29,7 +29,7 @@ fun AddSavingsScreen(
     navigateBack: () -> Unit
 ) {
     LaunchedEffect(Unit){
-        bankAccountViewModel.getAllBanks()
+        bankAccountViewModel.getAllBankAccounts()
         personnelViewModel.getAllPersonnel()
     }
     Scaffold(
