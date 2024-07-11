@@ -30,16 +30,15 @@ interface RevenueRepository {
     suspend fun generateRevenueList(context: Context, revenues: RevenueEntities): Flow<Resource<String?>>
 
 
-    suspend fun getRevenueAmount(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
     suspend fun getExpenseAmount(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
-    suspend fun getDebtAmount(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
-    suspend fun getDebtRepaymentAmount(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
     suspend fun getRevenueDays(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
     suspend fun getRevenueHours(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
+
+    suspend fun getAverageRevenueHours(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
     suspend fun getMaximumRevenueDay(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
     suspend fun getMinimumRevenueDay(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
     suspend fun getMaximumExpenseDay(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
     suspend fun getMinimumExpenseDay(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
-    suspend fun getShopRevenue(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
+    suspend fun getRevenueAmount(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
 
 }

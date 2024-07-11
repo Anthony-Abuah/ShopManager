@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cancel
@@ -12,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -439,14 +441,19 @@ fun HomeScreenTopBar(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Icon(
-                        modifier = Modifier
-                            .width(LocalSpacing.current.topBarIcon)
-                            .clickable { navigateToPersonnelNavGraph() },
-                        painter = painterResource(id = personnelIcon),
-                        contentDescription = emptyString,
-                        tint = MaterialTheme.colorScheme.onBackground
-                    )
+                    Box(modifier = Modifier.size(LocalSpacing.current.topBarIcon)
+                        .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            modifier = Modifier
+                                .width(LocalSpacing.current.dropDownItem)
+                                .clickable { navigateToPersonnelNavGraph() },
+                            painter = painterResource(id = personnelIcon),
+                            contentDescription = emptyString,
+                            tint = MaterialTheme.colorScheme.onBackground
+                        )
+                    }
 
                     Text(text = personnelUserName,
                         fontSize = 8.sp,

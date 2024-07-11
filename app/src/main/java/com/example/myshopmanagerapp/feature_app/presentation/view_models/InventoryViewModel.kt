@@ -59,6 +59,10 @@ class InventoryViewModel @Inject constructor(
     val generateInventoryListState: State<AddCompanyState> = _generateInventoryListState
 
 
+    private val _inventoryCost = mutableStateOf(ItemValueState())
+    val inventoryCost: State<ItemValueState> = _inventoryCost
+
+
     private val _addInventoryState = mutableStateOf(InventoryState())
     val addInventoryState: State<InventoryState> = _addInventoryState
 
@@ -88,7 +92,6 @@ class InventoryViewModel @Inject constructor(
 
     private val _leastAvailableItem = mutableStateOf(ItemValueState())
     val leastAvailableItem: State<ItemValueState> = _leastAvailableItem
-
 
     private val _eventFlow = MutableSharedFlow<UIEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -157,6 +160,36 @@ class InventoryViewModel @Inject constructor(
         inventoryInfo = inventoryRepository.getInventory(uniqueInventoryId) ?: InventoryEntity(0, emptyString, emptyString, emptyString, date, dayOfWeek,
             emptyList(), 0, 0.0, 0.0,emptyString, emptyString)
     }
+
+
+    fun getInventoryCost(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
+        inventoryRepository.getInventoryCost(periodDropDownItem).onEach { response->
+            when(response){
+                is Resource.Success ->{
+                    _inventoryCost.value = inventoryCost.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+                is Resource.Loading ->{
+                    _inventoryCost.value = inventoryCost.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = true
+                    )
+                }
+                is Resource.Error ->{
+                    _inventoryCost.value = inventoryCost.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+            }
+        }.launchIn(this)
+    }
+
 
     fun addInventoryWithStock(inventory: InventoryEntity) = viewModelScope.launch {
         inventoryRepository.addInventoryWithStock(inventory).onEach { response->

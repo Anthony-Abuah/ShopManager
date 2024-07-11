@@ -4,6 +4,8 @@ sealed class ReportScreens(val route: String){
     object MainReportScreen: ReportScreens("to_main_report_screen")
     object ViewStockReportNavGraph: ReportScreens("to_view_stock_report_nav_graph")
     object ViewRevenueReportNavGraph: ReportScreens("to_view_revenue_report_nav_graph")
+
+    object ViewExpenseReportNavGraph: ReportScreens("to_view_expense_report_nav_graph")
     object ViewInventoryReportNavGraph: ReportScreens("to_view_inventory_report_nav_graph")
     object GeneralReportNavGraph: ReportScreens("to_general_report_nav_graph")
 

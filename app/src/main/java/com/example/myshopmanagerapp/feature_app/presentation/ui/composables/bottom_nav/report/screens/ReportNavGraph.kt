@@ -10,6 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.report.expense.screen.ExpenseReportNavGraph
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.report.general.screens.GeneralReportNavGraph
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.report.inventory.screens.InventoryReportNavGraph
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.report.revenue.screens.RevenueReportNavGraph
@@ -26,13 +27,12 @@ fun ReportNavGraph(
     {
 
         composable(route = ReportScreens.MainReportScreen.route){
-            ReportScreen(navController = navController,
-                navHostController = navHostController,
+            ReportScreen(navHostController = navHostController,
                 navigateToViewRevenueReportScreen = {
                     navController.navigate(ReportScreens.ViewRevenueReportNavGraph.route)
                 },
-                navigateToInventoryReportScreen = {
-                    navController.navigate(ReportScreens.ViewInventoryReportNavGraph.route)
+                navigateToViewExpenseReportScreen = {
+                    navController.navigate(ReportScreens.ViewExpenseReportNavGraph.route)
                 },
                 navigateToStockReportScreen = {
                     navController.navigate(ReportScreens.ViewStockReportNavGraph.route)
@@ -43,7 +43,9 @@ fun ReportNavGraph(
                 navigateToViewGeneralReportScreen = {
                     navController.navigate(ReportScreens.GeneralReportNavGraph.route)
                 }
-            )
+            ) {
+                navController.navigate(ReportScreens.ViewInventoryReportNavGraph.route)
+            }
         }
 
         composable(route = ReportScreens.ViewStockReportNavGraph.route){
@@ -51,6 +53,9 @@ fun ReportNavGraph(
         }
         composable(route = ReportScreens.ViewRevenueReportNavGraph.route){
             RevenueReportNavGraph(navHostController = navController)
+        }
+        composable(route = ReportScreens.ViewExpenseReportNavGraph.route){
+            ExpenseReportNavGraph(navHostController = navController)
         }
         composable(route = ReportScreens.ViewInventoryReportNavGraph.route){
             InventoryReportNavGraph(navHostController = navController)

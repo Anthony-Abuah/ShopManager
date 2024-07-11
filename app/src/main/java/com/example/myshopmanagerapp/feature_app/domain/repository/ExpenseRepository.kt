@@ -29,8 +29,12 @@ interface ExpenseRepository {
 
     suspend fun deleteAllExpenses()
 
-    suspend fun getShopExpenses(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
+    suspend fun getExpenseAmount(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
+    suspend fun getAverageDailyExpenses(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
 
+    suspend fun getExpenseTypeAmounts(periodDropDownItem: PeriodDropDownItem): Flow<Resource<List<ItemValue>>>
+    suspend fun getMinimumExpenseDay(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
+    suspend fun getMaximumExpenseDay(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
     suspend fun generateExpenseList(context: Context, expenses: ExpenseEntities): Flow<Resource<String?>>
 
 }

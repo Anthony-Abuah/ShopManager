@@ -13,13 +13,15 @@ import com.example.myshopmanagerapp.core.Functions.toDate
 import com.example.myshopmanagerapp.core.Functions.toDateString
 import com.example.myshopmanagerapp.core.Functions.toEllipses
 import com.example.myshopmanagerapp.core.Functions.toNotNull
+import com.example.myshopmanagerapp.core.Functions.toTimestamp
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
 import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
 import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIdsJson
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
-import com.example.myshopmanagerapp.feature_app.data.local.entities.customers.CustomerEntity
 import com.example.myshopmanagerapp.feature_app.data.local.entities.debt.DebtEntity
+import com.example.myshopmanagerapp.feature_app.domain.model.ItemValue
+import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
 import com.example.myshopmanagerapp.feature_app.domain.model.UniqueId
 import com.example.myshopmanagerapp.feature_app.domain.repository.DebtRepository
 import kotlinx.coroutines.Dispatchers
@@ -418,6 +420,25 @@ class DebtRepositoryImpl(
         pdfDocument.close()
         emit(Resource.Success("Pdf document successfully created"))
 
+    }
+
+    override suspend fun getDebtAmount(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>> =flow{
+        emit(Resource.Loading())
+        try {
+            val allDebts = appDatabase.debtDao.getAllDebt() ?: emptyList()
+            if (periodDropDownItem.isAllTime) {
+                val totalDebtAmount = allDebts.sumOf { it.debtAmount }
+                emit(Resource.Success(ItemValue("Total Debt", totalDebtAmount)))
+            }else{
+                val firstDate = periodDropDownItem.firstDate.toTimestamp()
+                val lastDate = periodDropDownItem.lastDate.toTimestamp()
+                val allFilteredDebts = allDebts.filter { it.date in firstDate .. lastDate }
+                val totalDebtAmount = allFilteredDebts.sumOf { it.debtAmount }
+                emit(Resource.Success(ItemValue("Total Debt", totalDebtAmount)))
+            }
+        }catch (e:Exception){
+            emit(Resource.Error("Could not get value"))
+        }
     }
 
     private fun getDirectory(context: Context): File{

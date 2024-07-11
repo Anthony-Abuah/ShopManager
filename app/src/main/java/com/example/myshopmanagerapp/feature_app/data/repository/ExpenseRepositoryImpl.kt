@@ -226,13 +226,13 @@ class ExpenseRepositoryImpl(
         appDatabase.expenseDao.deleteAllExpenses()
     }
 
-    override suspend fun getShopExpenses(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>> = flow{
+    override suspend fun getExpenseAmount(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>> = flow{
         emit(Resource.Loading())
         try {
             val allExpenses = appDatabase.expenseDao.getAllExpenses() ?: emptyList()
             if (periodDropDownItem.isAllTime) {
-                val totalRevenue = allExpenses.sumOf { it.expenseAmount }
-                emit(Resource.Success(ItemValue("Total Expenses", totalRevenue)))
+                val totalExpenses = allExpenses.sumOf { it.expenseAmount }
+                emit(Resource.Success(ItemValue("Total Expenses", totalExpenses)))
             }else{
                 val firstDate = periodDropDownItem.firstDate.toTimestamp()
                 val lastDate = periodDropDownItem.lastDate.toTimestamp()
@@ -244,6 +244,94 @@ class ExpenseRepositoryImpl(
             emit(Resource.Error("Could not get value"))
         }
     }
+
+
+    override suspend fun getExpenseTypeAmounts(periodDropDownItem: PeriodDropDownItem): Flow<Resource<List<ItemValue>>> = flow{
+        emit(Resource.Loading())
+        try {
+            val allExpenses = appDatabase.expenseDao.getAllExpenses() ?: emptyList()
+            if (periodDropDownItem.isAllTime) {
+                val mutableExpenseTypes = mutableListOf<ItemValue>()
+                val mapOfExpenseTypes = allExpenses.groupBy {it.expenseType }.mapValues { it.value.sumOf {expense-> expense.expenseAmount } }
+                mapOfExpenseTypes.keys.forEach { expenseType ->
+                    mutableExpenseTypes.add(ItemValue(expenseType, mapOfExpenseTypes[expenseType]!!))
+                }
+                emit(Resource.Success(mutableExpenseTypes))
+            }else{
+                val firstDate = periodDropDownItem.firstDate.toTimestamp()
+                val lastDate = periodDropDownItem.lastDate.toTimestamp()
+                val allFilteredExpenses = allExpenses.filter { it.date in firstDate .. lastDate }
+                val mutableExpenseTypes = mutableListOf<ItemValue>()
+                val mapOfExpenseTypes = allFilteredExpenses.groupBy {it.expenseType }.mapValues { it.value.sumOf {expense-> expense.expenseAmount } }
+                mapOfExpenseTypes.keys.forEach { expenseType ->
+                    mutableExpenseTypes.add(ItemValue(expenseType, mapOfExpenseTypes[expenseType]!!))
+                }
+                emit(Resource.Success(mutableExpenseTypes))
+            }
+        }catch (e:Exception){
+            emit(Resource.Error("Could not get value"))
+        }
+    }
+
+    override suspend fun getAverageDailyExpenses(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>> = flow{
+        emit(Resource.Loading())
+        try {
+            val allExpenses = appDatabase.expenseDao.getAllExpenses() ?: emptyList()
+            if (periodDropDownItem.isAllTime) {
+                val expenseDays = allExpenses.groupBy {it.date }.keys.count()
+                val averageDailyExpenses = allExpenses.sumOf { it.expenseAmount }.div(expenseDays)
+                emit(Resource.Success(ItemValue("Average Daily Expenses", averageDailyExpenses)))
+            }else{
+                val firstDate = periodDropDownItem.firstDate.toTimestamp()
+                val lastDate = periodDropDownItem.lastDate.toTimestamp()
+                val allFilteredExpenses = allExpenses.filter { it.date in firstDate .. lastDate }
+                val expenseDays = allFilteredExpenses.groupBy {it.date }.keys.count()
+                val averageDailyExpenses = allFilteredExpenses.sumOf { it.expenseAmount }.div(expenseDays)
+                emit(Resource.Success(ItemValue("Average Daily Expenses", averageDailyExpenses)))
+            }
+        }catch (e:Exception){
+            emit(Resource.Error("Could not get value"))
+        }
+    }
+
+    override suspend fun getMinimumExpenseDay(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>> =flow{
+        emit(Resource.Loading())
+        try {
+            val allExpenses = appDatabase.expenseDao.getAllExpenses() ?: emptyList()
+            if (periodDropDownItem.isAllTime) {
+                val minimumExpenses = allExpenses.groupBy { "${it.dayOfWeek?.take(3)}, ${it.date.toDateString()}" }.mapValues { it.value.sumOf { expense-> expense.expenseAmount } }.minByOrNull { it.value }
+                emit(Resource.Success(ItemValue(minimumExpenses?.key ?: NotAvailable, minimumExpenses?.value.toNotNull())))
+            }else{
+                val firstDate = periodDropDownItem.firstDate.toTimestamp()
+                val lastDate = periodDropDownItem.lastDate.toTimestamp()
+                val allFilteredExpenses = allExpenses.filter { it.date in firstDate .. lastDate }
+                val minimumExpenses = allFilteredExpenses.groupBy { "${it.dayOfWeek?.take(3)}, ${it.date.toDateString()}" }.mapValues { it.value.sumOf { expense-> expense.expenseAmount } }.minByOrNull { it.value }
+                emit(Resource.Success(ItemValue(minimumExpenses?.key ?: NotAvailable, minimumExpenses?.value.toNotNull())))
+            }
+        }catch (e:Exception){
+            emit(Resource.Error("Could not get value"))
+        }
+    }
+
+    override suspend fun getMaximumExpenseDay(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>> =flow{
+        emit(Resource.Loading())
+        try {
+            val allExpenses = appDatabase.expenseDao.getAllExpenses() ?: emptyList()
+            if (periodDropDownItem.isAllTime) {
+                val maximumExpenses = allExpenses.groupBy { "${it.dayOfWeek?.take(3)}, ${it.date.toDateString()}" }.mapValues { it.value.sumOf { expense-> expense.expenseAmount } }.maxByOrNull { it.value }
+                emit(Resource.Success(ItemValue(maximumExpenses?.key ?: NotAvailable, maximumExpenses?.value.toNotNull())))
+            }else{
+                val firstDate = periodDropDownItem.firstDate.toTimestamp()
+                val lastDate = periodDropDownItem.lastDate.toTimestamp()
+                val allFilteredExpenses = allExpenses.filter { it.date in firstDate .. lastDate }
+                val maximumExpenses = allFilteredExpenses.groupBy { "${it.dayOfWeek?.take(3)}, ${it.date.toDateString()}" }.mapValues { it.value.sumOf { expense-> expense.expenseAmount } }.maxByOrNull { it.value }
+                emit(Resource.Success(ItemValue(maximumExpenses?.key ?: NotAvailable, maximumExpenses?.value.toNotNull())))
+            }
+        }catch (e:Exception){
+            emit(Resource.Error("Could not get value"))
+        }
+    }
+
 
 
     override suspend fun generateExpenseList(

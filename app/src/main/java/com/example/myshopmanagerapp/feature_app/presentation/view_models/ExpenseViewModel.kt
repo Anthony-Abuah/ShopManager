@@ -20,6 +20,7 @@ import com.example.myshopmanagerapp.feature_app.domain.repository.ExpenseReposit
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.company.AddCompanyState
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.expense.ExpenseEntitiesState
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.expense.ExpenseEntityState
+import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.inventory_item.ItemValuesState
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.revenue.ItemValueState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -65,8 +66,20 @@ class ExpenseViewModel @Inject constructor(
     private val _expenseEntitiesState = mutableStateOf(ExpenseEntitiesState())
     val expenseEntitiesState: State<ExpenseEntitiesState> = _expenseEntitiesState
 
-    private val _shopExpenseAmount = mutableStateOf(ItemValueState())
-    val shopExpenseAmount: State<ItemValueState> = _shopExpenseAmount
+    private val _expenseAmount = mutableStateOf(ItemValueState())
+    val expenseAmount: State<ItemValueState> = _expenseAmount
+
+    private val _averageDailyExpenses = mutableStateOf(ItemValueState())
+    val averageDailyExpenses: State<ItemValueState> = _averageDailyExpenses
+
+    private val _expenseTypeAmount = mutableStateOf(ItemValuesState())
+    val expenseTypeAmount: State<ItemValuesState> = _expenseTypeAmount
+
+    private val _maximumExpenseDay = mutableStateOf(ItemValueState())
+    val maximumExpenseDay: State<ItemValueState> = _maximumExpenseDay
+
+    private val _minimumExpenseDay = mutableStateOf(ItemValueState())
+    val minimumExpenseDay: State<ItemValueState> = _minimumExpenseDay
 
 
     private val _eventFlow = MutableSharedFlow<UIEvent>()
@@ -224,25 +237,139 @@ class ExpenseViewModel @Inject constructor(
     }
 
 
-    fun getShopExpense(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
-        expenseRepository.getShopExpenses(periodDropDownItem).onEach { response->
+    fun getExpenseAmount(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
+        expenseRepository.getExpenseAmount(periodDropDownItem).onEach { response->
             when(response){
                 is Resource.Success ->{
-                    _shopExpenseAmount.value = shopExpenseAmount.value.copy(
+                    _expenseAmount.value = expenseAmount.value.copy(
                         itemValue = response.data ?: ItemValue(emptyString, 0.0),
                         message = response.message,
                         isLoading = false
                     )
                 }
                 is Resource.Loading ->{
-                    _shopExpenseAmount.value = shopExpenseAmount.value.copy(
+                    _expenseAmount.value = expenseAmount.value.copy(
                         itemValue = response.data ?: ItemValue(emptyString, 0.0),
                         message = response.message,
                         isLoading = true
                     )
                 }
                 is Resource.Error ->{
-                    _shopExpenseAmount.value = shopExpenseAmount.value.copy(
+                    _expenseAmount.value = expenseAmount.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+            }
+        }.launchIn(this)
+    }
+
+
+    fun getAverageDailyExpenses(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
+        expenseRepository.getAverageDailyExpenses(periodDropDownItem).onEach { response->
+            when(response){
+                is Resource.Success ->{
+                    _averageDailyExpenses.value = averageDailyExpenses.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+                is Resource.Loading ->{
+                    _averageDailyExpenses.value = averageDailyExpenses.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = true
+                    )
+                }
+                is Resource.Error ->{
+                    _averageDailyExpenses.value = averageDailyExpenses.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+            }
+        }.launchIn(this)
+    }
+
+    fun getExpenseTypeAmounts(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
+        expenseRepository.getExpenseTypeAmounts(periodDropDownItem).onEach { response->
+            when(response){
+                is Resource.Success ->{
+                    _expenseTypeAmount.value = expenseTypeAmount.value.copy(
+                        itemValues = response.data ?: emptyList(),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+                is Resource.Loading ->{
+                    _expenseTypeAmount.value = expenseTypeAmount.value.copy(
+                        itemValues = response.data ?: emptyList(),
+                        message = response.message,
+                        isLoading = true
+                    )
+                }
+                is Resource.Error ->{
+                    _expenseTypeAmount.value = expenseTypeAmount.value.copy(
+                        itemValues = response.data ?: emptyList(),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+            }
+        }.launchIn(this)
+    }
+
+    fun getMinimumExpenseDay(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
+        expenseRepository.getMinimumExpenseDay(periodDropDownItem).onEach { response->
+            when(response){
+                is Resource.Success ->{
+                    _minimumExpenseDay.value = minimumExpenseDay.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+                is Resource.Loading ->{
+                    _minimumExpenseDay.value = minimumExpenseDay.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = true
+                    )
+                }
+                is Resource.Error ->{
+                    _minimumExpenseDay.value = minimumExpenseDay.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+            }
+        }.launchIn(this)
+    }
+
+
+    fun getMaximumExpenseDay(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
+        expenseRepository.getMaximumExpenseDay(periodDropDownItem).onEach { response->
+            when(response){
+                is Resource.Success ->{
+                    _maximumExpenseDay.value = maximumExpenseDay.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+                is Resource.Loading ->{
+                    _maximumExpenseDay.value = maximumExpenseDay.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = true
+                    )
+                }
+                is Resource.Error ->{
+                    _maximumExpenseDay.value = maximumExpenseDay.value.copy(
                         itemValue = response.data ?: ItemValue(emptyString, 0.0),
                         message = response.message,
                         isLoading = false

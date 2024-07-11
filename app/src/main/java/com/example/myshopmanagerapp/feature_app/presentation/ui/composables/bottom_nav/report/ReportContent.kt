@@ -13,6 +13,7 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.*
 @Composable
 fun ReportContent(
     navigateToViewRevenueReportScreen: ()-> Unit,
+    navigateToViewExpenseReportScreen: ()-> Unit,
     navigateToViewStockReportScreen: ()-> Unit,
     navigateToCashInReportScreen: ()-> Unit,
     navigateToViewGeneralReportScreen: ()-> Unit,
@@ -66,7 +67,7 @@ fun ReportContent(
             ReportCard(
                 title = "Revenue Report",
                 semiTitle = "View all your revenue records",
-                description = "You can see all your daily revenue and expenses here",
+                description = "You can see all your daily revenue here",
                 icon = R.drawable.ic_money_filled,
                 contentColor = if (isSystemInDarkTheme()) Green10 else Green95,
                 cardContainerColor = if (isSystemInDarkTheme()) Green80 else Green40,
@@ -76,7 +77,26 @@ fun ReportContent(
             )
         }
 
-        //Revenue Card
+        //Expense Card
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(LocalSpacing.current.small),
+        ) {
+            ReportCard(
+                title = "Expense Report",
+                semiTitle = "View all your expense records",
+                description = "You can see all your expense report here",
+                icon = R.drawable.ic_money_filled,
+                contentColor = if (isSystemInDarkTheme()) Yellow10 else Yellow95,
+                cardContainerColor = if (isSystemInDarkTheme()) Yellow80 else Yellow40,
+                onOpenCard = {
+                    navigateToViewExpenseReportScreen()
+                }
+            )
+        }
+
+        //Stock Card
         Box(
             modifier = Modifier
                 .fillMaxWidth()

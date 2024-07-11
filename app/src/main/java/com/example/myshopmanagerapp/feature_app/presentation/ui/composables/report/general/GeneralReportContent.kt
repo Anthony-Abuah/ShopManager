@@ -12,7 +12,7 @@ import com.example.myshopmanagerapp.core.FormRelatedString.ItemsSold
 import com.example.myshopmanagerapp.core.FormRelatedString.NumberOfBankAccounts
 import com.example.myshopmanagerapp.core.FormRelatedString.NumberOfInventoryItems
 import com.example.myshopmanagerapp.core.FormRelatedString.NumberOfOwingCustomers
-import com.example.myshopmanagerapp.core.FormRelatedString.NumberOfPersonnel
+import com.example.myshopmanagerapp.core.FormRelatedString.NumberOfActivePersonnel
 import com.example.myshopmanagerapp.core.FormRelatedString.ShopName
 import com.example.myshopmanagerapp.core.FormRelatedString.ShopValue
 import com.example.myshopmanagerapp.core.FormRelatedString.ShopValueInfo
@@ -74,7 +74,7 @@ fun GeneralReportContent(
 
         // Number Of Personnel
         ViewTextValueRow(
-            viewTitle = NumberOfPersonnel,
+            viewTitle = NumberOfActivePersonnel,
             viewValue = "$numberOfPersonnel personnel",
             icon = Icons.AutoMirrored.Filled.KeyboardArrowRight,
             showInfo = true,
@@ -153,7 +153,7 @@ fun GeneralReportContent(
         )
         HorizontalDivider()
 
-        Spacer(modifier = Modifier.height(LocalSpacing.current.small))
+        Spacer(modifier = Modifier.height(LocalSpacing.current.medium))
 
     }
     ConfirmationInfoDialog(

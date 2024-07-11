@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.myshopmanagerapp.core.Constants.Zero
@@ -735,6 +736,84 @@ fun ViewTextValueRow(
             }
         }
     }
+}
+
+@Composable
+fun ViewTextValueWithExtraValueRow(
+    viewTitle: String,
+    viewValue: String,
+    extraValue: String,
+    onClick: () -> Unit = {},
+) {
+    // Values
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(LocalSpacing.current.small),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(LocalSpacing.current.viewOrUpdateRow),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(top = LocalSpacing.current.small),
+                contentAlignment = Alignment.TopStart
+            ) {
+                Text(
+                    text = viewTitle,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    overflow = TextOverflow.Ellipsis,
+                    fontWeight = FontWeight.Light
+                )
+            }
+            Spacer(modifier = Modifier.height(LocalSpacing.current.small))
+
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .padding(bottom = LocalSpacing.current.small),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Box(
+                    modifier = Modifier.weight(3f),
+                    contentAlignment = Alignment.BottomStart
+                ) {
+                    Text(
+                        text = viewValue,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        overflow = TextOverflow.Ellipsis,
+                        fontWeight = FontWeight.Normal
+                    )
+                }
+                Box(
+                    modifier = Modifier.weight(2f),
+                    contentAlignment = Alignment.BottomEnd
+                ) {
+                    Text(
+                        text = extraValue,
+                        textAlign = TextAlign.End,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        overflow = TextOverflow.Ellipsis,
+                        fontWeight = FontWeight.Normal
+                    )
+                }
+            }
+        }
+    }
+
 }
 
 @Composable

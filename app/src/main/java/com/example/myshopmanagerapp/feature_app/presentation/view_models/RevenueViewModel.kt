@@ -54,35 +54,20 @@ class RevenueViewModel @Inject constructor(
     private val _revenueAmount = mutableStateOf(ItemValueState())
     val revenueAmount: State<ItemValueState> = _revenueAmount
 
-    private val _expenseAmount = mutableStateOf(ItemValueState())
-    val expenseAmount: State<ItemValueState> = _expenseAmount
-
-    private val _debtAmount = mutableStateOf(ItemValueState())
-    val debtAmount: State<ItemValueState> = _debtAmount
-
-    private val _debtRepaymentAmount = mutableStateOf(ItemValueState())
-    val debtRepaymentAmount: State<ItemValueState> = _debtRepaymentAmount
-
     private val _revenueDays = mutableStateOf(ItemValueState())
     val revenueDays: State<ItemValueState> = _revenueDays
 
     private val _revenueHours = mutableStateOf(ItemValueState())
     val revenueHours: State<ItemValueState> = _revenueHours
 
+    private val _averageRevenueHours = mutableStateOf(ItemValueState())
+    val averageRevenueHours: State<ItemValueState> = _averageRevenueHours
+
     private val _maxRevenue = mutableStateOf(ItemValueState())
     val maxRevenue: State<ItemValueState> = _maxRevenue
 
     private val _minRevenue = mutableStateOf(ItemValueState())
     val minRevenue: State<ItemValueState> = _minRevenue
-
-    private val _maxExpense = mutableStateOf(ItemValueState())
-    val maxExpense: State<ItemValueState> = _maxExpense
-
-    private val _minExpense = mutableStateOf(ItemValueState())
-    val minExpense: State<ItemValueState> = _minExpense
-
-    private val _shopRevenueAmount = mutableStateOf(ItemValueState())
-    val shopRevenueAmount: State<ItemValueState> = _shopRevenueAmount
 
 
     private val _insertRevenueState = mutableStateOf(ItemValueState())
@@ -163,89 +148,6 @@ class RevenueViewModel @Inject constructor(
         }.launchIn(this)
     }
 
-    fun getExpenseAmount(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
-        revenueRepository.getExpenseAmount(periodDropDownItem).onEach { response->
-            when(response){
-                is Resource.Success ->{
-                    _expenseAmount.value = expenseAmount.value.copy(
-                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
-                        message = response.message,
-                        isLoading = false
-                    )
-                }
-                is Resource.Loading ->{
-                    _expenseAmount.value = expenseAmount.value.copy(
-                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
-                        message = response.message,
-                        isLoading = true
-                    )
-                }
-                is Resource.Error ->{
-                    _expenseAmount.value = expenseAmount.value.copy(
-                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
-                        message = response.message,
-                        isLoading = false
-                    )
-                }
-            }
-        }.launchIn(this)
-    }
-
-    fun getDebtAmount(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
-        revenueRepository.getDebtAmount(periodDropDownItem).onEach { response->
-            when(response){
-                is Resource.Success ->{
-                    _debtAmount.value = debtAmount.value.copy(
-                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
-                        message = response.message,
-                        isLoading = false
-                    )
-                }
-                is Resource.Loading ->{
-                    _debtAmount.value = debtAmount.value.copy(
-                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
-                        message = response.message,
-                        isLoading = true
-                    )
-                }
-                is Resource.Error ->{
-                    _debtAmount.value = debtAmount.value.copy(
-                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
-                        message = response.message,
-                        isLoading = false
-                    )
-                }
-            }
-        }.launchIn(this)
-    }
-
-    fun getDebtRepaymentAmount(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
-        revenueRepository.getDebtRepaymentAmount(periodDropDownItem).onEach { response->
-            when(response){
-                is Resource.Success ->{
-                    _debtRepaymentAmount.value = debtRepaymentAmount.value.copy(
-                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
-                        message = response.message,
-                        isLoading = false
-                    )
-                }
-                is Resource.Loading ->{
-                    _debtRepaymentAmount.value = debtRepaymentAmount.value.copy(
-                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
-                        message = response.message,
-                        isLoading = true
-                    )
-                }
-                is Resource.Error ->{
-                    _debtRepaymentAmount.value = debtRepaymentAmount.value.copy(
-                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
-                        message = response.message,
-                        isLoading = false
-                    )
-                }
-            }
-        }.launchIn(this)
-    }
 
     fun getRevenueDays(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
         revenueRepository.getRevenueDays(periodDropDownItem).onEach { response->
@@ -303,6 +205,34 @@ class RevenueViewModel @Inject constructor(
         }.launchIn(this)
     }
 
+    fun getAverageRevenueHours(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
+        revenueRepository.getAverageRevenueHours(periodDropDownItem).onEach { response->
+            when(response){
+                is Resource.Success ->{
+                    _averageRevenueHours.value = averageRevenueHours.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+                is Resource.Loading ->{
+                    _averageRevenueHours.value = averageRevenueHours.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = true
+                    )
+                }
+                is Resource.Error ->{
+                    _averageRevenueHours.value = averageRevenueHours.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+            }
+        }.launchIn(this)
+    }
+
     fun getMaxRevenue(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
         revenueRepository.getMaximumRevenueDay(periodDropDownItem).onEach { response->
             when(response){
@@ -350,90 +280,6 @@ class RevenueViewModel @Inject constructor(
                 }
                 is Resource.Error ->{
                     _minRevenue.value = minRevenue.value.copy(
-                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
-                        message = response.message,
-                        isLoading = false
-                    )
-                }
-            }
-        }.launchIn(this)
-    }
-
-    fun getMaxExpense(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
-        revenueRepository.getMaximumExpenseDay(periodDropDownItem).onEach { response->
-            when(response){
-                is Resource.Success ->{
-                    _maxExpense.value = maxExpense.value.copy(
-                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
-                        message = response.message,
-                        isLoading = false
-                    )
-                }
-                is Resource.Loading ->{
-                    _maxExpense.value = maxExpense.value.copy(
-                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
-                        message = response.message,
-                        isLoading = true
-                    )
-                }
-                is Resource.Error ->{
-                    _maxExpense.value = maxExpense.value.copy(
-                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
-                        message = response.message,
-                        isLoading = false
-                    )
-                }
-            }
-        }.launchIn(this)
-    }
-
-    fun getMinExpense(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
-        revenueRepository.getMinimumExpenseDay(periodDropDownItem).onEach { response->
-            when(response){
-                is Resource.Success ->{
-                    _minExpense.value = minExpense.value.copy(
-                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
-                        message = response.message,
-                        isLoading = false
-                    )
-                }
-                is Resource.Loading ->{
-                    _minExpense.value = minExpense.value.copy(
-                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
-                        message = response.message,
-                        isLoading = true
-                    )
-                }
-                is Resource.Error ->{
-                    _minExpense.value = minExpense.value.copy(
-                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
-                        message = response.message,
-                        isLoading = false
-                    )
-                }
-            }
-        }.launchIn(this)
-    }
-
-    fun getShopRevenue(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
-        revenueRepository.getShopRevenue(periodDropDownItem).onEach { response->
-            when(response){
-                is Resource.Success ->{
-                    _shopRevenueAmount.value = shopRevenueAmount.value.copy(
-                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
-                        message = response.message,
-                        isLoading = false
-                    )
-                }
-                is Resource.Loading ->{
-                    _shopRevenueAmount.value = shopRevenueAmount.value.copy(
-                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
-                        message = response.message,
-                        isLoading = true
-                    )
-                }
-                is Resource.Error ->{
-                    _shopRevenueAmount.value = shopRevenueAmount.value.copy(
                         itemValue = response.data ?: ItemValue(emptyString, 0.0),
                         message = response.message,
                         isLoading = false

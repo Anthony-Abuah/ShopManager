@@ -4,6 +4,8 @@ import android.content.Context
 import com.example.myshopmanagerapp.core.DebtEntities
 import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.feature_app.data.local.entities.debt.DebtEntity
+import com.example.myshopmanagerapp.feature_app.domain.model.ItemValue
+import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
 import kotlinx.coroutines.flow.Flow
 
 
@@ -30,5 +32,7 @@ interface DebtRepository {
     suspend fun deleteAllDebt()
 
     suspend fun generateDebtList(context: Context, debts: DebtEntities, mapOfCustomers: Map<String, String>): Flow<Resource<String?>>
+
+    suspend fun getDebtAmount(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
 
 }

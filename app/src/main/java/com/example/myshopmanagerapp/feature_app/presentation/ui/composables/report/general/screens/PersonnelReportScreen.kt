@@ -36,7 +36,7 @@ fun PersonnelReportScreen(
             verticalArrangement = Arrangement.Center
         ) {
             PersonnelReportContent(
-                allPersonnel = personnelViewModel.personnelEntitiesState.value.personnelEntities ?: emptyList()
+                allPersonnel = personnelViewModel.personnelEntitiesState.value.personnelEntities?.filter { it.isActive== true } ?: emptyList()
             )
         }
     }

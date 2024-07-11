@@ -59,5 +59,5 @@ interface InventoryRepository {
         inventories: List<InventoryQuantityDisplayValues>,
     ): Flow<Resource<String?>>
 
-
+    suspend fun getInventoryCost(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
 }

@@ -79,7 +79,7 @@ fun GeneralReportNavGraph(
             }
         ){
             InventoryItemsReportScreen {
-                navHostController.popBackStack()
+                navController.popBackStack()
             }
         }
         composable(route = GeneralReportScreens.OwingCustomersReportScreen.route,
@@ -103,7 +103,7 @@ fun GeneralReportNavGraph(
             }
         ){
             OwingCustomersReportScreen {
-                navHostController.popBackStack()
+                navController.popBackStack()
             }
         }
         composable(route = GeneralReportScreens.BankAccountsReportScreen.route,
@@ -127,7 +127,7 @@ fun GeneralReportNavGraph(
             }
         ){
             BankAccountsReportScreen {
-                navHostController.popBackStack()
+                navController.popBackStack()
             }
         }
         composable(route = GeneralReportScreens.PersonnelReportScreen.route,
@@ -151,7 +151,7 @@ fun GeneralReportNavGraph(
             }
         ){
             PersonnelReportScreen {
-                navHostController.popBackStack()
+                navController.popBackStack()
             }
         }
     }

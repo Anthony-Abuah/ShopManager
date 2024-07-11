@@ -59,9 +59,9 @@ fun GeneralReportScreen(
         personnelViewModel.getAllPersonnel()
         savingsViewModel.getAllSavings()
         bankAccountViewModel.getAllBankAccounts()
-        revenueViewModel.getShopRevenue(period)
+        revenueViewModel.getRevenueAmount(period)
         withdrawalViewModel.getAllWithdrawals()
-        expenseViewModel.getShopExpense(period)
+        expenseViewModel.getExpenseAmount(period)
         stockViewModel.getShopValue(period)
     }
     val shopInfoJson = userPreferences.getShopInfo.collectAsState(initial = emptyString).value
@@ -72,7 +72,7 @@ fun GeneralReportScreen(
     Scaffold(
         topBar = {
             StockReportScreenTopBar(
-                topBarTitleText = "General Shop Report",
+                topBarTitleText = "Shop Overview",
                 periodDropDownItems = listOfPeriods,
                 onClickItem = {_period->
                     period = _period
@@ -105,8 +105,8 @@ fun GeneralReportScreen(
             val debtAmount = allCustomers.sumOf { it.debtAmount.toNotNull() }
 
             val shopValue = stockViewModel.shopValue.value.itemValue.value.toTwoDecimalPlaces()
-            val totalRevenue = revenueViewModel.shopRevenueAmount.value.itemValue.value.toTwoDecimalPlaces()
-            val totalExpense = expenseViewModel.shopExpenseAmount.value.itemValue.value.toTwoDecimalPlaces()
+            val totalRevenue = revenueViewModel.revenueAmount.value.itemValue.value.toTwoDecimalPlaces()
+            val totalExpense = expenseViewModel.expenseAmount.value.itemValue.value.toTwoDecimalPlaces()
 
             GeneralReportContent(
                 currency = currency,

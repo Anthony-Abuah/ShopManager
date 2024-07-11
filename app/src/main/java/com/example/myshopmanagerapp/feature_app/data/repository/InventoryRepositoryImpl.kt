@@ -830,6 +830,27 @@ class InventoryRepositoryImpl(
 
     }
 
+
+    override suspend fun getInventoryCost(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>> = flow{
+        emit(Resource.Loading())
+        try {
+            val allInventories = appDatabase.inventoryDao.getAllInventories() ?: emptyList()
+            if (periodDropDownItem.isAllTime) {
+                val totalInventoryCost = allInventories.sumOf { it.totalCostPrice }
+                emit(Resource.Success(ItemValue("Total Revenue", totalInventoryCost)))
+            }else{
+                val firstDate = periodDropDownItem.firstDate.toTimestamp()
+                val lastDate = periodDropDownItem.lastDate.toTimestamp()
+                val allFilteredInventories = allInventories.filter { it.date in firstDate .. lastDate }
+                val totalInventoryCost = allFilteredInventories.sumOf { it.totalCostPrice }
+                emit(Resource.Success(ItemValue("Total Revenue", totalInventoryCost)))
+            }
+        }catch (e:Exception){
+            emit(Resource.Error("Could not get value"))
+        }
+    }
+
+
     private fun getDirectory(context: Context): File{
         val mediaDir = context.externalMediaDirs.firstOrNull()?.let {
             File(it, context.resources.getString(R.string.app_name)).apply { mkdirs() }

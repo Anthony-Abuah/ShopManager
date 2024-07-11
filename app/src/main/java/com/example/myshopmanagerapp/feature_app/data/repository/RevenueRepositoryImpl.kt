@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import com.example.myshopmanagerapp.R
 import com.example.myshopmanagerapp.core.*
+import com.example.myshopmanagerapp.core.Constants.NotAvailable
 import com.example.myshopmanagerapp.core.Functions.shortened
 import com.example.myshopmanagerapp.core.Functions.toCompanyEntity
 import com.example.myshopmanagerapp.core.Functions.toDate
@@ -236,18 +237,41 @@ class RevenueRepositoryImpl(
         }
     }
 
+    override suspend fun getAverageRevenueHours(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>> =flow{
+        emit(Resource.Loading())
+        try {
+            val allRevenues = appDatabase.revenueDao.getAllRevenues() ?: emptyList()
+            if (periodDropDownItem.isAllTime) {
+                val totalRevenueHours = allRevenues.sumOf { it.numberOfHours.toNotNull() }.toDouble()
+                val totalRevenueDays = allRevenues.filter { it.numberOfHours.toNotNull() > 0 }.groupBy { it.date }.keys.count()
+                val averageRevenue = if (totalRevenueDays == 0) 0.0 else totalRevenueHours.div(totalRevenueDays)
+                emit(Resource.Success(ItemValue("Average revenue hours", averageRevenue)))
+            }else{
+                val firstDate = periodDropDownItem.firstDate.toTimestamp()
+                val lastDate = periodDropDownItem.lastDate.toTimestamp()
+                val allFilteredRevenues = allRevenues.filter { it.date in firstDate .. lastDate }
+                val totalRevenueHours = allFilteredRevenues.sumOf { it.numberOfHours.toNotNull() }.toDouble()
+                val totalRevenueDays = allFilteredRevenues.filter { it.numberOfHours.toNotNull() > 0 }.groupBy { it.date }.keys.count()
+                val averageRevenue = if (totalRevenueDays == 0) 0.0 else totalRevenueHours.div(totalRevenueDays)
+                emit(Resource.Success(ItemValue("Average revenue hours", averageRevenue)))
+            }
+        }catch (e:Exception){
+            emit(Resource.Error("Unable to get average revenue hours\nError Message: ${e.message}"))
+        }
+    }
+
     override suspend fun getRevenueDays(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>> = flow {
         emit(Resource.Loading())
         try {
             val allRevenues = appDatabase.revenueDao.getAllRevenues() ?: emptyList()
             if (periodDropDownItem.isAllTime) {
-                val numberOfDays = allRevenues.count()
+                val numberOfDays = allRevenues.groupBy { it.date }.keys.count()
                 emit(Resource.Success(ItemValue("Revenue days", numberOfDays.toDouble())))
             }else{
                 val firstDate = periodDropDownItem.firstDate.toTimestamp()
                 val lastDate = periodDropDownItem.lastDate.toTimestamp()
                 val allFilteredRevenues = allRevenues.filter { it.date in firstDate .. lastDate }
-                val numberOfDays = allFilteredRevenues.count()
+                val numberOfDays = allFilteredRevenues.groupBy { it.date }.keys.count()
                 emit(Resource.Success(ItemValue("Revenue days", numberOfDays.toDouble())))
             }
         }catch (e:Exception){
@@ -260,16 +284,14 @@ class RevenueRepositoryImpl(
         try {
             val allRevenues = appDatabase.revenueDao.getAllRevenues() ?: emptyList()
             if (periodDropDownItem.isAllTime) {
-                val maxRevenue = allRevenues.maxBy { it.revenueAmount }
-                val maxRevenueDay = "${maxRevenue.dayOfWeek?.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }}, ${maxRevenue.date.toDate().toDateString()}"
-                emit(Resource.Success(ItemValue(maxRevenueDay, maxRevenue.revenueAmount)))
+                val maximumRevenue = allRevenues.groupBy { "${it.dayOfWeek?.take(3)}, ${it.date.toDateString()}" }.mapValues { it.value.sumOf { revenue-> revenue.revenueAmount } }.maxByOrNull { it.value }
+                emit(Resource.Success(ItemValue(maximumRevenue?.key ?: NotAvailable, maximumRevenue?.value.toNotNull())))
             }else{
                 val firstDate = periodDropDownItem.firstDate.toTimestamp()
                 val lastDate = periodDropDownItem.lastDate.toTimestamp()
                 val allFilteredRevenues = allRevenues.filter { it.date in firstDate .. lastDate }
-                val maxRevenue = allFilteredRevenues.maxBy { it.revenueAmount }
-                val maxRevenueDay = "${maxRevenue.dayOfWeek?.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }}, ${maxRevenue.date.toDateString()}"
-                emit(Resource.Success(ItemValue(maxRevenueDay, maxRevenue.revenueAmount)))
+                val maximumRevenue = allFilteredRevenues.groupBy { "${it.dayOfWeek?.take(3)}, ${it.date.toDateString()}" }.mapValues { it.value.sumOf { revenue-> revenue.revenueAmount } }.maxByOrNull { it.value }
+                emit(Resource.Success(ItemValue(maximumRevenue?.key ?: NotAvailable, maximumRevenue?.value.toNotNull())))
             }
         }catch (e:Exception){
             emit(Resource.Error("Could not get value"))
@@ -281,16 +303,14 @@ class RevenueRepositoryImpl(
         try {
             val allRevenues = appDatabase.revenueDao.getAllRevenues() ?: emptyList()
             if (periodDropDownItem.isAllTime) {
-                val minRevenue = allRevenues.minBy { it.revenueAmount }
-                val minRevenueDay = "${minRevenue.dayOfWeek?.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }}, ${minRevenue.date.toDateString()}"
-                emit(Resource.Success(ItemValue(minRevenueDay, minRevenue.revenueAmount)))
+                val maximumRevenue = allRevenues.groupBy { "${it.dayOfWeek?.take(3)}, ${it.date.toDateString()}" }.mapValues { it.value.sumOf { revenue-> revenue.revenueAmount } }.minByOrNull { it.value }
+                emit(Resource.Success(ItemValue(maximumRevenue?.key ?: NotAvailable, maximumRevenue?.value.toNotNull())))
             }else{
                 val firstDate = periodDropDownItem.firstDate.toTimestamp()
                 val lastDate = periodDropDownItem.lastDate.toTimestamp()
                 val allFilteredRevenues = allRevenues.filter { it.date in firstDate .. lastDate }
-                val minRevenue = allFilteredRevenues.minBy { it.revenueAmount }
-                val minRevenueDay = "${minRevenue.dayOfWeek?.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }}, ${minRevenue.date.toDateString()}"
-                emit(Resource.Success(ItemValue(minRevenueDay, minRevenue.revenueAmount)))
+                val maximumRevenue = allFilteredRevenues.groupBy { "${it.dayOfWeek?.take(3)}, ${it.date.toDateString()}" }.mapValues { it.value.sumOf { revenue-> revenue.revenueAmount } }.minByOrNull { it.value }
+                emit(Resource.Success(ItemValue(maximumRevenue?.key ?: NotAvailable, maximumRevenue?.value.toNotNull())))
             }
         }catch (e:Exception){
             emit(Resource.Error("Could not get value"))
@@ -409,25 +429,6 @@ class RevenueRepositoryImpl(
         appDatabase.revenueDao.deleteAllRevenues()
     }
 
-    override suspend fun getRevenueAmount(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>> =flow {
-        emit(Resource.Loading())
-        try {
-            val allRevenues = appDatabase.revenueDao.getAllRevenues() ?: emptyList()
-            if (periodDropDownItem.isAllTime) {
-                val totalRevenue = allRevenues.sumOf { it.revenueAmount }
-                emit(Resource.Success(ItemValue("Total Revenue", totalRevenue)))
-            }else{
-                val firstDate = periodDropDownItem.firstDate.toTimestamp()
-                val lastDate = periodDropDownItem.lastDate.toTimestamp()
-                val allFilteredRevenues = allRevenues.filter { it.date in firstDate .. lastDate }
-                val totalRevenue = allFilteredRevenues.sumOf { it.revenueAmount }
-                emit(Resource.Success(ItemValue("Total Revenue", totalRevenue)))
-            }
-        }catch (e:Exception){
-            emit(Resource.Error("Could not get value"))
-        }
-    }
-
     override suspend fun getExpenseAmount(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>> =flow{
         emit(Resource.Loading())
         try {
@@ -447,43 +448,6 @@ class RevenueRepositoryImpl(
         }
     }
 
-    override suspend fun getDebtAmount(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>> =flow{
-        emit(Resource.Loading())
-        try {
-            val allDebts = appDatabase.debtDao.getAllDebt() ?: emptyList()
-            if (periodDropDownItem.isAllTime) {
-                val totalRevenueDebt = allDebts.sumOf { it.debtAmount }
-                emit(Resource.Success(ItemValue("Total Debt", totalRevenueDebt)))
-            }else{
-                val firstDate = periodDropDownItem.firstDate.toTimestamp()
-                val lastDate = periodDropDownItem.lastDate.toTimestamp()
-                val allFilteredDebts = allDebts.filter { it.date in firstDate .. lastDate }
-                val totalRevenueDebt = allFilteredDebts.sumOf { it.debtAmount }
-                emit(Resource.Success(ItemValue("Total Debt", totalRevenueDebt)))
-            }
-        }catch (e:Exception){
-            emit(Resource.Error("Could not get value"))
-        }
-    }
-
-    override suspend fun getDebtRepaymentAmount(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>  =flow{
-        emit(Resource.Loading())
-        try {
-            val allDebtRepayments = appDatabase.debtRepaymentDao.getAllDebtRepayment() ?: emptyList()
-            if (periodDropDownItem.isAllTime) {
-                val totalRevenueDebt = allDebtRepayments.sumOf { it.debtRepaymentAmount }
-                emit(Resource.Success(ItemValue("Total Debt Repayment", totalRevenueDebt)))
-            }else{
-                val firstDate = periodDropDownItem.firstDate.toTimestamp()
-                val lastDate = periodDropDownItem.lastDate.toTimestamp()
-                val allFilteredDebtRepayments = allDebtRepayments.filter { it.date in firstDate .. lastDate }
-                val totalRevenueDebt = allFilteredDebtRepayments.sumOf { it.debtRepaymentAmount }
-                emit(Resource.Success(ItemValue("Total Debt Repayment", totalRevenueDebt)))
-            }
-        }catch (e:Exception){
-            emit(Resource.Error("Could not get value"))
-        }
-    }
 
     override suspend fun getMaximumExpenseDay(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>> = flow {
         emit(Resource.Loading())
@@ -527,7 +491,7 @@ class RevenueRepositoryImpl(
         }
     }
 
-    override suspend fun getShopRevenue(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>> = flow{
+    override suspend fun getRevenueAmount(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>> = flow{
         emit(Resource.Loading())
         try {
             val allRevenues = appDatabase.revenueDao.getAllRevenues() ?: emptyList()

@@ -14,6 +14,8 @@ import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.UIEvent
 import com.example.myshopmanagerapp.feature_app.data.local.entities.debt_repayment.DebtRepaymentEntity
+import com.example.myshopmanagerapp.feature_app.domain.model.ItemValue
+import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
 import com.example.myshopmanagerapp.feature_app.domain.repository.DebtRepaymentRepository
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.company.AddCompanyState
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.debt_repayment.DebtRepaymentEntitiesState
@@ -58,6 +60,9 @@ class DebtRepaymentViewModel @Inject constructor(
 
     private val _debtRepaymentEntitiesState = mutableStateOf(DebtRepaymentEntitiesState())
     val debtRepaymentEntitiesState: State<DebtRepaymentEntitiesState> = _debtRepaymentEntitiesState
+
+    private val _debtRepaymentAmount = mutableStateOf(ItemValueState())
+    val debtRepaymentAmount: State<ItemValueState> = _debtRepaymentAmount
 
 
     private val _eventFlow = MutableSharedFlow<UIEvent>()
@@ -203,6 +208,34 @@ class DebtRepaymentViewModel @Inject constructor(
                     _deleteDebtRepaymentState.value = deleteDebtRepaymentState.value.copy(
                         message = response.message ,
                         isSuccessful = false,
+                        isLoading = false
+                    )
+                }
+            }
+        }.launchIn(this)
+    }
+
+    fun getDebtRepaymentAmount(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
+        debtRepaymentRepository.getDebtRepaymentAmount(periodDropDownItem).onEach { response->
+            when(response){
+                is Resource.Success ->{
+                    _debtRepaymentAmount.value = debtRepaymentAmount.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+                is Resource.Loading ->{
+                    _debtRepaymentAmount.value = debtRepaymentAmount.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = true
+                    )
+                }
+                is Resource.Error ->{
+                    _debtRepaymentAmount.value = debtRepaymentAmount.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
                         isLoading = false
                     )
                 }

@@ -103,7 +103,7 @@ fun LineChartCard(
             contentColor = MaterialTheme.colorScheme.background,
             containerColor = MaterialTheme.colorScheme.background
         ),
-        shape = MaterialTheme.shapes.medium,
+        //shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(LocalSpacing.current.small)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {

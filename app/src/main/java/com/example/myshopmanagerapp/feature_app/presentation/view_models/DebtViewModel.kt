@@ -14,6 +14,8 @@ import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.UIEvent
 import com.example.myshopmanagerapp.feature_app.data.local.entities.debt.DebtEntity
+import com.example.myshopmanagerapp.feature_app.domain.model.ItemValue
+import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
 import com.example.myshopmanagerapp.feature_app.domain.repository.DebtRepository
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.company.AddCompanyState
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.debt.DebtEntitiesState
@@ -57,6 +59,9 @@ class DebtViewModel @Inject constructor(
 
     private val _debtEntitiesState = mutableStateOf(DebtEntitiesState())
     val debtEntitiesState: State<DebtEntitiesState> = _debtEntitiesState
+
+    private val _debtAmount = mutableStateOf(ItemValueState())
+    val debtAmount: State<ItemValueState> = _debtAmount
 
 
     private val _eventFlow = MutableSharedFlow<UIEvent>()
@@ -206,6 +211,36 @@ class DebtViewModel @Inject constructor(
             }
         }.launchIn(this)
     }
+
+
+    fun getDebtAmount(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
+        debtRepository.getDebtAmount(periodDropDownItem).onEach { response->
+            when(response){
+                is Resource.Success ->{
+                    _debtAmount.value = debtAmount.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+                is Resource.Loading ->{
+                    _debtAmount.value = debtAmount.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = true
+                    )
+                }
+                is Resource.Error ->{
+                    _debtAmount.value = debtAmount.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+            }
+        }.launchIn(this)
+    }
+
 
     fun updateDebtDate(date: Long) {
         debtInfo = debtInfo.copy(
