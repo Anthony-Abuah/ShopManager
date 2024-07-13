@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -66,6 +67,7 @@ fun FirstScreenTopBar(
 @Composable
 fun BasicScreenTopBar(
     topBarTitleText: String,
+    backgroundColor: Color = MaterialTheme.colorScheme.background,
     navigateBack: () -> Unit
 ) {
     TopAppBar (
@@ -85,7 +87,7 @@ fun BasicScreenTopBar(
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
+            containerColor = backgroundColor,
             titleContentColor = MaterialTheme.colorScheme.onBackground,
             navigationIconContentColor = MaterialTheme.colorScheme.onBackground
         ),

@@ -1,16 +1,13 @@
 package com.example.myshopmanagerapp.feature_app.domain.repository
 
 import android.content.Context
-import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.InventoryEntities
+import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.feature_app.data.local.entities.inventory.InventoryEntity
-import com.example.myshopmanagerapp.feature_app.data.local.entities.stock.StockEntity
 import com.example.myshopmanagerapp.feature_app.domain.model.InventoryQuantityDisplayValues
-import com.example.myshopmanagerapp.feature_app.domain.model.ItemQuantityCategorization
 import com.example.myshopmanagerapp.feature_app.domain.model.ItemValue
 import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
 import kotlinx.coroutines.flow.Flow
-import java.util.*
 
 
 interface InventoryRepository {
@@ -40,18 +37,6 @@ interface InventoryRepository {
     suspend fun deleteAllInventories()
 
     suspend fun getItemsAndTheirQuantities(period: PeriodDropDownItem): Flow<Resource<List<ItemValue>>>
-
-    suspend fun getTotalNumberOfItems(period: PeriodDropDownItem): Flow<Resource<ItemValue>>
-
-    suspend fun getShopValue(period: PeriodDropDownItem): Flow<Resource<ItemValue>>
-
-    suspend fun getTotalCostValue(period: PeriodDropDownItem): Flow<Resource<ItemValue>>
-
-    suspend fun getTotalExpectedSalesValue(period: PeriodDropDownItem): Flow<Resource<ItemValue>>
-
-    suspend fun getMostAvailableItem(period: PeriodDropDownItem): Flow<Resource<ItemValue>>
-
-    suspend fun getLeastAvailableItem(period: PeriodDropDownItem): Flow<Resource<ItemValue>>
 
     suspend fun generateInventoryList(
         context: Context,

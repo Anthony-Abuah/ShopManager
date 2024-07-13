@@ -12,12 +12,11 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.*
 
 @Composable
 fun ReportContent(
-    navigateToViewRevenueReportScreen: ()-> Unit,
-    navigateToViewExpenseReportScreen: ()-> Unit,
-    navigateToViewStockReportScreen: ()-> Unit,
-    navigateToCashInReportScreen: ()-> Unit,
-    navigateToViewGeneralReportScreen: ()-> Unit,
-    navigateToViewInventoryReportScreen: ()-> Unit
+    navigateToViewRevenueReportScreen: () -> Unit,
+    navigateToViewExpenseReportScreen: () -> Unit,
+    navigateToCashInReportScreen: () -> Unit,
+    navigateToViewGeneralReportScreen: () -> Unit,
+    navigateToViewInventoryReportScreen: () -> Unit
 ) {
     BasicScreenColumnWithBottomBar {
         //General Report Card
@@ -92,25 +91,6 @@ fun ReportContent(
                 cardContainerColor = if (isSystemInDarkTheme()) Yellow80 else Yellow40,
                 onOpenCard = {
                     navigateToViewExpenseReportScreen()
-                }
-            )
-        }
-
-        //Stock Card
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(LocalSpacing.current.small),
-        ) {
-            ReportCard(
-                title = "Stock Report",
-                semiTitle = "View all your stock records",
-                description = "You can see all your inventory items, their quantities and values",
-                icon = R.drawable.ic_money_filled,
-                contentColor = if (isSystemInDarkTheme()) Gold10 else Gold95,
-                cardContainerColor = if (isSystemInDarkTheme()) Gold80 else Gold40,
-                onOpenCard = {
-                    navigateToViewStockReportScreen()
                 }
             )
         }

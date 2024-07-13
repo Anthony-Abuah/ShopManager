@@ -2,6 +2,7 @@ package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.rep
 
 sealed class InventoryReportScreens(val route: String){
     object MainInventoryReportScreen: InventoryReportScreens("to_main_inventory_report_screen")
+    object ViewInventoryItemReportScreen: InventoryReportScreens("to_view_inventory_item_report_screen")
 
     fun withArgs(vararg args: String): String {
         return buildString {

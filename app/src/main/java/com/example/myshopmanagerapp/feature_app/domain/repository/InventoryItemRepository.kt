@@ -12,9 +12,8 @@ interface InventoryItemRepository {
 
     fun getAllInventoryItems(): Flow<Resource<InventoryItemEntities?>>
 
-    fun getShopItemCostValues(): Flow<Resource<List<ItemValue>>>
-    fun getShopItemCostValues(period: PeriodDropDownItem): Flow<Resource<List<ItemValue>>>
-
+    suspend fun getPeriodicInventoryItems(period: PeriodDropDownItem): Flow<Resource<Map<InventoryItemEntity?, Int>>>
+    suspend fun getShopItemCostValues(period: PeriodDropDownItem):  Flow<Resource<List<ItemValue>>>
     fun getShopItemSellingValues(): Flow<Resource<List<ItemValue>>>
     fun getShopItemSellingValues(period: PeriodDropDownItem): Flow<Resource<List<ItemValue>>>
 
@@ -41,5 +40,4 @@ interface InventoryItemRepository {
     suspend fun deleteInventoryItem(uniqueInventoryItemId: String): Flow<Resource<String>>
 
     suspend fun deleteAllInventoryItems()
-
 }

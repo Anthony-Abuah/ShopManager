@@ -1,10 +1,12 @@
 package com.example.myshopmanagerapp.feature_app.data.repository
 
 import com.example.myshopmanagerapp.core.*
+import com.example.myshopmanagerapp.core.Constants.NotAvailable
 import com.example.myshopmanagerapp.core.Constants.ONE
 import com.example.myshopmanagerapp.core.Constants.Unit
 import com.example.myshopmanagerapp.core.Functions.toDate
 import com.example.myshopmanagerapp.core.Functions.toNotNull
+import com.example.myshopmanagerapp.core.Functions.toTimestamp
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
 import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
 import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIdsJson
@@ -201,7 +203,7 @@ class InventoryItemRepositoryImpl(
         }
     }
 
-    override fun getShopItemCostValues(): Flow<Resource<List<ItemValue>>> = flow{
+    override suspend fun getShopItemCostValues(period: PeriodDropDownItem): Flow<Resource<List<ItemValue>>> = flow{
         emit(Resource.Loading())
         try {
             val allInventoryItems = appDatabase.inventoryItemDao.getAllInventoryItems()
@@ -222,48 +224,34 @@ class InventoryItemRepositoryImpl(
         }
     }
 
-    override fun getShopItemCostValues(period: PeriodDropDownItem): Flow<Resource<List<ItemValue>>>  = flow{
+    override suspend fun getPeriodicInventoryItems(period: PeriodDropDownItem): Flow<Resource<Map<InventoryItemEntity?, Int>>>  = flow{
         emit(Resource.Loading())
-        val firstDate = period.firstDate.toDate().time
-        val lastDate = period.lastDate.toDate().time
         try {
-            val allInventoryItems = appDatabase.inventoryItemDao.getAllInventoryItems()
-            val allInventories = appDatabase.inventoryDao.getAllInventories() ?: emptyList()
-            val addedInventory = allInventories.filter { it.date in firstDate .. lastDate}
-            if (allInventoryItems.isNullOrEmpty()) {
-                emit(Resource.Error("No inventory items have been added yet"))
-            }else{
-                if (period.isAllTime) {
-                    val itemValues = allInventoryItems.map { item ->
-                        val itemName = item.inventoryItemName.replaceFirstChar {
-                            if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
-                        }
-                        val costPrice = item.currentCostPrice ?: 0.0
-                        val numberOfRemainingValue = item.totalNumberOfUnits ?: 0
-                        val totalValueOfItem = costPrice.times(numberOfRemainingValue)
-                        ItemValue(itemName, totalValueOfItem)
-                    }
-                    emit(Resource.Success(itemValues))
+            val allStocks = appDatabase.stockDao.getAllStocks()?.sortedBy { it.date } ?: emptyList()
+            val allInventoryItems = appDatabase.inventoryItemDao.getAllInventoryItems() ?: emptyList()
+            if (period.isAllTime) {
+                val mutableInventoryItems = mutableMapOf<InventoryItemEntity?, Int>()
+                val lastStocks = allStocks.groupBy { it.uniqueInventoryItemId }.mapValues { it.value.maxByOrNull { _inventory-> _inventory.date } }.values.filterNotNull()
+                lastStocks.forEach { stock->
+                    val inventoryItem = allInventoryItems.firstOrNull { it.uniqueInventoryItemId == stock.uniqueInventoryItemId }
+                    mutableInventoryItems[inventoryItem] = stock.totalNumberOfUnits
                 }
-                else{
-                    val mapOfInventoryItem = mutableMapOf<String, String>()
-                    allInventoryItems.forEach { item->
-                        mapOfInventoryItem[item.uniqueInventoryItemId] = item.inventoryItemName
-                    }
-                    val itemValues = addedInventory.map { item ->
-                        val itemName = mapOfInventoryItem[item.uniqueInventoryItemId].toNotNull().replaceFirstChar {
-                            if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
-                        }
-                        val costPrice = item.unitCostPrice.toNotNull()
-                        val numberOfRemainingValue = item.totalNumberOfUnits.toNotNull()
-                        val totalValueOfItem = costPrice.times(numberOfRemainingValue)
-                        ItemValue(itemName, totalValueOfItem)
-                    }
-                    emit(Resource.Success(itemValues))
-                }
+                emit(Resource.Success(mutableInventoryItems))
             }
-        }catch (e: Exception){
-            emit(Resource.Error("Unknown error! Could not get item values"))
+            else{
+                val firstDate = period.firstDate.toTimestamp()
+                val lastDate = period.lastDate.toTimestamp()
+                val allFilteredStocks = allStocks.filter { it.date in firstDate .. lastDate }
+                val mutableInventoryItems = mutableMapOf<InventoryItemEntity?, Int>()
+                val lastStocks = allFilteredStocks.groupBy { it.uniqueInventoryItemId }.mapValues { it.value.maxByOrNull { _inventory-> _inventory.date } }.values.filterNotNull()
+                lastStocks.forEach { stock->
+                    val inventoryItem = allInventoryItems.firstOrNull { it.uniqueInventoryItemId == stock.uniqueInventoryItemId }
+                    mutableInventoryItems[inventoryItem] = stock.totalNumberOfUnits
+                }
+                emit(Resource.Success(mutableInventoryItems))
+            }
+        }catch (e:Exception){
+            emit(Resource.Error("Could not get value"))
         }
     }
 
@@ -471,5 +459,6 @@ class InventoryItemRepositoryImpl(
     override suspend fun deleteAllInventoryItems() {
         appDatabase.inventoryItemDao.deleteAllInventoryItems()
     }
+
 
 }

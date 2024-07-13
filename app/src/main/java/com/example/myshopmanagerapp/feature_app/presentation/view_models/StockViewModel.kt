@@ -58,6 +58,9 @@ class StockViewModel @Inject constructor(
     private val _shopValue = mutableStateOf(ItemValueState())
     val shopValue: State<ItemValueState> = _shopValue
 
+    private val _expectedSalesAmount = mutableStateOf(ItemValueState())
+    val expectedSalesAmount: State<ItemValueState> = _expectedSalesAmount
+
 
 
     private val _eventFlow = MutableSharedFlow<UIEvent>()
@@ -84,6 +87,34 @@ class StockViewModel @Inject constructor(
                 }
                 is Resource.Error ->{
                     _shopValue.value = shopValue.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+            }
+        }.launchIn(this)
+    }
+
+    fun getExpectedSalesAmount(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
+        stockRepository.getExpectedSalesAmount(periodDropDownItem).onEach { response->
+            when(response){
+                is Resource.Success ->{
+                    _expectedSalesAmount.value = expectedSalesAmount.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+                is Resource.Loading ->{
+                    _expectedSalesAmount.value = expectedSalesAmount.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = true
+                    )
+                }
+                is Resource.Error ->{
+                    _expectedSalesAmount.value = expectedSalesAmount.value.copy(
                         itemValue = response.data ?: ItemValue(emptyString, 0.0),
                         message = response.message,
                         isLoading = false

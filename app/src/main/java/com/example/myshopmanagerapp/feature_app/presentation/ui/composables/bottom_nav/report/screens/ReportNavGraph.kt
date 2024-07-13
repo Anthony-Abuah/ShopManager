@@ -14,7 +14,6 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.repo
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.report.general.screens.GeneralReportNavGraph
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.report.inventory.screens.InventoryReportNavGraph
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.report.revenue.screens.RevenueReportNavGraph
-import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.report.stock.screens.StockReportNavGraph
 
 @Composable
 fun ReportNavGraph(
@@ -34,9 +33,6 @@ fun ReportNavGraph(
                 navigateToViewExpenseReportScreen = {
                     navController.navigate(ReportScreens.ViewExpenseReportNavGraph.route)
                 },
-                navigateToStockReportScreen = {
-                    navController.navigate(ReportScreens.ViewStockReportNavGraph.route)
-                },
                 navigateToCashInReportScreen = {
                     navController.navigate(ReportScreens.ViewCashInReportNavGraph.route)
                 },
@@ -48,9 +44,6 @@ fun ReportNavGraph(
             }
         }
 
-        composable(route = ReportScreens.ViewStockReportNavGraph.route){
-            StockReportNavGraph(navHostController = navController)
-        }
         composable(route = ReportScreens.ViewRevenueReportNavGraph.route){
             RevenueReportNavGraph(navHostController = navController)
         }

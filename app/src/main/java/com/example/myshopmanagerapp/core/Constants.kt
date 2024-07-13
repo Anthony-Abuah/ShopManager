@@ -60,6 +60,7 @@ object Constants{
     const val Loan = "Loan"
     const val Password = "1234"
     const val NotAvailable = "N/A"
+    const val UnknownItem = "Unknown Item"
 
 
     const val Yes = "Yes"

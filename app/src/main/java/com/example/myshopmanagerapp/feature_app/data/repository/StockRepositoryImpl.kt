@@ -375,8 +375,42 @@ class StockRepositoryImpl(
         }
     }
 
+    override suspend fun getExpectedSalesAmount(period: PeriodDropDownItem): Flow<Resource<ItemValue>> = flow{
+        emit(Resource.Loading())
+        try {
+            val allInventoryItems = appDatabase.inventoryItemDao.getAllInventoryItems() ?: emptyList()
+            val allStocks = appDatabase.stockDao.getAllStocks()?.sortedBy { it.date } ?: emptyList()
+            if (period.isAllTime) {
+                val lastStocks = allStocks.groupBy { it.uniqueInventoryItemId }.mapValues { it.value.maxByOrNull { _stock-> _stock.date } }.values.filterNotNull()
+                val totalSalesAmount = lastStocks.sumOf { stock->
+                    val inventory = allInventoryItems.firstOrNull { it.uniqueInventoryItemId == stock.uniqueInventoryItemId }
+                    val sellingPrice = inventory?.currentSellingPrice.toNotNull()
+                    stock.totalNumberOfUnits.times(sellingPrice)
+                }
+                emit(Resource.Success(ItemValue("Expected Sales Amount", totalSalesAmount)))
+            }else{
+                val firstDate = period.firstDate.toTimestamp()
+                val lastDate = period.lastDate.toTimestamp()
+                val allFilteredStocks = allStocks.filter { it.date in firstDate .. lastDate }
+                val lastStocks = allFilteredStocks.groupBy { it.uniqueInventoryItemId }.mapValues { it.value.maxByOrNull { _stock-> _stock.date } }.values.filterNotNull()
+                val totalSalesAmount = lastStocks.sumOf { stock->
+                    val inventory = allInventoryItems.firstOrNull { it.uniqueInventoryItemId == stock.uniqueInventoryItemId }
+                    val sellingPrice = inventory?.currentSellingPrice.toNotNull()
+                    stock.totalNumberOfUnits.times(sellingPrice)
+                }
+                emit(Resource.Success(ItemValue("Expected Sales Amount", totalSalesAmount)))
+            }
+        }catch (e: Exception){
+            emit(Resource.Error(
+                message = "Unknown error",
+                data = null
+            ))
+        }
+    }
+
     override suspend fun deleteAllStocks() {
         appDatabase.stockDao.deleteAllStocks()
     }
+
 
 }

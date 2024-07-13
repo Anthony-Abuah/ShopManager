@@ -18,7 +18,6 @@ fun ReportScreen(
     navHostController: NavHostController,
     navigateToViewRevenueReportScreen: () -> Unit,
     navigateToViewExpenseReportScreen: () -> Unit,
-    navigateToStockReportScreen: () -> Unit,
     navigateToCashInReportScreen: () -> Unit,
     navigateToViewGeneralReportScreen: () -> Unit,
     navigateToInventoryReportScreen: () -> Unit,
@@ -35,9 +34,8 @@ fun ReportScreen(
         ) {
             ReportContent(
                 navigateToViewRevenueReportScreen = navigateToViewRevenueReportScreen,
-                navigateToCashInReportScreen = navigateToCashInReportScreen,
-                navigateToViewStockReportScreen = navigateToStockReportScreen,
                 navigateToViewExpenseReportScreen = navigateToViewExpenseReportScreen,
+                navigateToCashInReportScreen = navigateToCashInReportScreen,
                 navigateToViewGeneralReportScreen = navigateToViewGeneralReportScreen,
             ) {
                 navigateToInventoryReportScreen()

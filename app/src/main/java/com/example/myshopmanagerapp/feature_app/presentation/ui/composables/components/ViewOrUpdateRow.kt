@@ -863,3 +863,51 @@ fun ViewInfo(info: String) {
         )
     }
 }
+
+
+@Composable
+fun CategoryCard(
+    number: String,
+    category: String,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(LocalSpacing.current.topBarIcon)
+            .padding(LocalSpacing.current.small),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier.width(LocalSpacing.current.topAppBarSize)
+                .fillMaxHeight(),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Text(
+                text = number,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Start,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                overflow = TextOverflow.Ellipsis,
+                fontWeight = FontWeight.Normal
+            )
+        }
+        Box(
+            modifier = Modifier.weight(1f)
+                .padding(horizontal = LocalSpacing.current.small)
+                .fillMaxHeight(),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = category,
+                textAlign = TextAlign.Start,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                overflow = TextOverflow.Ellipsis,
+                fontWeight = FontWeight.Normal
+            )
+        }
+    }
+}

@@ -1,30 +1,28 @@
 package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.report.general
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.myshopmanagerapp.R
 import com.example.myshopmanagerapp.core.Constants.emptyString
-import com.example.myshopmanagerapp.core.FormRelatedString.ItemsSold
+import com.example.myshopmanagerapp.core.Constants.listOfPeriods
+import com.example.myshopmanagerapp.core.FormRelatedString.NumberOfActivePersonnel
 import com.example.myshopmanagerapp.core.FormRelatedString.NumberOfBankAccounts
 import com.example.myshopmanagerapp.core.FormRelatedString.NumberOfInventoryItems
 import com.example.myshopmanagerapp.core.FormRelatedString.NumberOfOwingCustomers
-import com.example.myshopmanagerapp.core.FormRelatedString.NumberOfActivePersonnel
-import com.example.myshopmanagerapp.core.FormRelatedString.ShopName
 import com.example.myshopmanagerapp.core.FormRelatedString.ShopValue
 import com.example.myshopmanagerapp.core.FormRelatedString.ShopValueInfo
 import com.example.myshopmanagerapp.core.FormRelatedString.TotalExpenses
-import com.example.myshopmanagerapp.core.FormRelatedString.TotalOutstandingDebtAmount
 import com.example.myshopmanagerapp.core.FormRelatedString.TotalRevenues
 import com.example.myshopmanagerapp.core.FormRelatedString.TotalSavingsAmount
 import com.example.myshopmanagerapp.core.FormRelatedString.TotalWithdrawals
-import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenColumnWithoutBottomBar
-import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.ConfirmationInfoDialog
-import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.ViewTextValueRow
-import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.*
+import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.*
 
 @Composable
 fun GeneralReportContent(
@@ -32,6 +30,7 @@ fun GeneralReportContent(
     numberOfInventoryItems: String,
     totalSavings: String,
     numberOfOwingCustomers: String,
+    netIncome: String,
     totalRevenues: String,
     totalExpenses: String,
     totalWithdrawals: String,
@@ -41,120 +40,307 @@ fun GeneralReportContent(
     productsSold: String,
     totalOutstandingDebtAmount: String,
     shopValue: String,
+    getSelectedPeriod: (String)-> Unit,
     navigateToViewInventoryItemsScreen: ()-> Unit,
     navigateToViewOwingCustomersScreen: ()-> Unit,
     navigateToViewPersonnelScreen: ()-> Unit,
     navigateToViewBankAccountsScreen: ()-> Unit,
 ){
+    val mainBackgroundColor = if (isSystemInDarkTheme()) Grey10 else Grey99
+    val alternateBackgroundColor = if (isSystemInDarkTheme()) Grey15 else Grey95
+    val cardBackgroundColor = if (isSystemInDarkTheme()) Grey15 else BlueGrey90
     var openShowValueInfo by remember {
         mutableStateOf(false)
     }
-    BasicScreenColumnWithoutBottomBar{
-        HorizontalDivider()
-        // Shop name
-        ViewTextValueRow(viewTitle = ShopName, viewValue = shopName)
-
-        HorizontalDivider()
-
-        // Items sold
-        ViewTextValueRow(viewTitle = ItemsSold, viewValue = productsSold)
-
-        HorizontalDivider()
-
-        // Number of inventory items
-        ViewTextValueRow(
-            viewTitle = NumberOfInventoryItems,
-            viewValue = "$numberOfInventoryItems item(s)",
-            icon = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-            showInfo = true,
-            onClick = navigateToViewInventoryItemsScreen
-        )
-
-        HorizontalDivider()
-
-        // Number Of Personnel
-        ViewTextValueRow(
-            viewTitle = NumberOfActivePersonnel,
-            viewValue = "$numberOfPersonnel personnel",
-            icon = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-            showInfo = true,
-            onClick = navigateToViewPersonnelScreen
-        )
-
-        HorizontalDivider()
-
-        // Total Revenue
-        ViewTextValueRow(
-            viewTitle = TotalRevenues,
-            viewValue = "$currency $totalRevenues"
-        )
-        HorizontalDivider()
-
-        // Total Expense
-        ViewTextValueRow(
-            viewTitle = TotalExpenses,
-            viewValue = "$currency $totalExpenses"
-        )
-
-        HorizontalDivider()
-
-        // Number of owing customers
-        ViewTextValueRow(
-            viewTitle = NumberOfOwingCustomers,
-            viewValue = "$numberOfOwingCustomers customer(s)",
-            icon = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-            showInfo = true,
-            onClick = navigateToViewOwingCustomersScreen
-        )
-
-        HorizontalDivider()
-
-        // Number of bank accounts
-        ViewTextValueRow(
-            viewTitle = NumberOfBankAccounts,
-            viewValue = "$numberOfBankAccounts bank account(s)",
-            icon = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-            showInfo = true,
-            onClick = navigateToViewBankAccountsScreen
-        )
-        HorizontalDivider()
-
-        // Total Savings Amount
-        ViewTextValueRow(
-            viewTitle = TotalSavingsAmount,
-            viewValue = "$currency $totalSavings"
-        )
-
-        HorizontalDivider()
-
-        // Total Withdrawal
-        ViewTextValueRow(
-            viewTitle = TotalWithdrawals,
-            viewValue = "$currency $totalWithdrawals"
-        )
-        HorizontalDivider()
-
-        // Debt Amount
-        ViewTextValueRow(
-            viewTitle = TotalOutstandingDebtAmount,
-            viewValue = "$currency $totalOutstandingDebtAmount"
-        )
-
-        HorizontalDivider()
-
-        //Shop value
-        ViewTextValueRow(
-            viewTitle = ShopValue,
-            viewValue = "$currency $shopValue",
-            showInfo = true,
-            onClick = {
-                openShowValueInfo = !openShowValueInfo
+    Column(modifier = Modifier
+        .background(mainBackgroundColor)
+        .fillMaxSize()
+    ) {
+        Column(modifier = Modifier
+            .background(mainBackgroundColor)
+            .fillMaxWidth()
+            .height(160.dp),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Box(
+                modifier = Modifier.padding(LocalSpacing.current.smallMedium),
+                contentAlignment = Alignment.Center
+            ) {
+                ShopNameDisplayCard(
+                    icon = R.drawable.shop,
+                    title = shopName,
+                    info = "We sell $productsSold"
+                )
             }
-        )
-        HorizontalDivider()
 
-        Spacer(modifier = Modifier.height(LocalSpacing.current.medium))
+            val listOfPeriods = listOfPeriods.map { it.titleText }
+            Box(
+                modifier = Modifier.padding(LocalSpacing.current.smallMedium),
+                contentAlignment = Alignment.Center
+            ) {
+                TimeRange(listOfTimes = listOfPeriods.dropLast(1),
+                    getSelectedItem = {selectedPeriod->
+                    getSelectedPeriod(selectedPeriod)
+                })
+            }
+        }
 
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .background(mainBackgroundColor)
+                .padding(LocalSpacing.current.noPadding)
+                .verticalScroll(state = rememberScrollState(), enabled = true),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top,
+        ) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp)
+                .clickable { openShowValueInfo = !openShowValueInfo },
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(modifier = Modifier
+                    .weight(1f)
+                    .padding(LocalSpacing.current.small),
+                    contentAlignment = Alignment.Center
+                ){
+                    InfoDisplayCard(
+                        icon = R.drawable.shop,
+                        currency = currency,
+                        currencySize = 36.sp,
+                        bigText = "$currency $shopValue",
+                        bigTextSize = 28.sp,
+                        smallText = ShopValue,
+                        smallTextSize = 16.sp,
+                        backgroundColor = cardBackgroundColor,
+                        elevation = LocalSpacing.current.small,
+                        isAmount = false
+                    )
+                }
+            }
+
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .height(250.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = LocalSpacing.current.smallMedium)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(LocalSpacing.current.small),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        InfoDisplayCard(
+                            icon = R.drawable.shop,
+                            currency = currency,
+                            currencySize = 20.sp,
+                            bigText = totalRevenues,
+                            bigTextSize = 18.sp,
+                            smallText = TotalRevenues,
+                            smallTextSize = 10.sp,
+                            backgroundColor = cardBackgroundColor,
+                            shape = MaterialTheme.shapes.medium,
+                            elevation = LocalSpacing.current.small,
+                            isAmount = true
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(LocalSpacing.current.small),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        InfoDisplayCard(
+                            icon = R.drawable.shop,
+                            currency = currency,
+                            currencySize = 20.sp,
+                            bigText = totalSavings,
+                            bigTextSize = 18.sp,
+                            smallText = TotalSavingsAmount,
+                            smallTextSize = 10.sp,
+                            backgroundColor = cardBackgroundColor,
+                            shape = MaterialTheme.shapes.medium,
+                            elevation = LocalSpacing.current.small,
+                            isAmount = true
+                        )
+                    }
+                }
+
+                Column(modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = LocalSpacing.current.smallMedium)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(LocalSpacing.current.small),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        InfoDisplayCard(
+                            icon = R.drawable.shop,
+                            currency = currency,
+                            currencySize = 20.sp,
+                            bigText = totalExpenses,
+                            bigTextSize = 18.sp,
+                            smallText = TotalExpenses,
+                            smallTextSize = 10.sp,
+                            backgroundColor = cardBackgroundColor,
+                            shape = MaterialTheme.shapes.medium,
+                            elevation = LocalSpacing.current.small,
+                            isAmount = true
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(LocalSpacing.current.small),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        InfoDisplayCard(
+                            icon = R.drawable.shop,
+                            currency = currency,
+                            currencySize = 20.sp,
+                            bigText = totalWithdrawals,
+                            bigTextSize = 18.sp,
+                            smallText = TotalWithdrawals,
+                            smallTextSize = 10.sp,
+                            backgroundColor = cardBackgroundColor,
+                            shape = MaterialTheme.shapes.medium,
+                            elevation = LocalSpacing.current.small,
+                            isAmount = true
+                        )
+                    }
+                }
+
+                Column(modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = LocalSpacing.current.smallMedium)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(LocalSpacing.current.small),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        InfoDisplayCard(
+                            icon = R.drawable.shop,
+                            currency = currency,
+                            currencySize = 20.sp,
+                            bigText = netIncome,
+                            bigTextSize = 18.sp,
+                            smallText = "Net Income",
+                            smallTextSize = 10.sp,
+                            backgroundColor = cardBackgroundColor,
+                            shape = MaterialTheme.shapes.medium,
+                            elevation = LocalSpacing.current.small,
+                            isAmount = true
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(LocalSpacing.current.small),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        InfoDisplayCard(
+                            icon = R.drawable.shop,
+                            currency = currency,
+                            currencySize = 20.sp,
+                            bigText = totalOutstandingDebtAmount,
+                            bigTextSize = 18.sp,
+                            smallText = "Outstanding Debt",
+                            smallTextSize = 10.sp,
+                            backgroundColor = cardBackgroundColor,
+                            shape = MaterialTheme.shapes.medium,
+                            elevation = LocalSpacing.current.small,
+                            isAmount = true
+                        )
+                    }
+                }
+
+            }
+
+
+            Box(modifier = Modifier
+                .background(alternateBackgroundColor)
+                .fillMaxWidth()
+                .height(LocalSpacing.current.textFieldHeight)
+                .clickable { navigateToViewInventoryItemsScreen() },
+                contentAlignment = Alignment.Center
+            ) {
+                HorizontalInfoDisplayCard(
+                    icon = R.drawable.ic_inventory_item,
+                    modifier = Modifier.padding(LocalSpacing.current.small),
+                    name = NumberOfInventoryItems,
+                    nameTextSize = 16.sp,
+                    valueText = numberOfInventoryItems,
+                    valueTextSize = 16.sp
+                )
+            }
+
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .height(LocalSpacing.current.textFieldHeight)
+                .clickable { navigateToViewPersonnelScreen() },
+                contentAlignment = Alignment.Center
+            ) {
+                HorizontalInfoDisplayCard(
+                    icon = R.drawable.ic_person_filled,
+                    modifier = Modifier.padding(LocalSpacing.current.small),
+                    name = NumberOfActivePersonnel,
+                    nameTextSize = 16.sp,
+                    valueText = numberOfPersonnel,
+                    valueTextSize = 16.sp
+                )
+            }
+
+            Box(modifier = Modifier
+                .background(alternateBackgroundColor)
+                .fillMaxWidth()
+                .height(LocalSpacing.current.textFieldHeight)
+                .clickable { navigateToViewBankAccountsScreen() },
+                contentAlignment = Alignment.Center
+            ) {
+                HorizontalInfoDisplayCard(
+                    icon = R.drawable.ic_bank,
+                    modifier = Modifier.padding(LocalSpacing.current.small),
+                    name = NumberOfBankAccounts,
+                    nameTextSize = 16.sp,
+                    valueText = numberOfBankAccounts,
+                    valueTextSize = 16.sp
+                )
+            }
+
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .height(LocalSpacing.current.textFieldHeight)
+                .clickable { navigateToViewOwingCustomersScreen() },
+                contentAlignment = Alignment.Center
+            ) {
+                HorizontalInfoDisplayCard(
+                    icon = R.drawable.customer,
+                    modifier = Modifier.padding(LocalSpacing.current.small),
+                    name = NumberOfOwingCustomers,
+                    nameTextSize = 16.sp,
+                    valueText = numberOfOwingCustomers,
+                    valueTextSize = 16.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(LocalSpacing.current.medium))
+
+        }
     }
     ConfirmationInfoDialog(
         openDialog = openShowValueInfo,

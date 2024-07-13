@@ -8,9 +8,13 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.myshopmanagerapp.core.Constants
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.report.inventory.screens.ViewInventoryItemsReportScreen
 
 @Composable
 fun GeneralReportNavGraph(
@@ -45,8 +49,8 @@ fun GeneralReportNavGraph(
                 navigateToViewBankAccountsScreen = {
                     navController.navigate(GeneralReportScreens.BankAccountsReportScreen.route)
                 },
-                navigateToViewInventoryItemsScreen = {
-                    navController.navigate(GeneralReportScreens.InventoryItemsReportScreen.route)
+                navigateToViewInventoryItemsScreen = {_periodJson->
+                    navController.navigate(GeneralReportScreens.InventoryItemsReportScreen.withArgs(_periodJson))
                 },
                 navigateToViewOwingCustomersScreen = {
                     navController.navigate(GeneralReportScreens.OwingCustomersReportScreen.route)
@@ -58,7 +62,7 @@ fun GeneralReportNavGraph(
                 navHostController.popBackStack()
             }
         }
-        composable(route = GeneralReportScreens.InventoryItemsReportScreen.route,
+        composable(route = GeneralReportScreens.InventoryItemsReportScreen.route + "/{period}",
             enterTransition = {
                 slideInHorizontally(
                     initialOffsetX = { 500 },
@@ -76,10 +80,19 @@ fun GeneralReportNavGraph(
                         easing = LinearOutSlowInEasing
                     )
                 ) + fadeOut(animationSpec = tween(500))
-            }
-        ){
-            InventoryItemsReportScreen {
-                navController.popBackStack()
+            },
+            arguments = listOf(
+                navArgument("period") {
+                    type = NavType.StringType
+                    defaultValue = Constants.emptyString
+                    nullable = false
+                })
+        ){entry->
+            val periodJson = entry.arguments?.getString("period")
+            if (periodJson != null) {
+                ViewInventoryItemsReportScreen(periodJson = periodJson) {
+                    navController.popBackStack()
+                }
             }
         }
         composable(route = GeneralReportScreens.OwingCustomersReportScreen.route,

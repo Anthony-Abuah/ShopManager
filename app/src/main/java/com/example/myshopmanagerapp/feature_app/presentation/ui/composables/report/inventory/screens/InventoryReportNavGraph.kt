@@ -8,9 +8,12 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.myshopmanagerapp.core.Constants
 
 @Composable
 fun InventoryReportNavGraph(
@@ -40,11 +43,46 @@ fun InventoryReportNavGraph(
                     )
                 ) + fadeOut(animationSpec = tween(500))
             }){
-            MainInventoryReportScreen {
+            InventoryAndStockReportScreen (
+                navigateToViewInventoryItems = {period->
+                    navController.navigate(InventoryReportScreens.ViewInventoryItemReportScreen.withArgs(period))
+                }
+            ){
                 navHostController.popBackStack()
             }
         }
-
-
+        composable(route = InventoryReportScreens.ViewInventoryItemReportScreen.route + "/{period}",
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { 500 },
+                    animationSpec = tween(
+                        durationMillis = 500,
+                        easing = LinearOutSlowInEasing
+                    )
+                ) + fadeIn(animationSpec = tween(500))
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { -500 },
+                    animationSpec = tween(
+                        durationMillis = 500,
+                        easing = LinearOutSlowInEasing
+                    )
+                ) + fadeOut(animationSpec = tween(500))
+            },
+            arguments = listOf(
+                navArgument("period") {
+                    type = NavType.StringType
+                    defaultValue = Constants.emptyString
+                    nullable = false
+                })
+        ){entry->
+            val periodJson = entry.arguments?.getString("period")
+            if (periodJson != null) {
+                ViewInventoryItemsReportScreen(periodJson = periodJson) {
+                    navController.popBackStack()
+                }
+            }
+        }
     }
 }

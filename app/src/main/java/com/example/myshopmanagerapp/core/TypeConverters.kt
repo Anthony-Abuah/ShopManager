@@ -1,14 +1,47 @@
 package com.example.myshopmanagerapp.core
 
+import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.feature_app.data.local.entities.personnel.PersonnelEntity
 import com.example.myshopmanagerapp.feature_app.data.util.GsonParser
 import com.example.myshopmanagerapp.feature_app.data.util.JsonParser
+import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
+import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItemWithDate
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.time.LocalDate
+import java.util.*
 
 object TypeConverters {
     private val jsonParser: JsonParser = GsonParser(Gson())
 
+
+    fun String?.toPeriodDropDownItems(): PeriodDropDownItem {
+        return this?.let {
+            jsonParser.fromJson<PeriodDropDownItem>(
+                it, object : TypeToken<PeriodDropDownItem>(){}.type)
+        }?: PeriodDropDownItem(emptyString, true, LocalDate.now(), LocalDate.now())
+    }
+
+    fun PeriodDropDownItem?.toPeriodDropDownItemJson(): String{
+        return jsonParser.toJson(
+            this,
+            object : TypeToken<PeriodDropDownItem>(){}.type
+        ) ?: "[]"
+    }
+
+    fun String?.toPeriodDropDownItemsWithDate(): PeriodDropDownItemWithDate {
+        return this?.let {
+            jsonParser.fromJson<PeriodDropDownItemWithDate>(
+                it, object : TypeToken<PeriodDropDownItemWithDate>(){}.type)
+        }?: PeriodDropDownItemWithDate(emptyString, true, Date(), Date())
+    }
+
+    fun PeriodDropDownItemWithDate?.toPeriodDropDownItemWithDateJson(): String{
+        return jsonParser.toJson(
+            this,
+            object : TypeToken<PeriodDropDownItemWithDate>(){}.type
+        ) ?: "[]"
+    }
 
     fun String?.toUniqueIds(): UniqueIds {
         return this?.let {

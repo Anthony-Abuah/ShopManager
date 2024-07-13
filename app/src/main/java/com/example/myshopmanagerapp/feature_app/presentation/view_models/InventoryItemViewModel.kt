@@ -14,7 +14,9 @@ import com.example.myshopmanagerapp.core.QuantityCategorizations
 import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.UIEvent
 import com.example.myshopmanagerapp.feature_app.data.local.entities.inventory_items.InventoryItemEntity
+import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
 import com.example.myshopmanagerapp.feature_app.domain.repository.InventoryItemRepository
+import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.PeriodicInventoryItemState
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.inventory_item.InventoryItemEntitiesState
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.inventory_item.InventoryItemEntityState
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.inventory_item.InventoryItemState
@@ -82,6 +84,9 @@ class InventoryItemViewModel @Inject constructor(
     private val _inventoryItemEntitiesState = mutableStateOf(InventoryItemEntitiesState())
     val inventoryItemEntitiesState: State<InventoryItemEntitiesState> = _inventoryItemEntitiesState
 
+    private val _periodicInventoryItems = mutableStateOf(PeriodicInventoryItemState())
+    val periodicInventoryItems: State<PeriodicInventoryItemState> = _periodicInventoryItems
+
 
     private val _eventFlow = MutableSharedFlow<UIEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -118,6 +123,35 @@ class InventoryItemViewModel @Inject constructor(
             inventoryItemEntity = inventoryItemRepository.getInventoryItem(uniqueInventoryItemId),
             isLoading = false
         )
+    }
+
+
+    fun getPeriodicInventoryItems(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
+        inventoryItemRepository.getPeriodicInventoryItems(periodDropDownItem).onEach { response->
+            when(response){
+                is Resource.Success ->{
+                    _periodicInventoryItems.value = periodicInventoryItems.value.copy(
+                        data = response.data ?: emptyMap(),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+                is Resource.Loading ->{
+                    _periodicInventoryItems.value = periodicInventoryItems.value.copy(
+                        data = response.data ?: emptyMap(),
+                        message = response.message,
+                        isLoading = true
+                    )
+                }
+                is Resource.Error ->{
+                    _periodicInventoryItems.value = periodicInventoryItems.value.copy(
+                        data = response.data ?: emptyMap(),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+            }
+        }.launchIn(this)
     }
 
     fun getShopItemProfitPercentageValues() = viewModelScope.launch {
@@ -172,37 +206,6 @@ class InventoryItemViewModel @Inject constructor(
                 }
                 is Resource.Error ->{
                     _itemProfitValues.value = itemProfitValues.value.copy(
-                        message = response.message,
-                        isLoading = false,
-                        isSuccessful = false,
-                        itemValues = response.data ?: emptyList()
-                    )
-                }
-            }
-        }.launchIn(this)
-    }
-
-    fun getShopItemCostValues() = viewModelScope.launch {
-        inventoryItemRepository.getShopItemCostValues().onEach { response->
-            when(response){
-                is Resource.Success ->{
-                    _itemCostValues.value = itemCostValues.value.copy(
-                        message = response.message,
-                        isLoading = false,
-                        isSuccessful = true,
-                        itemValues = response.data ?: emptyList()
-                    )
-                }
-                is Resource.Loading ->{
-                    _itemCostValues.value = itemCostValues.value.copy(
-                        message = response.message,
-                        isLoading = false,
-                        isSuccessful = false,
-                        itemValues = response.data ?: emptyList()
-                    )
-                }
-                is Resource.Error ->{
-                    _itemCostValues.value = itemCostValues.value.copy(
                         message = response.message,
                         isLoading = false,
                         isSuccessful = false,

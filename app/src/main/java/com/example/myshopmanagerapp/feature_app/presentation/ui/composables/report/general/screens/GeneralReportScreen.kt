@@ -1,6 +1,6 @@
 package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.report.general.screens
 
-import android.widget.Toast
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,10 +16,13 @@ import com.example.myshopmanagerapp.core.FormRelatedString.GHS
 import com.example.myshopmanagerapp.core.Functions.toCompanyEntity
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.Functions.toTwoDecimalPlaces
+import com.example.myshopmanagerapp.core.TypeConverters.toPeriodDropDownItemWithDateJson
 import com.example.myshopmanagerapp.core.UserPreferences
 import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
-import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.StockReportScreenTopBar
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenTopBar
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.report.general.GeneralReportContent
+import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.Grey13
+import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.Grey98
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.*
 import java.time.LocalDate
 
@@ -35,7 +38,7 @@ fun GeneralReportScreen(
     withdrawalViewModel: WithdrawalViewModel = hiltViewModel(),
     savingsViewModel: SavingsViewModel = hiltViewModel(),
     bankAccountViewModel: BankAccountViewModel = hiltViewModel(),
-    navigateToViewInventoryItemsScreen: ()-> Unit,
+    navigateToViewInventoryItemsScreen: (String)-> Unit,
     navigateToViewOwingCustomersScreen: ()-> Unit,
     navigateToViewPersonnelScreen: ()-> Unit,
     navigateToViewBankAccountsScreen: ()-> Unit,
@@ -43,6 +46,7 @@ fun GeneralReportScreen(
 ) {
     val context = LocalContext.current
     val userPreferences = UserPreferences(context)
+    val periods = listOfPeriods.map { it.titleText }
     var period by remember {
         mutableStateOf(
             PeriodDropDownItem(
@@ -53,7 +57,7 @@ fun GeneralReportScreen(
         )
     }
     LaunchedEffect(period) {
-        inventoryItemViewModel.getAllInventoryItems()
+        inventoryItemViewModel.getPeriodicInventoryItems(period)
         inventoryViewModel.getAllInventories()
         customerViewModel.getAllCustomers()
         personnelViewModel.getAllPersonnel()
@@ -66,18 +70,13 @@ fun GeneralReportScreen(
     }
     val shopInfoJson = userPreferences.getShopInfo.collectAsState(initial = emptyString).value
     val shopInfo = shopInfoJson.toCompanyEntity()
-    val currency =  userPreferences.getCurrency.collectAsState(initial = emptyString).value ?: GHS
-
+    val currency =  userPreferences.getCurrency.collectAsState(initial = emptyString).value
 
     Scaffold(
         topBar = {
-            StockReportScreenTopBar(
+            BasicScreenTopBar(
                 topBarTitleText = "Shop Overview",
-                periodDropDownItems = listOfPeriods,
-                onClickItem = {_period->
-                    period = _period
-                    Toast.makeText(context, _period.titleText, Toast.LENGTH_LONG).show()
-                }
+                backgroundColor = if (isSystemInDarkTheme()) Grey13 else Grey98
             ) {
                 navigateBack()
             }
@@ -100,16 +99,18 @@ fun GeneralReportScreen(
             val numberOfPersonnel = allPersonnel.count()
             val allBankAccounts = bankAccountViewModel.bankAccountEntitiesState.value.bankAccountEntities ?: emptyList()
             val numberOfBankAccounts = allBankAccounts.count()
-            val allInventoryItems = inventoryItemViewModel.inventoryItemEntitiesState.value.inventoryItemEntities ?: emptyList()
+            val allInventoryItems = inventoryItemViewModel.periodicInventoryItems.value.data
             val numberOfInventoryItems = allInventoryItems.count()
             val debtAmount = allCustomers.sumOf { it.debtAmount.toNotNull() }
 
             val shopValue = stockViewModel.shopValue.value.itemValue.value.toTwoDecimalPlaces()
             val totalRevenue = revenueViewModel.revenueAmount.value.itemValue.value.toTwoDecimalPlaces()
             val totalExpense = expenseViewModel.expenseAmount.value.itemValue.value.toTwoDecimalPlaces()
+            val netIncome = totalRevenue.minus(totalExpense)
 
             GeneralReportContent(
-                currency = currency,
+                currency = if (currency.isNullOrBlank()) GHS else currency,
+                netIncome = "$netIncome",
                 numberOfInventoryItems = "$numberOfInventoryItems",
                 totalSavings = "$totalSavings",
                 numberOfOwingCustomers = "$numberOfOwingCustomers",
@@ -122,10 +123,19 @@ fun GeneralReportScreen(
                 productsSold = shopInfo?.companyProductsAndServices ?: "Not Registered",
                 totalOutstandingDebtAmount = "$debtAmount",
                 shopValue = "$shopValue",
-                navigateToViewInventoryItemsScreen,
-                navigateToViewOwingCustomersScreen,
-                navigateToViewPersonnelScreen,
-                navigateToViewBankAccountsScreen
+                getSelectedPeriod = {selectedPeriod->
+                    var periodIndex = periods.indexOf(selectedPeriod)
+                    if (periodIndex > listOfPeriods.size){ periodIndex = 0 }
+                    period = listOfPeriods[periodIndex]
+                },
+                navigateToViewInventoryItemsScreen = {
+                    val periodWithDate = period.toPeriodDropDownItemWithDate()
+                    val periodWithDateJson = periodWithDate.toPeriodDropDownItemWithDateJson()
+                    navigateToViewInventoryItemsScreen(periodWithDateJson)
+                },
+                navigateToViewOwingCustomersScreen = navigateToViewOwingCustomersScreen,
+                navigateToViewPersonnelScreen = navigateToViewPersonnelScreen,
+                navigateToViewBankAccountsScreen = navigateToViewBankAccountsScreen
             )
         }
     }
