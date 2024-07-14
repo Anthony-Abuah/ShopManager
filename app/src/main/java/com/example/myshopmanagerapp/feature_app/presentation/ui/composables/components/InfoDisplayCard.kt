@@ -89,6 +89,7 @@ fun InfoDisplayCard(
             ) {
                 Text(
                     text = bigText,
+                    textAlign = TextAlign.Center,
                     fontSize = bigTextSize,
                     fontWeight = FontWeight.ExtraBold,
                     overflow = TextOverflow.Ellipsis,
@@ -103,6 +104,7 @@ fun InfoDisplayCard(
             ) {
                 Text(
                     text = smallText,
+                    textAlign = TextAlign.Center,
                     fontSize = smallTextSize,
                     fontWeight = FontWeight.SemiBold,
                     overflow = TextOverflow.Ellipsis,

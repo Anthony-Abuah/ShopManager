@@ -37,6 +37,7 @@ fun InventoryAndStockReportScreen(
     navigateBack: ()-> Unit
 ) {
     val context = LocalContext.current
+    val periods = listOfPeriods.map { it.titleText }
     var period by remember {
         mutableStateOf(PeriodDropDownItem(
             titleText = "All Time",
@@ -100,8 +101,13 @@ fun InventoryAndStockReportScreen(
                 numberOfLeastAvailableInventoryItem = numberOfLeastAvailableInventoryItem?.toString() ?: NotAvailable,
                 mostExpensiveInventoryItem = mostExpensiveItem,
                 leastExpensiveInventoryItem = leastExpensiveItem,
-                numberOfMostExpensiveInventoryItem = numberOfMostExpensiveInventoryItem.toString(),
-                numberOfLeastExpensiveInventoryItem = numberOfLeastExpensiveInventoryItem.toString()
+                priceOfMostExpensiveInventoryItem = numberOfMostExpensiveInventoryItem.toString(),
+                priceOfLeastExpensiveInventoryItem = numberOfLeastExpensiveInventoryItem.toString(),
+                getSelectedPeriod = {selectedPeriod->
+                    var periodIndex = periods.indexOf(selectedPeriod)
+                    if (periodIndex >= listOfPeriods.size){ periodIndex = 0 }
+                    period = listOfPeriods[periodIndex]
+                }
             ) {
                 val periodWithDate = period.toPeriodDropDownItemWithDate()
                 val periodWithDateJson = periodWithDate.toPeriodDropDownItemWithDateJson()

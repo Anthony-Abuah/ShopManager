@@ -29,6 +29,7 @@ fun MainExpenseReportScreen(
     navigateBack: ()-> Unit
 ) {
     val context = LocalContext.current
+    val periods = listOfPeriods.map { it.titleText }
     var period by remember {
         mutableStateOf(
             PeriodDropDownItem(
@@ -95,7 +96,12 @@ fun MainExpenseReportScreen(
                 maxExpenseDay = maximumExpenseDay,
                 maximumExpenseAmount = "$maximumExpenseAmount",
                 minimumExpenseAmount = "$minimumExpenseAmount",
-                minimumExpenseDay =minimumExpenseDay
+                minimumExpenseDay =minimumExpenseDay,
+                getSelectedPeriod = {selectedPeriod->
+                    var periodIndex = periods.indexOf(selectedPeriod)
+                    if (periodIndex >= listOfPeriods.size){ periodIndex = 0 }
+                    period = listOfPeriods[periodIndex]
+                }
             )
         }
     }

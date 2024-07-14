@@ -56,36 +56,6 @@ fun GeneralReportContent(
         .background(mainBackgroundColor)
         .fillMaxSize()
     ) {
-        Column(modifier = Modifier
-            .background(mainBackgroundColor)
-            .fillMaxWidth()
-            .height(160.dp),
-            horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Box(
-                modifier = Modifier.padding(LocalSpacing.current.smallMedium),
-                contentAlignment = Alignment.Center
-            ) {
-                ShopNameDisplayCard(
-                    icon = R.drawable.shop,
-                    title = shopName,
-                    info = "We sell $productsSold"
-                )
-            }
-
-            val listOfPeriods = listOfPeriods.map { it.titleText }
-            Box(
-                modifier = Modifier.padding(LocalSpacing.current.smallMedium),
-                contentAlignment = Alignment.Center
-            ) {
-                TimeRange(listOfTimes = listOfPeriods.dropLast(1),
-                    getSelectedItem = {selectedPeriod->
-                    getSelectedPeriod(selectedPeriod)
-                })
-            }
-        }
-
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -95,6 +65,36 @@ fun GeneralReportContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top,
         ) {
+            Column(modifier = Modifier
+                .background(mainBackgroundColor)
+                .fillMaxWidth()
+                .height(160.dp),
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Box(
+                    modifier = Modifier.padding(LocalSpacing.current.smallMedium),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ShopNameDisplayCard(
+                        icon = R.drawable.shop,
+                        title = shopName,
+                        info = "We sell $productsSold"
+                    )
+                }
+
+                val listOfPeriods = listOfPeriods.map { it.titleText }
+                Box(
+                    modifier = Modifier.padding(LocalSpacing.current.smallMedium),
+                    contentAlignment = Alignment.Center
+                ) {
+                    TimeRange(listOfTimes = listOfPeriods.dropLast(1),
+                        getSelectedItem = {selectedPeriod->
+                            getSelectedPeriod(selectedPeriod)
+                        })
+                }
+            }
+
             Row(modifier = Modifier
                 .fillMaxWidth()
                 .height(150.dp)
@@ -108,7 +108,7 @@ fun GeneralReportContent(
                     contentAlignment = Alignment.Center
                 ){
                     InfoDisplayCard(
-                        icon = R.drawable.shop,
+                        icon = R.drawable.shop_value,
                         currency = currency,
                         currencySize = 36.sp,
                         bigText = "$currency $shopValue",
@@ -139,7 +139,8 @@ fun GeneralReportContent(
                         contentAlignment = Alignment.Center
                     ) {
                         InfoDisplayCard(
-                            icon = R.drawable.shop,
+                            icon = R.drawable.revenue,
+                            imageWidth = 32.dp,
                             currency = currency,
                             currencySize = 20.sp,
                             bigText = totalRevenues,
@@ -149,7 +150,7 @@ fun GeneralReportContent(
                             backgroundColor = cardBackgroundColor,
                             shape = MaterialTheme.shapes.medium,
                             elevation = LocalSpacing.current.small,
-                            isAmount = true
+                            isAmount = false
                         )
                     }
 
@@ -160,7 +161,8 @@ fun GeneralReportContent(
                         contentAlignment = Alignment.Center
                     ) {
                         InfoDisplayCard(
-                            icon = R.drawable.shop,
+                            icon = R.drawable.savings,
+                            imageWidth = 32.dp,
                             currency = currency,
                             currencySize = 20.sp,
                             bigText = totalSavings,
@@ -170,7 +172,7 @@ fun GeneralReportContent(
                             backgroundColor = cardBackgroundColor,
                             shape = MaterialTheme.shapes.medium,
                             elevation = LocalSpacing.current.small,
-                            isAmount = true
+                            isAmount = false
                         )
                     }
                 }
@@ -186,7 +188,8 @@ fun GeneralReportContent(
                         contentAlignment = Alignment.Center
                     ) {
                         InfoDisplayCard(
-                            icon = R.drawable.shop,
+                            icon = R.drawable.expense,
+                            imageWidth = 32.dp,
                             currency = currency,
                             currencySize = 20.sp,
                             bigText = totalExpenses,
@@ -196,7 +199,7 @@ fun GeneralReportContent(
                             backgroundColor = cardBackgroundColor,
                             shape = MaterialTheme.shapes.medium,
                             elevation = LocalSpacing.current.small,
-                            isAmount = true
+                            isAmount = false
                         )
                     }
 
@@ -207,7 +210,8 @@ fun GeneralReportContent(
                         contentAlignment = Alignment.Center
                     ) {
                         InfoDisplayCard(
-                            icon = R.drawable.shop,
+                            icon = R.drawable.withdrawal,
+                            imageWidth = 32.dp,
                             currency = currency,
                             currencySize = 20.sp,
                             bigText = totalWithdrawals,
@@ -217,7 +221,7 @@ fun GeneralReportContent(
                             backgroundColor = cardBackgroundColor,
                             shape = MaterialTheme.shapes.medium,
                             elevation = LocalSpacing.current.small,
-                            isAmount = true
+                            isAmount = false
                         )
                     }
                 }
@@ -233,7 +237,8 @@ fun GeneralReportContent(
                         contentAlignment = Alignment.Center
                     ) {
                         InfoDisplayCard(
-                            icon = R.drawable.shop,
+                            icon = R.drawable.shop_value,
+                            imageWidth = 32.dp,
                             currency = currency,
                             currencySize = 20.sp,
                             bigText = netIncome,
@@ -243,7 +248,7 @@ fun GeneralReportContent(
                             backgroundColor = cardBackgroundColor,
                             shape = MaterialTheme.shapes.medium,
                             elevation = LocalSpacing.current.small,
-                            isAmount = true
+                            isAmount = false
                         )
                     }
 
@@ -254,7 +259,8 @@ fun GeneralReportContent(
                         contentAlignment = Alignment.Center
                     ) {
                         InfoDisplayCard(
-                            icon = R.drawable.shop,
+                            icon = R.drawable.debt,
+                            imageWidth = 32.dp,
                             currency = currency,
                             currencySize = 20.sp,
                             bigText = totalOutstandingDebtAmount,
@@ -264,7 +270,7 @@ fun GeneralReportContent(
                             backgroundColor = cardBackgroundColor,
                             shape = MaterialTheme.shapes.medium,
                             elevation = LocalSpacing.current.small,
-                            isAmount = true
+                            isAmount = false
                         )
                     }
                 }
@@ -280,7 +286,7 @@ fun GeneralReportContent(
                 contentAlignment = Alignment.Center
             ) {
                 HorizontalInfoDisplayCard(
-                    icon = R.drawable.ic_inventory_item,
+                    icon = R.drawable.inventory_item,
                     modifier = Modifier.padding(LocalSpacing.current.small),
                     name = NumberOfInventoryItems,
                     nameTextSize = 16.sp,
@@ -296,7 +302,7 @@ fun GeneralReportContent(
                 contentAlignment = Alignment.Center
             ) {
                 HorizontalInfoDisplayCard(
-                    icon = R.drawable.ic_person_filled,
+                    icon = R.drawable.personnel,
                     modifier = Modifier.padding(LocalSpacing.current.small),
                     name = NumberOfActivePersonnel,
                     nameTextSize = 16.sp,
@@ -313,7 +319,7 @@ fun GeneralReportContent(
                 contentAlignment = Alignment.Center
             ) {
                 HorizontalInfoDisplayCard(
-                    icon = R.drawable.ic_bank,
+                    icon = R.drawable.bank_account,
                     modifier = Modifier.padding(LocalSpacing.current.small),
                     name = NumberOfBankAccounts,
                     nameTextSize = 16.sp,

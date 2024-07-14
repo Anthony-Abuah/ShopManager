@@ -35,6 +35,7 @@ fun MainRevenueReportScreen(
     navigateBack: ()-> Unit
 ) {
     val context = LocalContext.current
+    val periods = listOfPeriods.map { it.titleText }
     var period by remember {
         mutableStateOf(
             PeriodDropDownItem(
@@ -109,7 +110,7 @@ fun MainRevenueReportScreen(
                 averageHourlyRevenue = "$averageHourlyRevenue",
                 totalDays = "${totalDays.toInt()}",
                 totalHours = if (totalHours==0.0) NotAvailable else "${totalHours.toInt()}",
-                debtBalance = "$debtBalance",
+                outstandingDebtAmount = "$debtBalance",
                 totalRevenueAmount = "$revenueAmount",
                 totalDebtAmount = "$totalDebtAmount",
                 totalDebtRepaymentAmount = "$totalDebtRepaymentAmount",
@@ -117,6 +118,11 @@ fun MainRevenueReportScreen(
                 maximumRevenueAmount = maximumRevenueAmount.toString(),
                 minimumRevenueAmount = minimumRevenueAmount.toString(),
                 minimumRevenueDay = minimumRevenueDay,
+                getSelectedPeriod = {selectedPeriod->
+                    var periodIndex = periods.indexOf(selectedPeriod)
+                    if (periodIndex >= listOfPeriods.size){ periodIndex = 0 }
+                    period = listOfPeriods[periodIndex]
+                }
             )
         }
     }
