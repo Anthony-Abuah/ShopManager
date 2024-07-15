@@ -27,4 +27,13 @@ data class ItemQuantity(
     fun toQuantityCategorization():  QuantityCategorization{
         return QuantityCategorization(sizeName,unitsPerSize)
     }
+
+    fun toQuantityInfo(itemName: String, unitPrice: Double): ItemQuantityInfo{
+        return ItemQuantityInfo(
+            itemName = itemName,
+            quantity = quantity.toDouble(),
+            unitPrice = unitPrice,
+            amount = quantity.times(unitPrice)
+        )
+    }
 }

@@ -15,6 +15,8 @@ import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.UIEvent
 import com.example.myshopmanagerapp.core.WithdrawalEntities
 import com.example.myshopmanagerapp.feature_app.data.local.entities.withdrawals.WithdrawalEntity
+import com.example.myshopmanagerapp.feature_app.domain.model.ItemValue
+import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
 import com.example.myshopmanagerapp.feature_app.domain.repository.WithdrawalRepository
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.company.AddCompanyState
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.revenue.ItemValueState
@@ -61,6 +63,9 @@ class WithdrawalViewModel @Inject constructor(
 
     private val _withdrawalEntitiesState = mutableStateOf(WithdrawalEntitiesState())
     val withdrawalEntitiesState: State<WithdrawalEntitiesState> = _withdrawalEntitiesState
+
+    private val _withdrawalAmount = mutableStateOf(ItemValueState())
+    val withdrawalAmount: State<ItemValueState> = _withdrawalAmount
 
 
     private val _eventFlow = MutableSharedFlow<UIEvent>()
@@ -214,6 +219,38 @@ class WithdrawalViewModel @Inject constructor(
             }
         }.launchIn(this)
     }
+
+
+    fun getPeriodicWithdrawalAmount(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
+        withdrawalRepository.getPeriodicWithdrawalAmount(periodDropDownItem).onEach { response->
+            when(response){
+                is Resource.Success ->{
+                    _withdrawalAmount.value = withdrawalAmount.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+                is Resource.Loading ->{
+                    _withdrawalAmount.value = withdrawalAmount.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = true
+                    )
+                }
+                is Resource.Error ->{
+                    _withdrawalAmount.value = withdrawalAmount.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+            }
+        }.launchIn(this)
+    }
+
+
+
 
 
     fun updateWithdrawalDate(date: Long, dayOfWeek: String) {

@@ -31,6 +31,6 @@ interface DebtRepaymentRepository {
     suspend fun deleteAllDebtRepayment()
 
     suspend fun generateDebtRepaymentList(context: Context, debtRepayments: DebtRepaymentEntities, mapOfCustomers: Map<String, String>): Flow<Resource<String?>>
-    suspend fun getDebtRepaymentAmount(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
+    suspend fun getPeriodicDebtRepaymentAmount(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
 
 }

@@ -113,7 +113,7 @@ fun MainRevenueReportContent(
                 contentAlignment = Alignment.Center
             ) {
                 HorizontalInfoDisplayCard(
-                    icon = R.drawable.shop_value,
+                    icon = R.drawable.days,
                     modifier = Modifier.padding(LocalSpacing.current.small),
                     name = NumberOfDaysOpened,
                     nameTextSize = 16.sp,
@@ -126,13 +126,11 @@ fun MainRevenueReportContent(
                 .background(mainBackgroundColor)
                 .fillMaxWidth()
                 .height(LocalSpacing.current.textFieldHeight)
-                .clickable {
-                    // navigateToViewInventoryItemsScreen()
-                },
+                .clickable {},
                 contentAlignment = Alignment.Center
             ) {
                 HorizontalInfoDisplayCard(
-                    icon = R.drawable.revenue,
+                    icon = R.drawable.cash,
                     modifier = Modifier.padding(LocalSpacing.current.small),
                     name = AverageDailyRevenue,
                     nameTextSize = 16.sp,
@@ -146,13 +144,11 @@ fun MainRevenueReportContent(
                 .background(alternateBackgroundColor)
                 .fillMaxWidth()
                 .height(LocalSpacing.current.textFieldHeight)
-                .clickable {
-                    // navigateToViewInventoryItemsScreen()
-                },
+                .clickable {},
                 contentAlignment = Alignment.Center
             ) {
                 HorizontalInfoDisplayCard(
-                    icon = R.drawable.ic_time_filled,
+                    icon = R.drawable.time,
                     modifier = Modifier.padding(LocalSpacing.current.small),
                     name = TotalNumberOfHours,
                     nameTextSize = 16.sp,
@@ -165,13 +161,11 @@ fun MainRevenueReportContent(
                 .background(mainBackgroundColor)
                 .fillMaxWidth()
                 .height(LocalSpacing.current.textFieldHeight)
-                .clickable {
-                    // navigateToViewInventoryItemsScreen()
-                },
+                .clickable {},
                 contentAlignment = Alignment.Center
             ) {
                 HorizontalInfoDisplayCard(
-                    icon = R.drawable.revenue,
+                    icon = R.drawable.cash,
                     modifier = Modifier.padding(LocalSpacing.current.small),
                     name = AverageHourlyRevenue,
                     nameTextSize = 16.sp,
@@ -184,13 +178,11 @@ fun MainRevenueReportContent(
                 .background(alternateBackgroundColor)
                 .fillMaxWidth()
                 .height(LocalSpacing.current.textFieldHeight)
-                .clickable {
-                    // navigateToViewInventoryItemsScreen()
-                },
+                .clickable {},
                 contentAlignment = Alignment.Center
             ) {
                 HorizontalInfoDisplayCard(
-                    icon = R.drawable.ic_time_filled,
+                    icon = R.drawable.time,
                     modifier = Modifier.padding(LocalSpacing.current.small),
                     name = AverageHoursPerDay,
                     nameTextSize = 16.sp,
@@ -203,9 +195,7 @@ fun MainRevenueReportContent(
                 .background(mainBackgroundColor)
                 .fillMaxWidth()
                 .height(LocalSpacing.current.textFieldHeight)
-                .clickable {
-                    // navigateToViewInventoryItemsScreen()
-                },
+                .clickable {},
                 contentAlignment = Alignment.Center
             ) {
                 HorizontalInfoDisplayCard(
@@ -258,7 +248,7 @@ fun MainRevenueReportContent(
                         contentAlignment = Alignment.Center
                     ) {
                         InfoDisplayCard(
-                            icon = R.drawable.debt,
+                            icon = R.drawable.percentage,
                             imageWidth = 32.dp,
                             currency = currency,
                             currencySize = 20.sp,
@@ -285,7 +275,7 @@ fun MainRevenueReportContent(
                         contentAlignment = Alignment.Center
                     ) {
                         InfoDisplayCard(
-                            icon = R.drawable.revenue,
+                            icon = R.drawable.payment,
                             imageWidth = 32.dp,
                             currency = currency,
                             currencySize = 20.sp,
@@ -324,9 +314,12 @@ fun MainRevenueReportContent(
                 }
             }
 
-            Box(modifier = Modifier
+            Column(modifier = Modifier
                 .fillMaxWidth()
-                .padding(LocalSpacing.current.small)) {
+                .padding(
+                    horizontal = LocalSpacing.current.small,
+                    vertical = LocalSpacing.current.smallMedium
+                )) {
                 val revenuePoints = ListOfRevenues(allRevenues).toLinePoints()
                 LineChartCard(
                     lineTitle = "Revenues",
@@ -335,6 +328,7 @@ fun MainRevenueReportContent(
             }
 
             Row(modifier = Modifier
+                .background(alternateBackgroundColor)
                 .fillMaxWidth()
                 .height(250.dp),
                 horizontalArrangement = Arrangement.Center,
@@ -351,7 +345,7 @@ fun MainRevenueReportContent(
                         contentAlignment = Alignment.Center
                     ) {
                         InfoDisplayCard(
-                            icon = R.drawable.revenue,
+                            icon = R.drawable.highest_revenue,
                             imageWidth = 32.dp,
                             currency = currency,
                             currencySize = 20.sp,
@@ -359,7 +353,7 @@ fun MainRevenueReportContent(
                             bigTextSize = 16.sp,
                             smallText = DayWithHighestRevenue,
                             smallTextSize = 10.sp,
-                            backgroundColor = cardBackgroundColor,
+                            backgroundColor = mainBackgroundColor,
                             shape = MaterialTheme.shapes.medium,
                             elevation = LocalSpacing.current.small,
                             isAmount = false
@@ -373,7 +367,7 @@ fun MainRevenueReportContent(
                         contentAlignment = Alignment.Center
                     ) {
                         InfoDisplayCard(
-                            icon = R.drawable.debt,
+                            icon = R.drawable.lowest_revenue,
                             imageWidth = 32.dp,
                             currency = currency,
                             currencySize = 20.sp,
@@ -381,7 +375,7 @@ fun MainRevenueReportContent(
                             bigTextSize = 16.sp,
                             smallText = DayWithLowestRevenue,
                             smallTextSize = 10.sp,
-                            backgroundColor = cardBackgroundColor,
+                            backgroundColor = mainBackgroundColor,
                             shape = MaterialTheme.shapes.medium,
                             elevation = LocalSpacing.current.small,
                             isAmount = false
@@ -400,7 +394,7 @@ fun MainRevenueReportContent(
                         contentAlignment = Alignment.Center
                     ) {
                         InfoDisplayCard(
-                            icon = R.drawable.revenue,
+                            icon = R.drawable.cash,
                             imageWidth = 32.dp,
                             currency = currency,
                             currencySize = 20.sp,
@@ -408,7 +402,7 @@ fun MainRevenueReportContent(
                             bigTextSize = 16.sp,
                             smallText = MaxRevenueAmount,
                             smallTextSize = 10.sp,
-                            backgroundColor = cardBackgroundColor,
+                            backgroundColor = mainBackgroundColor,
                             shape = MaterialTheme.shapes.medium,
                             elevation = LocalSpacing.current.small,
                             isAmount = false
@@ -422,7 +416,7 @@ fun MainRevenueReportContent(
                         contentAlignment = Alignment.Center
                     ) {
                         InfoDisplayCard(
-                            icon = R.drawable.withdrawal,
+                            icon = R.drawable.cash,
                             imageWidth = 32.dp,
                             currency = currency,
                             currencySize = 20.sp,
@@ -430,7 +424,7 @@ fun MainRevenueReportContent(
                             bigTextSize = 16.sp,
                             smallText = MinRevenueAmount,
                             smallTextSize = 10.sp,
-                            backgroundColor = cardBackgroundColor,
+                            backgroundColor = mainBackgroundColor,
                             shape = MaterialTheme.shapes.medium,
                             elevation = LocalSpacing.current.small,
                             isAmount = false

@@ -2,7 +2,6 @@ package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.rep
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -11,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myshopmanagerapp.R
 import com.example.myshopmanagerapp.core.Constants
+import com.example.myshopmanagerapp.core.Constants.Expense_Types
 import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.FormRelatedString.AverageDailyExpense
 import com.example.myshopmanagerapp.core.FormRelatedString.DayWithHighestExpense
@@ -22,7 +22,10 @@ import com.example.myshopmanagerapp.core.FormRelatedString.TotalExpenses
 import com.example.myshopmanagerapp.feature_app.data.local.entities.expenses.ExpenseEntity
 import com.example.myshopmanagerapp.feature_app.domain.model.ItemValue
 import com.example.myshopmanagerapp.feature_app.domain.model.ListOfExpenses
-import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.*
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.HorizontalInfoDisplayCard
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.InfoDisplayCard
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.LineChartCard
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.TimeRange
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.*
 
 @Composable
@@ -107,7 +110,7 @@ fun MainExpenseReportContent(
                     contentAlignment = Alignment.Center
                 ){
                     InfoDisplayCard(
-                        icon = R.drawable.expense,
+                        icon = R.drawable.days,
                         imageWidth = 40.dp,
                         currency = currency,
                         currencySize = 36.sp,
@@ -131,7 +134,7 @@ fun MainExpenseReportContent(
                     contentAlignment = Alignment.Center
                 ){
                     InfoDisplayCard(
-                        icon = R.drawable.expense,
+                        icon = R.drawable.percentage,
                         imageWidth = 40.dp,
                         currency = currency,
                         currencySize = 36.sp,
@@ -177,7 +180,7 @@ fun MainExpenseReportContent(
                         contentAlignment = Alignment.Center
                     ) {
                         InfoDisplayCard(
-                            icon = R.drawable.expense,
+                            icon = R.drawable.highest_revenue,
                             imageWidth = 32.dp,
                             currency = currency,
                             currencySize = 20.sp,
@@ -199,7 +202,7 @@ fun MainExpenseReportContent(
                         contentAlignment = Alignment.Center
                     ) {
                         InfoDisplayCard(
-                            icon = R.drawable.expense,
+                            icon = R.drawable.lowest_revenue,
                             imageWidth = 32.dp,
                             currency = currency,
                             currencySize = 20.sp,
@@ -226,7 +229,7 @@ fun MainExpenseReportContent(
                         contentAlignment = Alignment.Center
                     ) {
                         InfoDisplayCard(
-                            icon = R.drawable.expense,
+                            icon = R.drawable.cash,
                             imageWidth = 32.dp,
                             currency = currency,
                             currencySize = 20.sp,
@@ -248,7 +251,7 @@ fun MainExpenseReportContent(
                         contentAlignment = Alignment.Center
                     ) {
                         InfoDisplayCard(
-                            icon = R.drawable.expense,
+                            icon = R.drawable.cash,
                             imageWidth = 32.dp,
                             currency = currency,
                             currencySize = 20.sp,
@@ -277,9 +280,9 @@ fun MainExpenseReportContent(
                     icon = R.drawable.ic_expense_type,
                     imageWidth = 0.dp,
                     modifier = Modifier.padding(horizontal = LocalSpacing.current.smallMedium),
-                    name = "Expense types",
+                    name = Expense_Types,
                     nameTextSize = 16.sp,
-                    valueText = " ",
+                    valueText = emptyString,
                     valueTextSize = 16.sp
                 )
             }
@@ -295,7 +298,7 @@ fun MainExpenseReportContent(
                     contentAlignment = Alignment.Center
                 ) {
                     HorizontalInfoDisplayCard(
-                        icon = R.drawable.ic_expense_type,
+                        icon = R.drawable.expense_type,
                         modifier = Modifier.padding(LocalSpacing.current.small),
                         name = type.itemName,
                         nameTextSize = 16.sp,

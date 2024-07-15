@@ -25,7 +25,6 @@ import com.example.myshopmanagerapp.feature_app.domain.model.InventoryQuantityDi
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.*
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
 
-
 @Composable
 fun AddInventoryContent(
     inventory: InventoryEntity,

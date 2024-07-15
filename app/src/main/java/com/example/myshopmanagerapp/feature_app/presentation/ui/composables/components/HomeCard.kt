@@ -1,9 +1,9 @@
 package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -11,7 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
@@ -19,57 +20,59 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpaci
 @Composable
 fun HomeCard(
     title: String,
-    semiTitle: String,
     description: String,
+    imageWidth: Dp = 40.dp,
     icon: Int,
-    contentColor: Color,
+    titleColor: Color = MaterialTheme.colorScheme.onBackground,
+    descriptionColor: Color,
     cardContainerColor: Color,
+    cardShadowColor: Color = MaterialTheme.colorScheme.background,
     onOpenCard: () -> Unit
 ){
     Card(modifier = Modifier
         .fillMaxWidth()
-        .height(120.dp)
+        .height(100.dp)
         .clickable { onOpenCard() },
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
-            containerColor = cardContainerColor
+            containerColor = cardShadowColor
         ),
-        elevation = CardDefaults.cardElevation(LocalSpacing.current.noElevation)
+        elevation = CardDefaults.cardElevation(LocalSpacing.current.extraSmall)
     ) {
         Row(
             modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Transparent),
+                .fillMaxWidth()
+                .fillMaxHeight(0.95f)
+                .background(cardContainerColor, MaterialTheme.shapes.medium),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Card(
                 modifier = Modifier
                     .padding(LocalSpacing.current.smallMedium)
-                    .weight(1f)
+                    .width(imageWidth)
                     .aspectRatio(1f),
-                shape = CircleShape,
+                shape = MaterialTheme.shapes.medium,
                 colors = CardDefaults.cardColors(
                     containerColor = cardContainerColor
                 ),
-                elevation = CardDefaults.cardElevation(LocalSpacing.current.noElevation)
+                elevation = CardDefaults.cardElevation(LocalSpacing.current.extraSmall)
             ) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        modifier = Modifier.size(LocalSpacing.current.large),
+                    Image(
+                        modifier = Modifier.fillMaxSize(),
                         painter = painterResource(id = icon),
                         contentDescription = emptyString,
-                        tint = contentColor
                     )
                 }
             }
 
             Column(
                 modifier = Modifier
-                    .weight(4f)
+                    .weight(1f)
                     .fillMaxHeight(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.Start
@@ -81,39 +84,31 @@ fun HomeCard(
                 ) {
                     Text(
                         text = title,
+                        textAlign = TextAlign.Start,
                         style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = contentColor
+                        fontWeight = FontWeight.ExtraBold,
+                        color = titleColor
                     )
                 }
 
                 Box(
                     modifier = Modifier.fillMaxWidth()
-                        .padding(LocalSpacing.current.small),
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    Text(
-                        text = semiTitle,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = contentColor,
-
-                    )
-                }
-                Box(
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(LocalSpacing.current.small),
+                        .padding(
+                            top = LocalSpacing.current.small,
+                            start = LocalSpacing.current.small,
+                            bottom = LocalSpacing.current.small,
+                            end = LocalSpacing.current.smallMedium),
                     contentAlignment = Alignment.CenterStart
                 ) {
                     Text(
                         text = description,
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Normal,
-                        color = contentColor,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
+                        color = descriptionColor,
+
                     )
                 }
+
             }
         }
     }

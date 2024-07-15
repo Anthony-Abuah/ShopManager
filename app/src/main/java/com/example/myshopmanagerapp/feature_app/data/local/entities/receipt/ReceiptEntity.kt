@@ -1,8 +1,14 @@
 package com.example.myshopmanagerapp.feature_app.data.local.entities.receipt
 
+import androidx.compose.ui.text.capitalize
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.myshopmanagerapp.core.Constants.Receipt_Table
+import com.example.myshopmanagerapp.core.Constants.emptyString
+import com.example.myshopmanagerapp.core.Functions.toLocalDate
+import com.example.myshopmanagerapp.core.Functions.toNotNull
+import com.example.myshopmanagerapp.feature_app.data.local.entities.inventory.InventoryEntity
+import com.example.myshopmanagerapp.feature_app.domain.model.ItemQuantity
 import com.example.myshopmanagerapp.feature_app.domain.model.ItemQuantityInfo
 import com.example.myshopmanagerapp.feature_app.domain.model.ReceiptInfo
 

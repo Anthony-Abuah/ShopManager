@@ -12,12 +12,15 @@ import com.example.myshopmanagerapp.core.Functions.toDate
 import com.example.myshopmanagerapp.core.Functions.toDateString
 import com.example.myshopmanagerapp.core.Functions.toEllipses
 import com.example.myshopmanagerapp.core.Functions.toNotNull
+import com.example.myshopmanagerapp.core.Functions.toTimestamp
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
 import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
 import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIdsJson
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
 import com.example.myshopmanagerapp.feature_app.data.local.entities.withdrawals.WithdrawalEntity
+import com.example.myshopmanagerapp.feature_app.domain.model.ItemValue
+import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
 import com.example.myshopmanagerapp.feature_app.domain.model.UniqueId
 import com.example.myshopmanagerapp.feature_app.domain.repository.WithdrawalRepository
 import kotlinx.coroutines.Dispatchers
@@ -384,6 +387,26 @@ class WithdrawalRepositoryImpl(
         emit(Resource.Success("Pdf document successfully created"))
 
     }
+
+    override suspend fun getPeriodicWithdrawalAmount(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>> =flow{
+        emit(Resource.Loading())
+        try {
+            val allWithdrawals = appDatabase.withdrawalDao.getAllWithdrawals() ?: emptyList()
+            if (periodDropDownItem.isAllTime) {
+                val totalWithdrawalAmount = allWithdrawals.sumOf { it.withdrawalAmount }
+                emit(Resource.Success(ItemValue("Total Withdrawals", totalWithdrawalAmount)))
+            }else{
+                val firstDate = periodDropDownItem.firstDate.toTimestamp()
+                val lastDate = periodDropDownItem.lastDate.toTimestamp()
+                val allFilteredWithdrawals = allWithdrawals.filter { it.date in firstDate .. lastDate }
+                val totalWithdrawalAmount = allFilteredWithdrawals.sumOf { it.withdrawalAmount }
+                emit(Resource.Success(ItemValue("Total Withdrawals", totalWithdrawalAmount)))
+            }
+        }catch (e:Exception){
+            emit(Resource.Error("Could not get value"))
+        }
+    }
+
 
     private fun getDirectory(context: Context): File {
         val mediaDir = context.externalMediaDirs.firstOrNull()?.let {

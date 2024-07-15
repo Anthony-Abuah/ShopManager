@@ -175,7 +175,7 @@ fun HorizontalInfoDisplayCard(
 
             Box(
                 modifier = Modifier
-                    .weight(valueText.length.toFloat()),
+                    .weight(valueText.length.plus(1).toFloat()),
                 contentAlignment = Alignment.CenterEnd
             ) {
                 Text(

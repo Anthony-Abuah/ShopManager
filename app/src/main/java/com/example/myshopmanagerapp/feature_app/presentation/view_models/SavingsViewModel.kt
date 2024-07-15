@@ -15,6 +15,8 @@ import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.SavingsEntities
 import com.example.myshopmanagerapp.core.UIEvent
 import com.example.myshopmanagerapp.feature_app.data.local.entities.savings.SavingsEntity
+import com.example.myshopmanagerapp.feature_app.domain.model.ItemValue
+import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
 import com.example.myshopmanagerapp.feature_app.domain.repository.SavingsRepository
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.company.AddCompanyState
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.revenue.ItemValueState
@@ -63,6 +65,9 @@ class SavingsViewModel @Inject constructor(
 
     private val _savingsEntitiesState = mutableStateOf(SavingsEntitiesState())
     val savingsEntitiesState: State<SavingsEntitiesState> = _savingsEntitiesState
+
+    private val _savingsAmount = mutableStateOf(ItemValueState())
+    val savingsAmount: State<ItemValueState> = _savingsAmount
 
 
     private val _eventFlow = MutableSharedFlow<UIEvent>()
@@ -217,6 +222,36 @@ class SavingsViewModel @Inject constructor(
             }
         }.launchIn(this)
     }
+
+
+    fun getPeriodicSavingsAmount(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
+        savingsRepository.getPeriodicSavingsAmount(periodDropDownItem).onEach { response->
+            when(response){
+                is Resource.Success ->{
+                    _savingsAmount.value = savingsAmount.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+                is Resource.Loading ->{
+                    _savingsAmount.value = savingsAmount.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = true
+                    )
+                }
+                is Resource.Error ->{
+                    _savingsAmount.value = savingsAmount.value.copy(
+                        itemValue = response.data ?: ItemValue(emptyString, 0.0),
+                        message = response.message,
+                        isLoading = false
+                    )
+                }
+            }
+        }.launchIn(this)
+    }
+
 
     fun updateSavingsDate(date: Long, dayOfWeek: String) {
         savingsInfo = savingsInfo.copy(

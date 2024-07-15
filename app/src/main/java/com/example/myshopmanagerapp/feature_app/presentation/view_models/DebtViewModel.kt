@@ -213,8 +213,8 @@ class DebtViewModel @Inject constructor(
     }
 
 
-    fun getDebtAmount(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
-        debtRepository.getDebtAmount(periodDropDownItem).onEach { response->
+    fun getPeriodicDebtAmount(periodDropDownItem: PeriodDropDownItem) = viewModelScope.launch {
+        debtRepository.getPeriodicDebtAmount(periodDropDownItem).onEach { response->
             when(response){
                 is Resource.Success ->{
                     _debtAmount.value = debtAmount.value.copy(

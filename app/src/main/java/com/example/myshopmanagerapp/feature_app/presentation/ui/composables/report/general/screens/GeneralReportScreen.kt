@@ -38,6 +38,8 @@ fun GeneralReportScreen(
     withdrawalViewModel: WithdrawalViewModel = hiltViewModel(),
     savingsViewModel: SavingsViewModel = hiltViewModel(),
     bankAccountViewModel: BankAccountViewModel = hiltViewModel(),
+    debtViewModel: DebtViewModel = hiltViewModel(),
+    debtRepaymentViewModel: DebtRepaymentViewModel = hiltViewModel(),
     navigateToViewInventoryItemsScreen: (String)-> Unit,
     navigateToViewOwingCustomersScreen: ()-> Unit,
     navigateToViewPersonnelScreen: ()-> Unit,
@@ -61,10 +63,12 @@ fun GeneralReportScreen(
         inventoryViewModel.getAllInventories()
         customerViewModel.getAllCustomers()
         personnelViewModel.getAllPersonnel()
-        savingsViewModel.getAllSavings()
+        savingsViewModel.getPeriodicSavingsAmount(period)
         bankAccountViewModel.getAllBankAccounts()
+        debtViewModel.getPeriodicDebtAmount(period)
+        debtRepaymentViewModel.getPeriodicDebtRepaymentAmount(period)
         revenueViewModel.getRevenueAmount(period)
-        withdrawalViewModel.getAllWithdrawals()
+        withdrawalViewModel.getPeriodicWithdrawalAmount(period)
         expenseViewModel.getExpenseAmount(period)
         stockViewModel.getShopValue(period)
     }
@@ -87,11 +91,9 @@ fun GeneralReportScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            val allSavings = savingsViewModel.savingsEntitiesState.value.savingsEntities ?: emptyList()
-            val totalSavings = allSavings.sumOf { savings-> savings.savingsAmount }.toTwoDecimalPlaces()
-
-            val allWithdrawals = withdrawalViewModel.withdrawalEntitiesState.value.withdrawalEntities ?: emptyList()
-            val totalWithdrawals = allWithdrawals.sumOf { withdrawal-> withdrawal.withdrawalAmount }.toTwoDecimalPlaces()
+            val totalSavings = savingsViewModel.savingsAmount.value.itemValue.value
+            val totalWithdrawals = withdrawalViewModel.withdrawalAmount.value.itemValue.value
+            val savingsBalance = totalSavings.minus(totalWithdrawals)
 
             val allCustomers = customerViewModel.customerEntitiesState.value.customerEntities ?: emptyList()
             val numberOfOwingCustomers = allCustomers.count {customer-> customer.debtAmount.toNotNull() > 0.0 }
@@ -101,7 +103,9 @@ fun GeneralReportScreen(
             val numberOfBankAccounts = allBankAccounts.count()
             val allInventoryItems = inventoryItemViewModel.periodicInventoryItems.value.data
             val numberOfInventoryItems = allInventoryItems.count()
-            val debtAmount = allCustomers.sumOf { it.debtAmount.toNotNull() }
+            val debtAmount = debtViewModel.debtAmount.value.itemValue.value
+            val debtRepaymentAmount = debtRepaymentViewModel.debtRepaymentAmount.value.itemValue.value
+            val outstandingDebtAmount = debtAmount.minus(debtRepaymentAmount)
 
             val shopValue = stockViewModel.shopValue.value.itemValue.value.toTwoDecimalPlaces()
             val totalRevenue = revenueViewModel.revenueAmount.value.itemValue.value.toTwoDecimalPlaces()
@@ -111,6 +115,9 @@ fun GeneralReportScreen(
             GeneralReportContent(
                 currency = if (currency.isNullOrBlank()) GHS else currency,
                 netIncome = "$netIncome",
+                totalDebtAmount = "$debtAmount",
+                totalDebtRepaymentAmount = "$debtRepaymentAmount",
+                totalSavingsBalance = "$savingsBalance",
                 numberOfInventoryItems = "$numberOfInventoryItems",
                 totalSavings = "$totalSavings",
                 numberOfOwingCustomers = "$numberOfOwingCustomers",
@@ -121,7 +128,7 @@ fun GeneralReportScreen(
                 numberOfBankAccounts = "$numberOfBankAccounts",
                 shopName = shopInfo?.companyName ?: "Not Registered",
                 productsSold = shopInfo?.companyProductsAndServices ?: "Not Registered",
-                totalOutstandingDebtAmount = "$debtAmount",
+                totalOutstandingDebtAmount = "$outstandingDebtAmount",
                 shopValue = "$shopValue",
                 getSelectedPeriod = {selectedPeriod->
                     var periodIndex = periods.indexOf(selectedPeriod)

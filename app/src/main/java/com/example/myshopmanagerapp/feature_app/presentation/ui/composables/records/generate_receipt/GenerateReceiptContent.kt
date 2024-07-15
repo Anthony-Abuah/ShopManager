@@ -13,6 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.myshopmanagerapp.R
 import com.example.myshopmanagerapp.core.Constants.emptyString
+import com.example.myshopmanagerapp.core.CustomerEntities
 import com.example.myshopmanagerapp.core.FormRelatedString.Cancel
 import com.example.myshopmanagerapp.core.FormRelatedString.InventoryItemPlaceholder
 import com.example.myshopmanagerapp.core.FormRelatedString.InventoryItemQuantityPlaceholder
@@ -28,29 +29,33 @@ import com.example.myshopmanagerapp.core.FormRelatedString.SelectReceiptCustomer
 import com.example.myshopmanagerapp.core.FormRelatedString.SelectReceiptDate
 import com.example.myshopmanagerapp.core.Functions.amountIsNotValid
 import com.example.myshopmanagerapp.core.Functions.convertToDouble
+import com.example.myshopmanagerapp.core.Functions.getTotalNumberOfUnits
+import com.example.myshopmanagerapp.core.Functions.toDateString
+import com.example.myshopmanagerapp.core.Functions.toLocalDate
 import com.example.myshopmanagerapp.core.Functions.toNotNull
-import com.example.myshopmanagerapp.feature_app.domain.model.ItemQuantityCategorization
+import com.example.myshopmanagerapp.feature_app.data.local.entities.customers.CustomerEntity
+import com.example.myshopmanagerapp.feature_app.data.local.entities.inventory_items.InventoryItemEntity
+import com.example.myshopmanagerapp.feature_app.data.local.entities.receipt.ReceiptEntity
+import com.example.myshopmanagerapp.feature_app.domain.model.ItemQuantity
 import com.example.myshopmanagerapp.feature_app.domain.model.ItemQuantityInfo
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.*
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
+import java.util.*
 
 
 @Composable
 fun GenerateReceiptContent(
-    dateString: String,
-    dayOfWeek: String,
+    receipt: ReceiptEntity,
     receiptCreatedMessage: String,
     receiptIsCreated: Boolean,
     receiptDisplayItems: List<ItemQuantityInfo>,
-    inventoryItems: List<String>,
-    mapOfCustomers: Map<String, String>,
+    inventoryItems: List<InventoryItemEntity>,
+    allCustomers: CustomerEntities,
     addReceiptDate: (String) -> Unit,
-    getUniqueCustomerId: (String) -> Unit,
-    getCustomerName: (String) -> Unit,
     getReceiptItems: (List<ItemQuantityInfo>) -> Unit,
     createInventoryItem: () -> Unit,
     addCustomer: () -> Unit,
-    saveReceipt: () -> Unit,
+    saveReceipt: (CustomerEntity?) -> Unit,
     navigateBack: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -59,6 +64,12 @@ fun GenerateReceiptContent(
         mutableStateOf<ItemQuantityInfo?>(null)
     }
 
+    var customerName by remember {
+        mutableStateOf(emptyString)
+    }
+    var customer by remember {
+        mutableStateOf<CustomerEntity?>(null)
+    }
     var openAddItemDisplayDialog by remember {
         mutableStateOf(false)
     }
@@ -90,6 +101,9 @@ fun GenerateReceiptContent(
             modifier = Modifier.padding(LocalSpacing.current.small),
             contentAlignment = Alignment.Center
         ) {
+            val dayOfWeek = receipt.date.toLocalDate().dayOfWeek.toString().lowercase()
+                .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
+            val dateString = receipt.date.toDateString()
             DatePickerTextField(
                 defaultDate = "$dayOfWeek, $dateString",
                 context = context,
@@ -105,6 +119,10 @@ fun GenerateReceiptContent(
             modifier = Modifier.padding(LocalSpacing.current.small),
             contentAlignment = Alignment.Center
         ) {
+            val dayOfWeek = receipt.date.toLocalDate().dayOfWeek.toString().lowercase()
+                .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT)
+                else it.toString() }
+
             BasicTextField1(
                 value = dayOfWeek,
                 onValueChange = {},
@@ -119,21 +137,17 @@ fun GenerateReceiptContent(
         Box(modifier = Modifier.padding(LocalSpacing.current.small),
             contentAlignment = Alignment.Center
         ){
-            var thisUniqueCustomerId by remember {
-                mutableStateOf(emptyString)
-            }
             AutoCompleteWithAddButton(
                 label = SelectReceiptCustomer,
-                listItems = mapOfCustomers.keys.toList(),
+                listItems = allCustomers.map { it.customerName },
                 placeholder = ReceiptCustomerPlaceholder,
                 readOnly = false,
                 expandedIcon = R.drawable.ic_person_filled,
                 unexpandedIcon = R.drawable.ic_person_outline,
                 onClickAddButton = { addCustomer() },
                 getSelectedItem = {
-                    thisUniqueCustomerId = mapOfCustomers[it].toNotNull()
-                    getUniqueCustomerId(thisUniqueCustomerId)
-                    getCustomerName(it)
+                    customerName = it
+                    customer = allCustomers.firstOrNull{customerEntity -> customerEntity.customerName == it }
                 }
             )
         }
@@ -164,9 +178,8 @@ fun GenerateReceiptContent(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
-                var itemQuantities by remember {
-                    mutableStateOf<ItemQuantityCategorization?>(null)
-                }
+                var itemQuantities by remember { mutableStateOf(emptyList<ItemQuantity>()) }
+                var inventoryItem by remember { mutableStateOf<InventoryItemEntity?>(null) }
                 var inventoryItemName by remember { mutableStateOf(emptyString) }
                 var totalCostPrice by remember { mutableStateOf(emptyString) }
                 var unitCostPrice by remember { mutableStateOf(emptyString) }
@@ -179,54 +192,57 @@ fun GenerateReceiptContent(
                     AutoCompleteWithAddButton1(
                         value = inventoryItemName,
                         label = SelectInventoryItem,
-                        listItems = inventoryItems,
+                        listItems = inventoryItems.map { it.inventoryItemName },
                         placeholder = InventoryItemPlaceholder,
                         readOnly = true,
                         expandedIcon = R.drawable.ic_inventory,
                         unexpandedIcon = R.drawable.ic_inventory,
                         onClickAddButton = { createInventoryItem() },
-                        getSelectedItem = { inventoryItemName = it }
+                        getSelectedItem = {
+                            inventoryItemName = it
+                            inventoryItem = inventoryItems.firstOrNull { item-> it == item.inventoryItemName }
+                        }
                     )
                 }
 
                 // Item Quantity
-                var expandItemQuantity by remember {
-                    mutableStateOf(false)
-                }
+                var expandItemQuantity by remember { mutableStateOf(false) }
+
                 Box(
                     modifier = Modifier
                         .padding(LocalSpacing.current.small)
                         .clickable { expandItemQuantity = !expandItemQuantity },
                     contentAlignment = Alignment.Center
                 ) {
-                    val numberOfUnits = itemQuantities?.unit.toNotNull()
-                    val totalNumberOfUnits = itemQuantities?.totalNumberOfUnits.toNotNull()
-                    val totalNumberOfPacks = itemQuantities?.totalNumberOfSize1.toNotNull()
-                    val quantityValue = "$totalNumberOfPacks packs, $numberOfUnits units"
+                    val numberOfUnits = itemQuantities.getTotalNumberOfUnits()
                     ItemQuantityCategorizationTextField(
-                        value = "$quantityValue \nTotal units: $totalNumberOfUnits units",
+                        value = "Quantity: $numberOfUnits units",
                         onValueChange = {},
                         placeholder = InventoryItemQuantityPlaceholder,
                         label = AddInventoryQuantity,
                         readOnly = true,
-                        onClickIcon = {
-                            expandItemQuantity = !expandItemQuantity
-                        },
+                        onClickIcon = { expandItemQuantity = !expandItemQuantity },
                         icon = R.drawable.ic_quantity
                     )
                 }
+
+
                 AnimatedVisibility(
                     modifier = Modifier
                         .padding(LocalSpacing.current.small)
                         .background(MaterialTheme.colorScheme.surface),
                     visible = expandItemQuantity
                 ) {
-                    ItemQuantityCategorizationCard(
-                        itemQuantityCategorization = itemQuantities,
-                        discardChanges = { expandItemQuantity = false }
-                    ) { _itemQuantityCategorization ->
-                        itemQuantities = _itemQuantityCategorization
-                        expandItemQuantity = false
+                    if (inventoryItem != null) {
+                        QuantityCategorizationCard(
+                            inventoryItem = inventoryItem!!,
+                            itemQuantities = itemQuantities,
+                            discardChanges = { expandItemQuantity = false },
+                            getQuantities = {
+                                itemQuantities = it
+                                expandItemQuantity = false
+                            }
+                        )
                     }
                 }
 
@@ -242,7 +258,7 @@ fun GenerateReceiptContent(
                             unitCostPrice = _amount
                             priceValueIsWrong = amountIsNotValid(_amount)
                             if (!priceValueIsWrong){
-                                val numberOfUnits = itemQuantities?.totalNumberOfUnits.toNotNull()
+                                val numberOfUnits = itemQuantities.getTotalNumberOfUnits().toNotNull()
                                 totalCostPrice = "${_amount.toDouble().times(numberOfUnits)}"
                             }
                         },
@@ -267,7 +283,7 @@ fun GenerateReceiptContent(
                             totalCostPrice = _amount
                             priceValueIsWrong = amountIsNotValid(_amount)
                             if (!priceValueIsWrong){
-                                val numberOfUnits = itemQuantities?.totalNumberOfUnits.toNotNull()
+                                val numberOfUnits = itemQuantities.getTotalNumberOfUnits().toNotNull()
                                 unitCostPrice = "${_amount.toDouble().div(numberOfUnits.toDouble())}"
                             }
                         },
@@ -318,24 +334,26 @@ fun GenerateReceiptContent(
                             containerColor = MaterialTheme.colorScheme.primaryContainer,
                             buttonHeight = LocalSpacing.current.topAppBarSize
                         ) {
-                            if (inventoryItemName.isEmpty()) {
-                                Toast.makeText(context, "Please add item route", Toast.LENGTH_LONG).show()
-                            } else if (itemQuantities == null) {
-                                Toast.makeText(context, "Please add the quantity of item selected", Toast.LENGTH_LONG).show()
-                            } else if (unitCostPrice.isEmpty() || totalCostPrice.isEmpty()) {
-                                Toast.makeText(context, "Please add the cost of item", Toast.LENGTH_LONG).show()
-                            } else {
-                                if (receiptDisplayItems.size > 20){
+                            when(true){
+                                (inventoryItemName.isEmpty())-> {
+                                    Toast.makeText(context, "Please add item name", Toast.LENGTH_LONG).show()
+                                }
+                                (unitCostPrice.isEmpty() || totalCostPrice.isEmpty()) ->{
+                                    Toast.makeText(context, "Please add the cost of item", Toast.LENGTH_LONG).show()
+                                }
+                                (receiptDisplayItems.size > 20)->{
                                     addItemDisplayDialogMessage = "Cannot add more than 20 items to this receipt" +
                                             "\nCreate another receipt and add more items"
                                     openAddItemDisplayDialog = !openAddItemDisplayDialog
-                                }else if (receiptDisplayItems.map { it.itemName }.contains(inventoryItemName)){
+                                }
+                                (receiptDisplayItems.map { it.itemName }.contains(inventoryItemName))->{
                                     addItemDisplayDialogMessage = "$inventoryItemName has already been added"
                                     openAddItemDisplayDialog = !openAddItemDisplayDialog
-                                }else {
+                                }
+                                else->{
                                     itemQuantityInfo = ItemQuantityInfo(
                                         inventoryItemName,
-                                        itemQuantities!!.totalNumberOfUnits.toDouble(),
+                                        itemQuantities.getTotalNumberOfUnits().toDouble(),
                                         convertToDouble(unitCostPrice),
                                         convertToDouble(totalCostPrice)
                                     )
@@ -347,6 +365,7 @@ fun GenerateReceiptContent(
                             }
                         }
                     }
+
                 }
             }
         }
@@ -400,7 +419,7 @@ fun GenerateReceiptContent(
             unconfirmedUpdatedToastText = null,
             confirmedUpdatedToastText = null,
             confirmUpdate = {
-                saveReceipt()
+                saveReceipt(customer)
                 confirmationInfoDialog = !confirmationInfoDialog
             }) {
             confirmationPromptDialog = false

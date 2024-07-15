@@ -2,6 +2,7 @@ package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bot
 
 import com.example.myshopmanagerapp.core.NavDrawerItem
 import com.example.myshopmanagerapp.R
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.BottomNavScreens
 
 object HomeNavDrawerItems {
 
@@ -10,68 +11,35 @@ object HomeNavDrawerItems {
             title = "Records",
             selectedIcon = R.drawable.ic_home,
             unselectedIcon = R.drawable.ic_home,
-            badgeCount = null,
+            badgeCount = null
         ),
         NavDrawerItem(
             title = "Report",
             selectedIcon = R.drawable.ic_report,
             unselectedIcon = R.drawable.ic_report,
-            badgeCount = null
+            badgeCount = null,
+            route = BottomNavScreens.Report.route
         ),
         NavDrawerItem(
             title = "Actions",
             selectedIcon = R.drawable.ic_settings,
             unselectedIcon = R.drawable.ic_settings,
-            badgeCount = null
+            badgeCount = null,
+            route = BottomNavScreens.Actions.route
         ),
         NavDrawerItem(
             title = "Customer",
             selectedIcon = R.drawable.ic_person_filled,
-            unselectedIcon = R.drawable.ic_person_outline,
+            unselectedIcon = R.drawable.ic_person_filled,
             badgeCount = null,
             route = HomeScreens.CustomerNavGraph.route
         ),
         NavDrawerItem(
             title = "Personnel",
             selectedIcon = R.drawable.ic_person_filled,
-            unselectedIcon = R.drawable.ic_person_outline,
+            unselectedIcon = R.drawable.ic_person_filled,
             badgeCount = null,
             route = HomeScreens.PersonnelNavGraph.route
-        ),
-        NavDrawerItem(
-            title = "Debt",
-            selectedIcon = R.drawable.ic_money_filled,
-            unselectedIcon = R.drawable.ic_money_outline,
-            badgeCount = null,
-            route = HomeScreens.DebtNavGraph.route
-        ),
-        NavDrawerItem(
-            title = "Debt Repayment",
-            selectedIcon = R.drawable.ic_money_filled,
-            unselectedIcon = R.drawable.ic_money_outline,
-            badgeCount = null,
-            route = HomeScreens.DebtRepaymentNavGraph.route
-        ),
-        NavDrawerItem(
-            title = "Bank",
-            selectedIcon = R.drawable.ic_bank,
-            unselectedIcon = R.drawable.ic_bank,
-            badgeCount = null,
-            route = HomeScreens.BankNavGraph.route
-        ),
-        NavDrawerItem(
-            title = "Savings",
-            selectedIcon = R.drawable.ic_money_filled,
-            unselectedIcon = R.drawable.ic_money_outline,
-            badgeCount = null,
-            route = HomeScreens.SavingsNavGraph.route
-        ),
-        NavDrawerItem(
-            title = "Withdrawal",
-            selectedIcon = R.drawable.ic_money_filled,
-            unselectedIcon = R.drawable.ic_money_outline,
-            badgeCount = null,
-            route = HomeScreens.WithdrawalNavGraph.route
         ),
         NavDrawerItem(
             title = "Supplier",
@@ -79,6 +47,20 @@ object HomeNavDrawerItems {
             unselectedIcon = R.drawable.ic_person_outline,
             badgeCount = null,
             route = HomeScreens.SupplierNavGraph.route
+        ),
+        NavDrawerItem(
+            title = "Bank Account",
+            selectedIcon = R.drawable.ic_bank,
+            unselectedIcon = R.drawable.ic_bank,
+            badgeCount = null,
+            route = HomeScreens.BankNavGraph.route
+        ),
+        NavDrawerItem(
+            title = "Generate Receipt",
+            selectedIcon = R.drawable.ic_receipt,
+            unselectedIcon = R.drawable.ic_receipt,
+            badgeCount = null,
+            route = HomeScreens.ReceiptNavGraph.route
         ),
         NavDrawerItem(
             title = "Company",
@@ -98,13 +80,6 @@ object HomeNavDrawerItems {
             selectedIcon = R.drawable.ic_backup,
             unselectedIcon = R.drawable.ic_backup,
             badgeCount = null,
-        ),
-        NavDrawerItem(
-            title = "Generate Receipt",
-            selectedIcon = R.drawable.ic_receipt,
-            unselectedIcon = R.drawable.ic_receipt,
-            badgeCount = null,
-            route = HomeScreens.ReceiptNavGraph.route
         ),
         NavDrawerItem(
             title = "User Guide",

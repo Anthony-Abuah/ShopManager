@@ -4,6 +4,8 @@ import android.content.Context
 import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.WithdrawalEntities
 import com.example.myshopmanagerapp.feature_app.data.local.entities.withdrawals.WithdrawalEntity
+import com.example.myshopmanagerapp.feature_app.domain.model.ItemValue
+import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
 import kotlinx.coroutines.flow.Flow
 
 
@@ -27,5 +29,6 @@ interface WithdrawalRepository {
 
     suspend fun generateWithdrawalsList(context: Context, withdrawals: WithdrawalEntities, mapOfBankAccounts: Map<String, String>): Flow<Resource<String?>>
 
+    suspend fun getPeriodicWithdrawalAmount(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
 
 }

@@ -48,6 +48,10 @@ fun HomeScreen(
     navigateToExpenseListScreen: () -> Unit,
     navigateToInventoryListScreen: () -> Unit,
     navigateToStockListScreen: () -> Unit,
+    navigateToDebtListScreen: () -> Unit,
+    navigateToDebtRepaymentListScreen: () -> Unit,
+    navigateToWithdrawalListScreen: () -> Unit,
+    navigateToSavingsListScreen: () -> Unit,
     navigateToInventoryItemListScreen: () -> Unit
 ) {
 
@@ -130,7 +134,9 @@ fun HomeScreen(
                                     selectedItemIndex = index
                                     coroutineScope.launch {
                                         drawerState.close()
-                                        navDrawerItem.route?.let { navController.navigate(it) }
+                                        if (index<3) { navDrawerItem.route?.let { navHostController.navigate(it) } }
+                                        else { navDrawerItem.route?.let { navController.navigate(it) } }
+
                                         if (navDrawerItem.title == "Back up"){
                                             backupViewModel.absoluteRemoteBackup()
                                         }
@@ -152,11 +158,8 @@ fun HomeScreen(
 
                             Spacer(modifier = Modifier.height(LocalSpacing.current.small))
 
-                            if (index == 2 || index == 11 ){
-                                HorizontalDivider(
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                    thickness = 0.25.dp,
-                                )
+                            if (index == 2 || index == 8 ){
+                                HorizontalDivider()
                                 Spacer(modifier = Modifier.height(LocalSpacing.current.small))
                             }
                         }
@@ -174,6 +177,7 @@ fun HomeScreen(
                                 message = event.message
                             )
                         }
+                        else -> {}
                     }
                 }
             }
@@ -204,6 +208,10 @@ fun HomeScreen(
                         navigateToInventoryItemListScreen = navigateToInventoryItemListScreen,
                         navigateToInventoryListScreen = navigateToInventoryListScreen,
                         navigateToStockListScreen = navigateToStockListScreen,
+                        navigateToDebtListScreen = navigateToDebtListScreen,
+                        navigateToDebtRepaymentListScreen = navigateToDebtRepaymentListScreen,
+                        navigateToSavingsListScreen = navigateToSavingsListScreen,
+                        navigateToWithdrawalListScreen = navigateToWithdrawalListScreen,
                     )
                 }
             }

@@ -76,6 +76,7 @@ object Constants{
     const val Delete = "Delete"
     val editDelete = listOf(Edit, Delete)
 
+    const val Expense_Types = "Expense Types"
     const val ChangesEntityMarkers = "Changes Markers"
     const val AdditionEntityMarkers = "Addition Entity Markers"
     const val UserPreferences = "User Preferences"

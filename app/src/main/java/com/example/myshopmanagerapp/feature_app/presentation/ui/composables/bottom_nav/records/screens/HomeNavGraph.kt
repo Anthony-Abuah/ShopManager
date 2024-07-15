@@ -79,6 +79,18 @@ fun HomeNavGraph(
                 navigateToStockListScreen = {
                     navController.navigate(HomeScreens.StockNavGraph.route)
                 },
+                navigateToDebtListScreen = {
+                    navController.navigate(HomeScreens.DebtNavGraph.route)
+                },
+                navigateToWithdrawalListScreen = {
+                    navController.navigate(HomeScreens.WithdrawalNavGraph.route)
+                },
+                navigateToSavingsListScreen = {
+                    navController.navigate(HomeScreens.SavingsNavGraph.route)
+                },
+                navigateToDebtRepaymentListScreen = {
+                    navController.navigate(HomeScreens.DebtRepaymentNavGraph.route)
+                },
             ) {
                 navController.navigate(HomeScreens.InventoryItemNavGraph.route)
             }

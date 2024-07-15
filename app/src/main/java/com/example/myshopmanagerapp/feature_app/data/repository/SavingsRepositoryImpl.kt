@@ -13,12 +13,15 @@ import com.example.myshopmanagerapp.core.Functions.toDate
 import com.example.myshopmanagerapp.core.Functions.toDateString
 import com.example.myshopmanagerapp.core.Functions.toEllipses
 import com.example.myshopmanagerapp.core.Functions.toNotNull
+import com.example.myshopmanagerapp.core.Functions.toTimestamp
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
 import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
 import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIdsJson
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
 import com.example.myshopmanagerapp.feature_app.data.local.entities.savings.SavingsEntity
+import com.example.myshopmanagerapp.feature_app.domain.model.ItemValue
+import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
 import com.example.myshopmanagerapp.feature_app.domain.model.UniqueId
 import com.example.myshopmanagerapp.feature_app.domain.repository.SavingsRepository
 import kotlinx.coroutines.Dispatchers
@@ -386,6 +389,27 @@ class SavingsRepositoryImpl(
         emit(Resource.Success("Pdf document successfully created"))
 
     }
+
+
+    override suspend fun getPeriodicSavingsAmount(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>> =flow{
+        emit(Resource.Loading())
+        try {
+            val allSavings = appDatabase.savingsDao.getAllSavings() ?: emptyList()
+            if (periodDropDownItem.isAllTime) {
+                val totalSavingsAmount = allSavings.sumOf { it.savingsAmount }
+                emit(Resource.Success(ItemValue("Total Savings", totalSavingsAmount)))
+            }else{
+                val firstDate = periodDropDownItem.firstDate.toTimestamp()
+                val lastDate = periodDropDownItem.lastDate.toTimestamp()
+                val allFilteredSavings = allSavings.filter { it.date in firstDate .. lastDate }
+                val totalSavingsAmount = allFilteredSavings.sumOf { it.savingsAmount }
+                emit(Resource.Success(ItemValue("Total Savings", totalSavingsAmount)))
+            }
+        }catch (e:Exception){
+            emit(Resource.Error("Could not get value"))
+        }
+    }
+
 
     private fun getDirectory(context: Context): File{
         val mediaDir = context.externalMediaDirs.firstOrNull()?.let {

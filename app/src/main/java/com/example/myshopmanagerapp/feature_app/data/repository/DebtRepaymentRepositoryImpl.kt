@@ -424,7 +424,7 @@ class DebtRepaymentRepositoryImpl(
 
     }
 
-    override suspend fun getDebtRepaymentAmount(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>  =flow{
+    override suspend fun getPeriodicDebtRepaymentAmount(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>  =flow{
         emit(Resource.Loading())
         try {
             val allDebtRepayments = appDatabase.debtRepaymentDao.getAllDebtRepayment() ?: emptyList()

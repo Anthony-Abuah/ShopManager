@@ -11,12 +11,17 @@ import androidx.compose.ui.unit.sp
 import com.example.myshopmanagerapp.R
 import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.Constants.listOfPeriods
+import com.example.myshopmanagerapp.core.FormRelatedString.NetIncome
 import com.example.myshopmanagerapp.core.FormRelatedString.NumberOfActivePersonnel
 import com.example.myshopmanagerapp.core.FormRelatedString.NumberOfBankAccounts
 import com.example.myshopmanagerapp.core.FormRelatedString.NumberOfInventoryItems
 import com.example.myshopmanagerapp.core.FormRelatedString.NumberOfOwingCustomers
+import com.example.myshopmanagerapp.core.FormRelatedString.OutstandingDebt
+import com.example.myshopmanagerapp.core.FormRelatedString.SavingsBalance
 import com.example.myshopmanagerapp.core.FormRelatedString.ShopValue
 import com.example.myshopmanagerapp.core.FormRelatedString.ShopValueInfo
+import com.example.myshopmanagerapp.core.FormRelatedString.TotalDebtAmount
+import com.example.myshopmanagerapp.core.FormRelatedString.TotalDebtRepaymentAmount
 import com.example.myshopmanagerapp.core.FormRelatedString.TotalExpenses
 import com.example.myshopmanagerapp.core.FormRelatedString.TotalRevenues
 import com.example.myshopmanagerapp.core.FormRelatedString.TotalSavingsAmount
@@ -28,6 +33,9 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.*
 fun GeneralReportContent(
     currency: String,
     numberOfInventoryItems: String,
+    totalDebtAmount: String,
+    totalDebtRepaymentAmount: String,
+    totalSavingsBalance: String,
     totalSavings: String,
     numberOfOwingCustomers: String,
     netIncome: String,
@@ -124,7 +132,7 @@ fun GeneralReportContent(
 
             Row(modifier = Modifier
                 .fillMaxWidth()
-                .height(250.dp),
+                .height(400.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -168,6 +176,28 @@ fun GeneralReportContent(
                             bigText = totalSavings,
                             bigTextSize = 18.sp,
                             smallText = TotalSavingsAmount,
+                            smallTextSize = 10.sp,
+                            backgroundColor = cardBackgroundColor,
+                            shape = MaterialTheme.shapes.medium,
+                            elevation = LocalSpacing.current.small,
+                            isAmount = false
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(LocalSpacing.current.small),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        InfoDisplayCard(
+                            icon = R.drawable.debt,
+                            imageWidth = 32.dp,
+                            currency = currency,
+                            currencySize = 20.sp,
+                            bigText = totalDebtAmount,
+                            bigTextSize = 18.sp,
+                            smallText = TotalDebtAmount,
                             smallTextSize = 10.sp,
                             backgroundColor = cardBackgroundColor,
                             shape = MaterialTheme.shapes.medium,
@@ -224,6 +254,27 @@ fun GeneralReportContent(
                             isAmount = false
                         )
                     }
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(LocalSpacing.current.small),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        InfoDisplayCard(
+                            icon = R.drawable.payment,
+                            imageWidth = 32.dp,
+                            currency = currency,
+                            currencySize = 20.sp,
+                            bigText = totalDebtRepaymentAmount,
+                            bigTextSize = 18.sp,
+                            smallText = TotalDebtRepaymentAmount,
+                            smallTextSize = 10.sp,
+                            backgroundColor = cardBackgroundColor,
+                            shape = MaterialTheme.shapes.medium,
+                            elevation = LocalSpacing.current.small,
+                            isAmount = false
+                        )
+                    }
                 }
 
                 Column(modifier = Modifier
@@ -243,7 +294,7 @@ fun GeneralReportContent(
                             currencySize = 20.sp,
                             bigText = netIncome,
                             bigTextSize = 18.sp,
-                            smallText = "Net Income",
+                            smallText = NetIncome,
                             smallTextSize = 10.sp,
                             backgroundColor = cardBackgroundColor,
                             shape = MaterialTheme.shapes.medium,
@@ -259,13 +310,35 @@ fun GeneralReportContent(
                         contentAlignment = Alignment.Center
                     ) {
                         InfoDisplayCard(
-                            icon = R.drawable.debt,
+                            icon = R.drawable.cash,
+                            imageWidth = 32.dp,
+                            currency = currency,
+                            currencySize = 20.sp,
+                            bigText = totalSavingsBalance,
+                            bigTextSize = 18.sp,
+                            smallText = SavingsBalance,
+                            smallTextSize = 10.sp,
+                            backgroundColor = cardBackgroundColor,
+                            shape = MaterialTheme.shapes.medium,
+                            elevation = LocalSpacing.current.small,
+                            isAmount = false
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(LocalSpacing.current.small),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        InfoDisplayCard(
+                            icon = R.drawable.expense_type,
                             imageWidth = 32.dp,
                             currency = currency,
                             currencySize = 20.sp,
                             bigText = totalOutstandingDebtAmount,
                             bigTextSize = 18.sp,
-                            smallText = "Outstanding Debt",
+                            smallText = OutstandingDebt,
                             smallTextSize = 10.sp,
                             backgroundColor = cardBackgroundColor,
                             shape = MaterialTheme.shapes.medium,

@@ -112,7 +112,7 @@ fun InventoryAndStockReportContent(
                 contentAlignment = Alignment.Center
             ) {
                 HorizontalInfoDisplayCard(
-                    icon = R.drawable.inventory_item,
+                    icon = R.drawable.quantity,
                     modifier = Modifier.padding(LocalSpacing.current.small),
                     name = NumberOfInventoryItems,
                     nameTextSize = 16.sp,
@@ -149,7 +149,7 @@ fun InventoryAndStockReportContent(
                 contentAlignment = Alignment.Center
             ) {
                 HorizontalInfoDisplayCard(
-                    icon = R.drawable.shop_value,
+                    icon = R.drawable.profit,
                     modifier = Modifier.padding(LocalSpacing.current.small),
                     name = ExpectedProfit,
                     nameTextSize = 16.sp,
@@ -168,7 +168,7 @@ fun InventoryAndStockReportContent(
                 contentAlignment = Alignment.Center
             ) {
                 HorizontalInfoDisplayCard(
-                    icon = R.drawable.shop_value,
+                    icon = R.drawable.percentage,
                     modifier = Modifier.padding(LocalSpacing.current.small),
                     name = ExpectedProfitPercentage,
                     nameTextSize = 16.sp,
@@ -230,7 +230,7 @@ fun InventoryAndStockReportContent(
                     contentAlignment = Alignment.Center
                 ) {
                     InfoDisplayCard(
-                        icon = R.drawable.expense,
+                        icon = R.drawable.quantity,
                         imageWidth = 32.dp,
                         currency = currency,
                         currencySize = 20.sp,
@@ -251,7 +251,7 @@ fun InventoryAndStockReportContent(
                     contentAlignment = Alignment.Center
                 ) {
                     InfoDisplayCard(
-                        icon = R.drawable.expense,
+                        icon = R.drawable.quantity,
                         imageWidth = 32.dp,
                         currency = currency,
                         currencySize = 20.sp,
@@ -273,7 +273,7 @@ fun InventoryAndStockReportContent(
                     contentAlignment = Alignment.Center
                 ) {
                     InfoDisplayCard(
-                        icon = R.drawable.expense,
+                        icon = R.drawable.price,
                         imageWidth = 32.dp,
                         currency = currency,
                         currencySize = 20.sp,
@@ -295,7 +295,7 @@ fun InventoryAndStockReportContent(
                     contentAlignment = Alignment.Center
                 ) {
                     InfoDisplayCard(
-                        icon = R.drawable.expense,
+                        icon = R.drawable.price,
                         imageWidth = 32.dp,
                         currency = currency,
                         currencySize = 20.sp,

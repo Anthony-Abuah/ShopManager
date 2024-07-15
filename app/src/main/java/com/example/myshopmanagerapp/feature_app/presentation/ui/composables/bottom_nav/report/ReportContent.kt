@@ -1,12 +1,15 @@
 package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.report
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.myshopmanagerapp.R
-import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenColumnWithBottomBar
-import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.ReportCard
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.HomeCard
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.*
 
 
@@ -18,43 +21,58 @@ fun ReportContent(
     navigateToViewGeneralReportScreen: () -> Unit,
     navigateToViewInventoryReportScreen: () -> Unit
 ) {
-    BasicScreenColumnWithBottomBar {
+    val mainBackgroundColor = if (isSystemInDarkTheme()) Grey20 else Grey99
+    val cardBackgroundColor = if (isSystemInDarkTheme()) Grey15 else Grey90
+    val shadowColor = if (isSystemInDarkTheme()) Grey10 else Grey80
+    val descriptionColor = if (isSystemInDarkTheme()) Grey70 else Grey40
+    val titleColor = if (isSystemInDarkTheme()) Grey99 else Grey10
+
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(mainBackgroundColor)
+            .padding(LocalSpacing.current.noPadding),
+            //.verticalScroll(state = rememberScrollState(), enabled = true),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top,
+    ) {
         //General Report Card
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(LocalSpacing.current.small),
         ) {
-            ReportCard(
+            HomeCard(
                 title = "General Shop Report",
-                semiTitle = "View all your shop info",
                 description = "You can see all your basic shop information and records here",
-                icon = R.drawable.ic_money_filled,
-                contentColor = if (isSystemInDarkTheme()) DarkViolet10 else DarkViolet95,
-                cardContainerColor = if (isSystemInDarkTheme()) DarkViolet80 else DarkViolet40,
-                onOpenCard = {
-                    navigateToViewGeneralReportScreen()
-                }
-            )
+                icon = R.drawable.shop,
+                descriptionColor = descriptionColor,
+                titleColor = titleColor,
+                cardContainerColor = cardBackgroundColor,
+                cardShadowColor = shadowColor
+            ) {
+                navigateToViewGeneralReportScreen()
+            }
         }
 
-        //General Report Card
+        //Cash Flow
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(LocalSpacing.current.small),
         ) {
-            ReportCard(
-                title = "Cash flow",
-                semiTitle = "View all your cash flows",
+            HomeCard(
+                title = "Cash Flow",
                 description = "You can see all your cash flow information and records here",
-                icon = R.drawable.ic_money_filled,
-                contentColor = if (isSystemInDarkTheme()) YellowishGreen10 else YellowishGreen95,
-                cardContainerColor = if (isSystemInDarkTheme()) YellowishGreen80 else YellowishGreen40,
-                onOpenCard = {
-                    navigateToCashInReportScreen()
-                }
-            )
+                icon = R.drawable.cash,
+                descriptionColor = descriptionColor,
+                titleColor = titleColor,
+                cardContainerColor = cardBackgroundColor,
+                cardShadowColor = shadowColor
+            ) {
+                navigateToCashInReportScreen()
+            }
         }
 
         //Revenue Card
@@ -63,17 +81,17 @@ fun ReportContent(
                 .fillMaxWidth()
                 .padding(LocalSpacing.current.small),
         ) {
-            ReportCard(
+            HomeCard(
                 title = "Revenue Report",
-                semiTitle = "View all your revenue records",
-                description = "You can see all your daily revenue here",
-                icon = R.drawable.ic_money_filled,
-                contentColor = if (isSystemInDarkTheme()) Green10 else Green95,
-                cardContainerColor = if (isSystemInDarkTheme()) Green80 else Green40,
-                onOpenCard = {
-                    navigateToViewRevenueReportScreen()
-                }
-            )
+                description = "You can view all your revenue information and records here",
+                icon = R.drawable.revenue,
+                descriptionColor = descriptionColor,
+                titleColor = titleColor,
+                cardContainerColor = cardBackgroundColor,
+                cardShadowColor = shadowColor
+            ) {
+                navigateToViewRevenueReportScreen()
+            }
         }
 
         //Expense Card
@@ -82,17 +100,17 @@ fun ReportContent(
                 .fillMaxWidth()
                 .padding(LocalSpacing.current.small),
         ) {
-            ReportCard(
+            HomeCard(
                 title = "Expense Report",
-                semiTitle = "View all your expense records",
-                description = "You can see all your expense report here",
-                icon = R.drawable.ic_money_filled,
-                contentColor = if (isSystemInDarkTheme()) Yellow10 else Yellow95,
-                cardContainerColor = if (isSystemInDarkTheme()) Yellow80 else Yellow40,
-                onOpenCard = {
-                    navigateToViewExpenseReportScreen()
-                }
-            )
+                description = "You can view all your expense information and records here",
+                icon = R.drawable.expense,
+                descriptionColor = descriptionColor,
+                titleColor = titleColor,
+                cardContainerColor = cardBackgroundColor,
+                cardShadowColor = shadowColor
+            ) {
+                navigateToViewExpenseReportScreen()
+            }
         }
 
         //Inventory Report Card
@@ -101,17 +119,17 @@ fun ReportContent(
                 .fillMaxWidth()
                 .padding(LocalSpacing.current.small),
         ) {
-            ReportCard(
-                title = "Inventory Report",
-                semiTitle = "View all your inventory records",
-                description = "You can see all your inventory items, their quantities and values",
-                icon = R.drawable.ic_money_filled,
-                contentColor = if (isSystemInDarkTheme()) Blue10 else Blue95,
-                cardContainerColor = if (isSystemInDarkTheme()) Blue80 else Blue40,
-                onOpenCard = {
-                    navigateToViewInventoryReportScreen()
-                }
-            )
+            HomeCard(
+                title = "Inventory & Stock Report",
+                description = "You can view all your inventory and stock information and records here",
+                icon = R.drawable.inventory_item,
+                descriptionColor = descriptionColor,
+                titleColor = titleColor,
+                cardContainerColor = cardBackgroundColor,
+                cardShadowColor = shadowColor
+            ) {
+                navigateToViewInventoryReportScreen()
+            }
         }
 
     }

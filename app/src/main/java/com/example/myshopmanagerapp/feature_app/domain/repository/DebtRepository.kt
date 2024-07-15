@@ -33,6 +33,6 @@ interface DebtRepository {
 
     suspend fun generateDebtList(context: Context, debts: DebtEntities, mapOfCustomers: Map<String, String>): Flow<Resource<String?>>
 
-    suspend fun getDebtAmount(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
+    suspend fun getPeriodicDebtAmount(periodDropDownItem: PeriodDropDownItem): Flow<Resource<ItemValue?>>
 
 }
