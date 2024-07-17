@@ -76,15 +76,16 @@ fun GenerateReceiptScreen(
                     val longDate = _dateString.toLocalDate().toDate().time
                     companyViewModel.addReceiptDate(longDate)
                 },
-                getReceiptItems = {_item->
-                    companyViewModel.addReceiptItems(_item)
+                getReceiptItems = {_items->
+                    companyViewModel.addReceiptItems(_items)
                 },
                 createInventoryItem = { navigateToAddInventoryItemScreen() },
-                addCustomer = { navigateToAddCustomerScreen() },
-                saveReceipt = {customer->
+                addCustomer = {customer->
                     companyViewModel.addReceiptCustomer(customer?.customerName.toNotNull(), customer?.customerContact.toNotNull())
+                },
+                addNewCustomer = { navigateToAddCustomerScreen() },
+                saveReceipt = {
                     companyViewModel.addReceiptShopInfo(shopName, shopContact, shopLocation)
-                    companyViewModel.addReceiptPersonnel("Anthony Abuah", "Manager")
                     companyViewModel.generateReceipt()
                 }
             ) {

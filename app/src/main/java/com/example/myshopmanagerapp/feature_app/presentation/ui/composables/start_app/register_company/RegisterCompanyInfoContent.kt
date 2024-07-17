@@ -21,7 +21,7 @@ import com.example.myshopmanagerapp.core.FormRelatedString.CompanyNamePlaceholde
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterCompanyContact
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterCompanyLocation
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterCompanyName
-import com.example.myshopmanagerapp.core.Functions.nameIsValid
+import com.example.myshopmanagerapp.core.Functions.textIsInvalid
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.feature_app.data.local.entities.company.CompanyEntity
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicButton
@@ -74,7 +74,7 @@ fun RegisterCompanyInfoContent(
                     companyName = it
                     addCompanyName(companyName)
                 },
-                isError = nameIsValid(companyName) || companyName.isEmpty() ,
+                isError = textIsInvalid(companyName) || companyName.isEmpty() ,
                 readOnly = false,
                 placeholder = CompanyNamePlaceholder,
                 label = EnterCompanyName,
@@ -120,7 +120,7 @@ fun RegisterCompanyInfoContent(
                     companyLocation = it
                     addCompanyLocation(companyLocation)
                 },
-                isError = nameIsValid(companyLocation),
+                isError = textIsInvalid(companyLocation),
                 readOnly = false,
                 placeholder = CompanyLocationPlaceholder,
                 label = EnterCompanyLocation,

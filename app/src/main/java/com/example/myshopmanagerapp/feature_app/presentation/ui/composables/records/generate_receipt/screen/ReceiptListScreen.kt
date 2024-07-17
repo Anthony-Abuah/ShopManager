@@ -53,7 +53,10 @@ fun ReceiptListScreen(
                 allReceipts = allReceipts,
                 isLoading = isLoading,
                 savePDFConfirmationMessage = companyViewModel.generateInvoiceState.value.data,
-                navigateToUpdateReceipt = { navigateToUpdateReceipt(it) }
+                deleteReceiptMessage  = companyViewModel.deleteReceiptState.value.data,
+                reloadAllReceipts = { companyViewModel.getAllReceipts() },
+                deleteReceipt = { companyViewModel.deleteReceipt(it) },
+                navigateToUpdateReceipt = { navigateToUpdateReceipt(it) },
             ){_receiptEntity->
                 companyViewModel.generateReceipt(context, _receiptEntity.toReceiptInfo() )
             }

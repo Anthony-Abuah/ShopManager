@@ -41,7 +41,7 @@ fun DeleteConfirmationDialog(
                     .padding(LocalSpacing.current.noPadding)
                     .fillMaxWidth(),
                 onDismissRequest = {
-                    unconfirmedDeletedToastText?.let { Toast.makeText(context, it, Toast.LENGTH_LONG).show() }
+                    if (unconfirmedDeletedToastText != null){ Toast.makeText(context, unconfirmedDeletedToastText, Toast.LENGTH_LONG).show() }
                     closeDialog()
                 },
                 title = {

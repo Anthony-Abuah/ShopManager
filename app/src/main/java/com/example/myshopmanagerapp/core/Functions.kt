@@ -22,7 +22,6 @@ import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.Constants.longDateFormat
 import com.example.myshopmanagerapp.core.Constants.shortDateFormat
 import com.example.myshopmanagerapp.feature_app.data.local.entities.company.CompanyEntity
-import com.example.myshopmanagerapp.feature_app.data.local.entities.stock.StockEntity
 import com.example.myshopmanagerapp.feature_app.data.remote.dto.company.CompanyInfoDto
 import com.example.myshopmanagerapp.feature_app.data.util.GsonParser
 import com.example.myshopmanagerapp.feature_app.data.util.JsonParser
@@ -160,7 +159,7 @@ object Functions {
         return date?.time ?: 0
     }
 
-    fun nameIsValid(name: String): Boolean{
+    fun textIsInvalid(name: String): Boolean{
         var value = true
         try { name.toDouble() }catch (e: NumberFormatException){
             value = false

@@ -12,7 +12,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.Functions.toCompanyEntity
 import com.example.myshopmanagerapp.core.Functions.toDate
-import com.example.myshopmanagerapp.core.Functions.toDateString
 import com.example.myshopmanagerapp.core.Functions.toLocalDate
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.UserPreferences
@@ -21,7 +20,6 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.reco
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.CompanyViewModel
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.CustomerViewModel
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.InventoryItemViewModel
-import java.util.*
 
 
 @Composable
@@ -54,18 +52,9 @@ fun UpdateReceiptScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            val customer = customerViewModel.customerInfo
-            val receiptInfo = companyViewModel.receiptInfo
-            val date = receiptInfo.date
-            val dateString = date.toDate().toDateString()
-            val dayOfWeek = date.toDate().toLocalDate().dayOfWeek.toString().lowercase()
-                .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
-            val receiptItems = receiptInfo.items
+            val updatedReceiptInfo = companyViewModel.updateReceiptInfo
+            val receiptItems = updatedReceiptInfo.items
             val allCustomers = customerViewModel.customerEntitiesState.value.customerEntities ?: emptyList()
-            val mapOfCustomers = mutableMapOf<String, String>()
-            allCustomers.forEach {_customer->
-                mapOfCustomers[_customer.customerName] = _customer.uniqueCustomerId
-            }
 
             val allInventoryItems = inventoryItemViewModel.inventoryItemEntitiesState.value.inventoryItemEntities ?: emptyList()
 
@@ -75,30 +64,27 @@ fun UpdateReceiptScreen(
             val shopLocation = shopInfo?.companyLocation ?: "My Location"
 
             UpdateReceiptContent(
-                dateString = dateString,
-                dayOfWeek = dayOfWeek,
-                customerId = dayOfWeek,
-                receiptCreatedMessage = companyViewModel.addReceiptState.value.message.toNotNull(),
-                receiptIsCreated = companyViewModel.addReceiptState.value.isSuccessful,
+                receipt = updatedReceiptInfo,
+                receiptCreatedMessage = companyViewModel.updateReceiptState.value.message.toNotNull(),
+                receiptIsCreated = companyViewModel.updateReceiptState.value.isSuccessful,
                 receiptDisplayItems = receiptItems,
-                inventoryItems = allInventoryItems.map { _item-> _item.inventoryItemName },
-                mapOfCustomers = mapOfCustomers,
-                addReceiptDate = {_dateString->
+                inventoryItems = allInventoryItems,
+                allCustomers = allCustomers,
+                updateReceiptDate = { _dateString->
                     val longDate = _dateString.toLocalDate().toDate().time
-                    companyViewModel.addReceiptDate(longDate)
+                    companyViewModel.updateReceiptDate(longDate)
                 },
-                getReceiptItems = {_item->
-                    companyViewModel.addReceiptItems(_item)
+                updateReceiptItems = { _item->
+                    companyViewModel.updateReceiptItems(_item)
                 },
-                getUniqueCustomerId = {_id-> customerViewModel.getCustomer(_id) },
-                getCustomerName = {_name -> customerViewModel.updateCustomerName(_name) },
+                updateCustomer = { _customer->
+                    companyViewModel.updateReceiptCustomer(_customer?.customerName.toNotNull(), _customer?.customerContact.toNotNull())
+                },
                 createInventoryItem = { navigateToAddInventoryItemScreen() },
-                addCustomer = { navigateToAddCustomerScreen() },
-                saveReceipt = {
-                    companyViewModel.addReceiptCustomer(customer.customerName, customer.customerContact)
-                    companyViewModel.addReceiptShopInfo(shopName, shopContact, shopLocation)
-                    companyViewModel.addReceiptPersonnel("Anthony Abuah", "Manager")
-                    companyViewModel.generateReceipt()
+                addNewCustomer = { navigateToAddCustomerScreen() },
+                updateReceipt = {
+                    companyViewModel.updateReceiptShopInfo(shopName, shopContact, shopLocation)
+                    companyViewModel.updateReceipt()
                 }
             ) {
                 navigateBack()

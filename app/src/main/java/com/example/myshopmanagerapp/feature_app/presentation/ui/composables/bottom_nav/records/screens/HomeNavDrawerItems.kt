@@ -35,6 +35,13 @@ object HomeNavDrawerItems {
             route = HomeScreens.CustomerNavGraph.route
         ),
         NavDrawerItem(
+            title = "Add Inventory Item",
+            selectedIcon = R.drawable.ic_inventory_item,
+            unselectedIcon = R.drawable.ic_inventory_item,
+            badgeCount = null,
+            route = HomeScreens.InventoryItemNavGraph.route
+        ),
+        NavDrawerItem(
             title = "Personnel",
             selectedIcon = R.drawable.ic_person_filled,
             unselectedIcon = R.drawable.ic_person_filled,

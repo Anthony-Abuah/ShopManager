@@ -29,6 +29,7 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpaci
 
 @Composable
 fun AutoCompleteWithAddButton(
+    value: String = emptyString,
     label: String,
     placeholder: String,
     listItems: List<String>,
@@ -39,7 +40,7 @@ fun AutoCompleteWithAddButton(
     getSelectedItem: (listItem: String) -> Unit
 ) {
     var item by remember {
-        mutableStateOf("")
+        mutableStateOf(value)
     }
     var isExpanded by remember {
         mutableStateOf(false)

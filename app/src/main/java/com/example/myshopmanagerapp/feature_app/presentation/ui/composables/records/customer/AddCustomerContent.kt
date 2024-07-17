@@ -18,7 +18,7 @@ import com.example.myshopmanagerapp.core.FormRelatedString.EnterCustomerContact
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterCustomerLocation
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterCustomerName
 import com.example.myshopmanagerapp.core.FormRelatedString.SaveCustomer
-import com.example.myshopmanagerapp.core.Functions.nameIsValid
+import com.example.myshopmanagerapp.core.Functions.textIsInvalid
 import com.example.myshopmanagerapp.core.Functions.generateUniqueCustomerId
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.feature_app.data.local.entities.customers.CustomerEntity
@@ -62,7 +62,7 @@ fun AddCustomerContent(
                 onValueChange = {
                     thisCustomerName = it
                     addCustomerName(it)
-                    customerNameError = nameIsValid(it)
+                    customerNameError = textIsInvalid(it)
                 },
                 readOnly = false,
                 isError = customerNameError,

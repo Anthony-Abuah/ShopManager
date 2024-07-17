@@ -21,6 +21,8 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpaci
 fun HomeCard(
     title: String,
     description: String,
+    height: Dp = 100.dp,
+    imagePadding: Dp = LocalSpacing.current.smallMedium,
     imageWidth: Dp = 40.dp,
     icon: Int,
     titleColor: Color = MaterialTheme.colorScheme.onBackground,
@@ -31,7 +33,7 @@ fun HomeCard(
 ){
     Card(modifier = Modifier
         .fillMaxWidth()
-        .height(100.dp)
+        .height(height)
         .clickable { onOpenCard() },
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
@@ -49,7 +51,7 @@ fun HomeCard(
         ) {
             Card(
                 modifier = Modifier
-                    .padding(LocalSpacing.current.smallMedium)
+                    .padding(imagePadding)
                     .width(imageWidth)
                     .aspectRatio(1f),
                 shape = MaterialTheme.shapes.medium,

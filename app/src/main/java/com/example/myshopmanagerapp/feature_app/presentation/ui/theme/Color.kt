@@ -8,6 +8,7 @@ val Purple700 = Color(0xFF3700B3)
 val Teal200 = Color(0xFF03DAC5)
 
 
+val Green5 = Color(0xFF001400)
 val Green10 = Color(0xFF003300)
 val Green20 = Color(0xFF006600)
 val Green30 = Color(0xFF009900)
@@ -56,6 +57,7 @@ val Blue90 = Color(0xFFCCCCFF)
 val Blue95 = Color(0xFFE6E6FF)
 
 
+val Red5 = Color(0xFF150000)
 val Red10 = Color(0xFF330000)
 val Red20 = Color(0xFF660000)
 val Red30 = Color(0xFF990000)
@@ -138,6 +140,7 @@ val DimViolet90 = Color(0xFFF5D6EB)
 val DimViolet95 = Color(0xFFFAEAF5)
 
 
+val Grey5 = Color(0xFF0C0C0C)
 val Grey10 = Color(0xFF1A1A1A)
 val Grey13 = Color(0xFF141414)
 val Grey15 = Color(0xFF232323)

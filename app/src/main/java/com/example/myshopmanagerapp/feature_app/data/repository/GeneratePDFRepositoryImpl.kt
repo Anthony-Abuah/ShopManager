@@ -6,18 +6,16 @@ import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import android.graphics.pdf.PdfDocument.PageInfo
 import com.example.myshopmanagerapp.R
-import com.example.myshopmanagerapp.core.ChangesEntityMarkers
+import com.example.myshopmanagerapp.core.*
 import com.example.myshopmanagerapp.core.Functions.generateReceiptId
 import com.example.myshopmanagerapp.core.Functions.shortened
 import com.example.myshopmanagerapp.core.Functions.toDate
 import com.example.myshopmanagerapp.core.Functions.toDateString
 import com.example.myshopmanagerapp.core.Functions.toEllipses
 import com.example.myshopmanagerapp.core.Functions.toNotNull
-import com.example.myshopmanagerapp.core.ReceiptEntities
-import com.example.myshopmanagerapp.core.Resource
+import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
 import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
 import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIdsJson
-import com.example.myshopmanagerapp.core.AdditionEntityMarkers
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.entities.receipt.ReceiptDao
 import com.example.myshopmanagerapp.feature_app.data.local.entities.receipt.ReceiptEntity
@@ -52,25 +50,46 @@ class GeneratePDFRepositoryImpl(
     override suspend fun addReceipt(receipt: ReceiptEntity): Flow<Resource<String?>> = flow{
         emit(Resource.Loading())
         try {
+            val context = MyShopManagerApp.applicationContext()
+            val userPreferences = UserPreferences(context)
+            val personnel = userPreferences.getPersonnelInfo.first().toPersonnelEntity()
             val date = receipt.date
             val customerName = receipt.customerName
             val uniqueReceiptId = generateReceiptId(date, customerName)
             val allReceipts = receiptDao.getAllReceipts() ?: emptyList()
             val allReceiptIds = allReceipts.map { it.uniqueReceiptId }
-            if (allReceiptIds.contains(uniqueReceiptId)){
-                emit(Resource.Error(
-                    data = "Auto generated receipt id already exists. \nPlease try again",
-                    message = "Couldn't create receipt"
-                ))
-            }else{
-                val receiptInfo = receipt.copy(uniqueReceiptId = uniqueReceiptId)
-                receiptDao.addReceipt(receiptInfo)
-                val context = MyShopManagerApp.applicationContext()
-                val addedReceiptIdsJson = AdditionEntityMarkers(context).getAddedReceiptIds.first().toNotNull()
-                val addedReceiptIds = addedReceiptIdsJson.toUniqueIds().plus(UniqueId(receipt.uniqueReceiptId)).toSet().toList()
-                AdditionEntityMarkers(context).saveAddedReceiptIds(addedReceiptIds.toUniqueIdsJson())
-                emit(Resource.Success("Receipt successfully saved"))
+
+            when(true){
+                receipt.items.isEmpty() ->{
+                    emit(Resource.Error(
+                        data = "Auto generated receipt id already exists. \nPlease try again",
+                        message = "Couldn't create receipt"
+                    ))
+                }
+                (allReceiptIds.contains(uniqueReceiptId)) ->{
+                    emit(Resource.Error(
+                        data = "Auto generated receipt id already exists. \nPlease try again",
+                        message = "Couldn't create receipt"
+                    ))
+                }
+                (personnel == null) ->{
+                    emit(Resource.Error(
+                        data = "Could not get personnel.\nPlease log in as personnel to generate this receipt",
+                        message = "Couldn't create receipt"
+                    ))
+                }
+                else-> {
+                    val personnelName = "${personnel.lastName} ${personnel.firstName} ${personnel.otherNames}"
+                    val personnelRole = personnel.role.toNotNull()
+                    val receiptInfo = receipt.copy(uniqueReceiptId = uniqueReceiptId, personnelName = personnelName, personnelRole = personnelRole)
+                    receiptDao.addReceipt(receiptInfo)
+                    val addedReceiptIdsJson = AdditionEntityMarkers(context).getAddedReceiptIds.first().toNotNull()
+                    val addedReceiptIds = addedReceiptIdsJson.toUniqueIds().plus(UniqueId(receipt.uniqueReceiptId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedReceiptIds(addedReceiptIds.toUniqueIdsJson())
+                    emit(Resource.Success("Receipt successfully saved"))
+                }
             }
+
         }catch (e: Exception){
             emit(Resource.Error(
                 data = "${e.message}",
@@ -84,27 +103,51 @@ class GeneratePDFRepositoryImpl(
         emit(Resource.Loading())
         try {
             val context = MyShopManagerApp.applicationContext()
-            val date = receipt.date
-            val customerName = receipt.customerName
-            val uniqueReceiptId = generateReceiptId(date, customerName)
-            val allReceipts = receiptDao.getAllReceipts() ?: emptyList()
-            val allReceiptIds = allReceipts.map { it.uniqueReceiptId }.toSet().toList().minus(receipt.uniqueReceiptId)
-            if (allReceiptIds.contains(uniqueReceiptId)){
-                emit(Resource.Error(
-                    data = "Auto generated receipt id already exists. \nPlease try again",
-                    message = "Couldn't update receipt"
-                ))
-            }else{
-                val receiptInfo = receipt.copy(uniqueReceiptId = uniqueReceiptId)
-                receiptDao.updateReceipt(receiptInfo)
-                val addedReceiptIdsJson = AdditionEntityMarkers(context).getAddedReceiptIds.first().toNotNull()
-                val addedReceiptIds = addedReceiptIdsJson.toUniqueIds().plus(UniqueId(receipt.uniqueReceiptId)).toSet().toList()
-                AdditionEntityMarkers(context).saveAddedReceiptIds(addedReceiptIds.toUniqueIdsJson())
+            val userPreferences = UserPreferences(context)
+            val personnel = userPreferences.getPersonnelInfo.first().toPersonnelEntity()
 
-                val updatedReceiptIdsJson = ChangesEntityMarkers(context).getChangedReceiptIds.first().toNotNull()
-                val updatedReceiptIds = updatedReceiptIdsJson.toUniqueIds().plus(UniqueId(receipt.uniqueReceiptId)).toSet().toList()
-                ChangesEntityMarkers(context).saveChangedReceiptIds(updatedReceiptIds.toUniqueIdsJson())
-                emit(Resource.Success("Receipt successfully updated"))
+            val oldReceipt = receiptDao.getReceipt(receipt.uniqueReceiptId)
+
+            when(true) {
+                receipt.items.isEmpty() -> {
+                    emit(
+                        Resource.Error(
+                            data = "Auto generated receipt id already exists. \nPlease try again",
+                            message = "Couldn't update receipt"
+                        )
+                    )
+                }
+                (oldReceipt == null) -> {
+                    emit(
+                        Resource.Error(
+                            data = "Could not load the details of the receipt you want to update. \nPlease try again",
+                            message = "Couldn't update receipt"
+                        )
+                    )
+                }
+                (personnel == null) -> {
+                    emit(
+                        Resource.Error(
+                            data = "Could not get personnel.\nPlease log in as personnel to generate this receipt",
+                            message = "Couldn't update receipt"
+                        )
+                    )
+                }
+                else -> {
+                    val personnelName = "${personnel.lastName} ${personnel.firstName} ${personnel.otherNames}"
+                    val personnelRole = personnel.role.toNotNull()
+                    val receiptInfo = receipt.copy( personnelName = personnelName, personnelRole = personnelRole)
+                    receiptDao.updateReceipt(receiptInfo)
+
+                    val addedReceiptIdsJson = AdditionEntityMarkers(context).getAddedReceiptIds.first().toNotNull()
+                    val addedReceiptIds = addedReceiptIdsJson.toUniqueIds().plus(UniqueId(receipt.uniqueReceiptId)).toSet().toList()
+                    AdditionEntityMarkers(context).saveAddedReceiptIds(addedReceiptIds.toUniqueIdsJson())
+
+                    val updatedReceiptIdsJson = ChangesEntityMarkers(context).getChangedReceiptIds.first().toNotNull()
+                    val updatedReceiptIds = updatedReceiptIdsJson.toUniqueIds().plus(UniqueId(receipt.uniqueReceiptId)).toSet().toList()
+                    ChangesEntityMarkers(context).saveChangedReceiptIds(updatedReceiptIds.toUniqueIdsJson())
+                    emit(Resource.Success("Receipt successfully updated"))
+                }
             }
         }catch (e: Exception){
             emit(Resource.Error(
@@ -194,7 +237,7 @@ class GeneratePDFRepositoryImpl(
             body.color = Color.WHITE
             body.textSize = 25f
             body.textAlign = Paint.Align.LEFT
-            canvas.drawText("ReceiptId: ", centerWidth, 175f, body)
+            canvas.drawText("Receipt Id: ", centerWidth, 175f, body)
             body.textAlign = Paint.Align.RIGHT
             canvas.drawText(receiptInfo.uniqueReceiptId, canvas.width.minus(30f), 175f, body)
 
@@ -211,7 +254,7 @@ class GeneratePDFRepositoryImpl(
             body.color = Color.BLACK
             body.textSize = 25f
             body.textAlign = Paint.Align.LEFT
-            canvas.drawText("Receipt: ", 25f, 227f, body)
+            canvas.drawText("Customer: ", 25f, 227f, body)
             canvas.drawText(receiptInfo.customerName.toEllipses(23), 150f, 227f, body)
 
 
@@ -234,10 +277,13 @@ class GeneratePDFRepositoryImpl(
             body.color = Color.WHITE
             body.textSize = 25f
             body.textAlign = Paint.Align.LEFT
+            title.color = Color.WHITE
+            title.textSize = 25f
+            title.textAlign = Paint.Align.RIGHT
             canvas.drawText("Qty", 25f, 277f, body)
             canvas.drawText("Item Name", 150f, 277f, body)
             canvas.drawText("Unit Cost", canvas.width.minus(300f), 277f, body)
-            canvas.drawText("Amount", canvas.width.minus(150f), 277f, body)
+            canvas.drawText("Amount", canvas.width.minus(30f), 277f, title)
 
             receiptInfo.items.forEachIndexed { index, item->
                 val newLine = index.plus(1).times(50f)
@@ -255,10 +301,13 @@ class GeneratePDFRepositoryImpl(
                 body.color = Color.BLACK
                 body.textSize = 25f
                 body.textAlign = Paint.Align.LEFT
+                title.color = Color.BLACK
+                title.textSize = 25f
+                title.textAlign = Paint.Align.RIGHT
                 canvas.drawText(item.quantity.shortened().toEllipses(10), 25f, newLine.plus(277f), body)
-                canvas.drawText(item.itemName.toEllipses(30), 150f, newLine.plus(277f), body)
+                canvas.drawText(item.itemName.toEllipses(25), 150f, newLine.plus(277f), body)
                 canvas.drawText(item.unitPrice.shortened().toEllipses(10), canvas.width.minus(300f), newLine.plus(277f), body)
-                canvas.drawText(item.amount.shortened().toEllipses(10), canvas.width.minus(150f), newLine.plus(277f), body)
+                canvas.drawText(item.amount.shortened().toEllipses(10), canvas.width.minus(30f), newLine.plus(277f), title)
 
             }
 

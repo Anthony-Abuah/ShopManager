@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.myshopmanagerapp.R
+import com.example.myshopmanagerapp.core.Constants.Delete
 import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.Functions.toTwoDecimalPlaces
 import com.example.myshopmanagerapp.feature_app.domain.model.ItemQuantityInfo
@@ -339,6 +340,7 @@ fun ReceiptItemsDisplayCardOnList(
     customerName: String,
     customerContact: String,
     receiptItems: List<ItemQuantityInfo>,
+    delete: () -> Unit = {},
     saveAsPDF: () -> Unit,
 ){
     val horizontalScrollState = rememberScrollState()
@@ -347,7 +349,9 @@ fun ReceiptItemsDisplayCardOnList(
     val contentColor = MaterialTheme.colorScheme.onSurface
     val fullWidth = (100 + 200 + 300).dp
     Card(
-        modifier = Modifier.wrapContentHeight()
+        modifier = Modifier
+            .width(fullWidth)
+            .wrapContentHeight()
             .background(backgroundColor),
         shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(
@@ -394,6 +398,7 @@ fun ReceiptItemsDisplayCardOnList(
                     )
                 }
             }
+
             // Customer info row
             Row(
                 modifier = Modifier
@@ -701,8 +706,9 @@ fun ReceiptItemsDisplayCardOnList(
                 }
             }
 
+            // Total Cost Row
             val totalCost = receiptItems.sumOf { it.amount }
-            Box(
+            Row(
                 modifier = Modifier
                     .background(backgroundColor)
                     .requiredWidth(fullWidth)
@@ -711,18 +717,55 @@ fun ReceiptItemsDisplayCardOnList(
                         LocalSpacing.current.divider,
                         contentColor
                     ),
-                contentAlignment = Alignment.CenterStart
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
             ) {
-                Text(
-                    modifier = Modifier.padding(LocalSpacing.current.small),
-                    text = "Total Cost: $currency $totalCost",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center
-                )
+                Box(modifier = Modifier
+                    .requiredWidth(450.dp)
+                    .fillMaxHeight(),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Text(
+                        modifier = Modifier.padding(LocalSpacing.current.small),
+                        text = "Total Cost: $currency $totalCost",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Center
+                    )
+                }
+                Row(modifier = Modifier
+                    .background(MaterialTheme.colorScheme.error)
+                    .requiredWidth(150.dp)
+                    .fillMaxHeight()
+                    .clickable { delete() },
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(modifier = Modifier
+                        .padding(LocalSpacing.current.small)
+                        .fillMaxHeight()
+                        .clickable { delete() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = Delete,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onError
+                        )
+                    }
+                    Box(modifier = Modifier
+                        .padding(LocalSpacing.current.small)
+                        .fillMaxHeight()
+                        .clickable { delete() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(imageVector = Icons.Default.Delete, contentDescription = emptyString, tint = MaterialTheme.colorScheme.onError)
+                    }
+                }
             }
 
         }

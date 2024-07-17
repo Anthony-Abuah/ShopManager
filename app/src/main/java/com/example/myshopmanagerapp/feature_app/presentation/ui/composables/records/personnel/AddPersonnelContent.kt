@@ -22,7 +22,7 @@ import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelNamePlacehol
 import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelRolePlaceholder
 import com.example.myshopmanagerapp.core.FormRelatedString.SavePersonnel
 import com.example.myshopmanagerapp.core.Functions.generateUniquePersonnelId
-import com.example.myshopmanagerapp.core.Functions.nameIsValid
+import com.example.myshopmanagerapp.core.Functions.textIsInvalid
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelRoles
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelRolesJson
@@ -86,7 +86,7 @@ fun AddPersonnelContent(
                 onValueChange = {
                     thisPersonnelFirstName = it
                     addFirstName(it)
-                    firstNameError = nameIsValid(it)
+                    firstNameError = textIsInvalid(it)
                 },
                 isError = firstNameError,
                 readOnly = false,
@@ -109,7 +109,7 @@ fun AddPersonnelContent(
                 value = thisPersonnelLastName,
                 onValueChange = {
                     thisPersonnelLastName = it
-                    lastNameError = nameIsValid(it)
+                    lastNameError = textIsInvalid(it)
                     addLastName(it)
                 },
                 isError = lastNameError,
@@ -134,7 +134,7 @@ fun AddPersonnelContent(
                 onValueChange = {
                     thisPersonnelOtherNames = it
                     otherNameError =
-                        if (thisPersonnelOtherNames.isNullOrEmpty()) false else nameIsValid(
+                        if (thisPersonnelOtherNames.isNullOrEmpty()) false else textIsInvalid(
                             it
                         )
                     addOtherNames(it)

@@ -18,7 +18,7 @@ import com.example.myshopmanagerapp.core.FormRelatedString.Date
 import com.example.myshopmanagerapp.core.FormRelatedString.DayOfTheWeek
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterReceiptId
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterShortDescription
-import com.example.myshopmanagerapp.core.FormRelatedString.EnterTotalCostPrice
+import com.example.myshopmanagerapp.core.FormRelatedString.EnterTotalAmount
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterUnitCostPrice
 import com.example.myshopmanagerapp.core.FormRelatedString.InventoryInformation
 import com.example.myshopmanagerapp.core.FormRelatedString.InventoryItemName
@@ -134,7 +134,7 @@ fun ViewInventoryContent(
             viewValue = "$currency ${inventory.totalCostPrice}",
             insideValue = inventory.totalCostPrice.toString(),
             placeholder = AmountPlaceholder,
-            label = EnterTotalCostPrice,
+            label = EnterTotalAmount,
             icon = R.drawable.ic_money_filled,
             getUpdatedValue = {
                 val unitCostPrice = convertToDouble(it).div(inventory.quantityInfo.getTotalNumberOfUnits())

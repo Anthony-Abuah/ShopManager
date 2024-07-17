@@ -17,6 +17,7 @@ import com.example.myshopmanagerapp.core.ReceiptEntities
 import com.example.myshopmanagerapp.feature_app.data.local.entities.receipt.ReceiptEntity
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenColumnWithoutBottomBar
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.ConfirmationInfoDialog
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.DeleteConfirmationDialog
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.UpdateConfirmationDialog
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
 
@@ -26,17 +27,29 @@ fun ReceiptListContent(
     allReceipts: ReceiptEntities,
     isLoading: Boolean,
     savePDFConfirmationMessage: String?,
+    deleteReceiptMessage: String?,
+    reloadAllReceipts: () -> Unit,
     navigateToUpdateReceipt: (String) -> Unit,
+    deleteReceipt: (String) -> Unit,
     saveAsPDF: (ReceiptEntity) -> Unit,
 ) {
     var receiptEntity by remember {
         mutableStateOf<ReceiptEntity?>(null)
     }
+    var uniqueReceiptId by remember {
+        mutableStateOf(emptyString)
+    }
+    var deleteConfirmationDialog by remember {
+        mutableStateOf(false)
+    }
     var savePDFConfirmation by remember {
         mutableStateOf(false)
     }
-    var savePDFConfirmationInfo by remember {
+    var openConfirmationInfoDialog by remember {
         mutableStateOf(false)
+    }
+    var confirmationInfoDialogMessage by remember {
+        mutableStateOf(emptyString)
     }
 
     if (isLoading) {
@@ -79,7 +92,14 @@ fun ReceiptListContent(
                         modifier = Modifier.padding(LocalSpacing.current.default),
                         contentAlignment = Alignment.Center
                     ) {
-                        ReceiptCard(receipt, navigateToUpdateReceipt ) {_receiptEntity ->
+                        ReceiptCard(
+                            receiptEntity = receipt,
+                            deleteReceipt = { _uniqueReceiptId->
+                                uniqueReceiptId = _uniqueReceiptId
+                                deleteConfirmationDialog = !deleteConfirmationDialog
+                            },
+                            navigateToUpdateReceiptScreen = navigateToUpdateReceipt,
+                        ) {_receiptEntity ->
                             receiptEntity = _receiptEntity
                             savePDFConfirmation = !savePDFConfirmation
                         }
@@ -94,6 +114,19 @@ fun ReceiptListContent(
             }
         }
     }
+    DeleteConfirmationDialog(
+        openDialog = deleteConfirmationDialog,
+        title = emptyString,
+        textContent = "Are you sure you want to delete this receipt?",
+        unconfirmedDeletedToastText = null,
+        confirmedDeleteToastText = null,
+        confirmDelete = {
+            deleteReceipt(uniqueReceiptId)
+            confirmationInfoDialogMessage = deleteReceiptMessage.toNotNull()
+            reloadAllReceipts()
+        }) {
+        deleteConfirmationDialog = false
+    }
 
     UpdateConfirmationDialog(
         openDialog = savePDFConfirmation,
@@ -101,20 +134,22 @@ fun ReceiptListContent(
         textContent = "Are you sure you want to save this receipt as PDF",
         unconfirmedUpdatedToastText = null,
         confirmedUpdatedToastText = null,
-        confirmUpdate = { saveAsPDF(receiptEntity!!)
-            savePDFConfirmationInfo = !savePDFConfirmationInfo
+        confirmUpdate = {
+            saveAsPDF(receiptEntity!!)
+            confirmationInfoDialogMessage = savePDFConfirmationMessage.toNotNull()
+            openConfirmationInfoDialog = !openConfirmationInfoDialog
         }) {
         savePDFConfirmation = false
     }
 
     ConfirmationInfoDialog(
-        openDialog = savePDFConfirmationInfo,
+        openDialog = openConfirmationInfoDialog,
         isLoading = false,
         title = null,
-        textContent = savePDFConfirmationMessage.toNotNull(),
+        textContent = confirmationInfoDialogMessage.toNotNull(),
         unconfirmedDeletedToastText = null,
         confirmedDeleteToastText = null
     ) {
-        savePDFConfirmationInfo = false
+        openConfirmationInfoDialog = false
     }
 }

@@ -275,7 +275,7 @@ fun MainRevenueReportContent(
                         contentAlignment = Alignment.Center
                     ) {
                         InfoDisplayCard(
-                            icon = R.drawable.payment,
+                            icon = R.drawable.debt_payment,
                             imageWidth = 32.dp,
                             currency = currency,
                             currencySize = 20.sp,

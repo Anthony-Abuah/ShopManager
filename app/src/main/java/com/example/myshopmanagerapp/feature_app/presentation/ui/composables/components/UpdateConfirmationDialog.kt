@@ -41,7 +41,7 @@ fun UpdateConfirmationDialog(
                     .padding(LocalSpacing.current.noPadding)
                     .fillMaxWidth(),
                 onDismissRequest = {
-                    unconfirmedUpdatedToastText?.let { Toast.makeText(context, it, Toast.LENGTH_LONG).show() }
+                    if (unconfirmedUpdatedToastText != null){ Toast.makeText(context, unconfirmedUpdatedToastText, Toast.LENGTH_LONG).show() }
                     closeDialog()
                 },
                 title = {
@@ -71,7 +71,7 @@ fun UpdateConfirmationDialog(
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            confirmedUpdatedToastText?.let { Toast.makeText(context, it, Toast.LENGTH_LONG).show() }
+                            if (confirmedUpdatedToastText != null){ Toast.makeText(context, confirmedUpdatedToastText, Toast.LENGTH_LONG).show() }
                             confirmUpdate()
                             closeDialog()
                         }

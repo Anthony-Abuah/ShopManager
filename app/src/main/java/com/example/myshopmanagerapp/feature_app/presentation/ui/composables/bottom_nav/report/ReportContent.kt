@@ -32,11 +32,12 @@ fun ReportContent(
         modifier = Modifier
             .fillMaxSize()
             .background(mainBackgroundColor)
-            .padding(LocalSpacing.current.noPadding),
-            //.verticalScroll(state = rememberScrollState(), enabled = true),
+            .padding(LocalSpacing.current.noPadding)
+            .verticalScroll(state = rememberScrollState(), enabled = true),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
     ) {
+        Spacer(modifier = Modifier.height(LocalSpacing.current.smallMedium))
         //General Report Card
         Box(
             modifier = Modifier
@@ -131,6 +132,7 @@ fun ReportContent(
                 navigateToViewInventoryReportScreen()
             }
         }
+        Spacer(modifier = Modifier.height(LocalSpacing.current.bottomNavBarSize))
 
     }
 }

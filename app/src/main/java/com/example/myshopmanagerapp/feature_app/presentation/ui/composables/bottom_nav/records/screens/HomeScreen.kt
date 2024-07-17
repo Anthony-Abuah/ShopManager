@@ -31,6 +31,8 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bott
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.records.HomeContent
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.records.screens.HomeNavDrawerItems.homeNavDrawerItems
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.HomeScreenTopBar
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.WindowInfo
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.rememberWindowInfo
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.BackupViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -51,8 +53,7 @@ fun HomeScreen(
     navigateToDebtListScreen: () -> Unit,
     navigateToDebtRepaymentListScreen: () -> Unit,
     navigateToWithdrawalListScreen: () -> Unit,
-    navigateToSavingsListScreen: () -> Unit,
-    navigateToInventoryItemListScreen: () -> Unit
+    navigateToSavingsListScreen: () -> Unit
 ) {
 
     val context = LocalContext.current
@@ -63,6 +64,9 @@ fun HomeScreen(
     val shopInfoJson = userPreferences.getShopInfo.collectAsState(initial = emptyString).value
     val shopInfo = shopInfoJson.toCompanyEntity()
 
+    val windowType = rememberWindowInfo().screenWidthInfo
+
+
     Surface(modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
@@ -71,96 +75,222 @@ fun HomeScreen(
         var selectedItemIndex by remember {
             mutableStateOf(0)
         }
+
         ModalNavigationDrawer(
-            modifier = Modifier,
+            modifier = Modifier.fillMaxWidth(),
             drawerContent = {
-                ModalDrawerSheet(modifier = Modifier.fillMaxWidth(0.8f)) {
-                    Column(modifier = Modifier
-                        .background(MaterialTheme.colorScheme.surface)
-                        .fillMaxWidth()
-                        .wrapContentHeight(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Top
-                    ){
-                        Image(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(LocalSpacing.current.default)
-                                .requiredHeight(120.dp),
-                            painter = painterResource(id = R.drawable.shop),
-                            contentDescription = emptyString
-                        )
-                        Spacer(modifier = Modifier.height(LocalSpacing.current.smallMedium))
-                        Box(modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
+                when(windowType){
+                    WindowInfo.WindowType.Compact->{
+                        ModalDrawerSheet(
+                            modifier = Modifier.fillMaxWidth(0.8f),
+                            windowInsets = WindowInsets.safeDrawing
                         ) {
-                            val companyName = shopInfo?.companyName?.replaceFirstChar {
-                                if (it.isLowerCase()) it.titlecase(Locale.getDefault())
-                                else it.toString()
+                            Column(
+                                modifier = Modifier
+                                    .background(MaterialTheme.colorScheme.surface)
+                                    .fillMaxWidth()
+                                    .wrapContentHeight(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Top
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(LocalSpacing.current.default)
+                                        .requiredHeight(120.dp),
+                                    painter = painterResource(id = R.drawable.shop),
+                                    contentDescription = emptyString
+                                )
+                                Spacer(modifier = Modifier.height(LocalSpacing.current.smallMedium))
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    val companyName = shopInfo?.companyName?.replaceFirstChar {
+                                        if (it.isLowerCase()) it.titlecase(Locale.getDefault())
+                                        else it.toString()
+                                    }
+                                    Text(
+                                        modifier = Modifier.padding(LocalSpacing.current.medium),
+                                        text = companyName ?: "Shop Manager",
+                                        style = MaterialTheme.typography.titleLarge,
+                                        overflow = TextOverflow.Ellipsis,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                    )
+                                }
                             }
-                            Text(
-                                modifier = Modifier.padding(LocalSpacing.current.medium),
-                                text = companyName ?: "Shop Manager",
-                                style = MaterialTheme.typography.titleLarge,
-                                overflow = TextOverflow.Ellipsis,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
+                            HorizontalDivider()
+
+                            Column(
+                                modifier = Modifier
+                                    .background(Color.Transparent)
+                                    .fillMaxWidth()
+                                    .fillMaxHeight(1f)
+                                    .verticalScroll(rememberScrollState()),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Top
+                            ) {
+                                Spacer(modifier = Modifier.height(LocalSpacing.current.medium))
+
+                                homeNavDrawerItems.forEachIndexed { index, navDrawerItem ->
+                                    Spacer(modifier = Modifier.height(LocalSpacing.current.small))
+
+                                    NavigationDrawerItem(
+                                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                                        label = { Text(text = navDrawerItem.title) },
+                                        selected = index == selectedItemIndex,
+                                        onClick = {
+                                            selectedItemIndex = index
+                                            coroutineScope.launch {
+                                                drawerState.close()
+                                                if (index < 3) {
+                                                    navDrawerItem.route?.let {
+                                                        navHostController.navigate(
+                                                            it
+                                                        )
+                                                    }
+                                                } else {
+                                                    navDrawerItem.route?.let {
+                                                        navController.navigate(
+                                                            it
+                                                        )
+                                                    }
+                                                }
+
+                                                if (navDrawerItem.title == "Back up") {
+                                                    backupViewModel.absoluteRemoteBackup()
+                                                }
+                                            }
+                                        },
+                                        icon = {
+                                            Icon(
+                                                painter = painterResource(
+                                                    id = if (index == selectedItemIndex) navDrawerItem.selectedIcon
+                                                    else navDrawerItem.unselectedIcon
+                                                ),
+                                                contentDescription = navDrawerItem.title
+                                            )
+                                        },
+                                        badge = {
+                                            navDrawerItem.badgeCount?.let { Text(text = it) }
+                                        }
+                                    )
+
+                                    Spacer(modifier = Modifier.height(LocalSpacing.current.small))
+
+                                    if (index == 2 || index == 9) {
+                                        HorizontalDivider()
+                                        Spacer(modifier = Modifier.height(LocalSpacing.current.small))
+                                    }
+                                }
+                            }
                         }
                     }
-                    HorizontalDivider(
-                        color = MaterialTheme.colorScheme.onSurface,
-                        thickness = 0.25.dp,
-                    )
-
-                    Column(modifier = Modifier
-                        .background(Color.Transparent)
-                        .fillMaxWidth()
-                        .fillMaxHeight(1f)
-                        .verticalScroll(rememberScrollState()),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Top
-                    ) {
-                        Spacer(modifier = Modifier.height(LocalSpacing.current.medium))
-
-                        homeNavDrawerItems.forEachIndexed { index, navDrawerItem ->
-                            Spacer(modifier = Modifier.height(LocalSpacing.current.small))
-
-                            NavigationDrawerItem(
-                                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-                                label = { Text(text = navDrawerItem.title) },
-                                selected = index == selectedItemIndex,
-                                onClick = {
-                                    selectedItemIndex = index
-                                    coroutineScope.launch {
-                                        drawerState.close()
-                                        if (index<3) { navDrawerItem.route?.let { navHostController.navigate(it) } }
-                                        else { navDrawerItem.route?.let { navController.navigate(it) } }
-
-                                        if (navDrawerItem.title == "Back up"){
-                                            backupViewModel.absoluteRemoteBackup()
-                                        }
+                    else->{
+                        ModalDrawerSheet(
+                            modifier = Modifier,
+                            windowInsets = WindowInsets.safeDrawing
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .background(MaterialTheme.colorScheme.surface)
+                                    .fillMaxWidth()
+                                    .wrapContentHeight(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Top
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(LocalSpacing.current.default)
+                                        .requiredHeight(120.dp),
+                                    painter = painterResource(id = R.drawable.shop),
+                                    contentDescription = emptyString
+                                )
+                                Spacer(modifier = Modifier.height(LocalSpacing.current.smallMedium))
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    val companyName = shopInfo?.companyName?.replaceFirstChar {
+                                        if (it.isLowerCase()) it.titlecase(Locale.getDefault())
+                                        else it.toString()
                                     }
-                                },
-                                icon = {
-                                    Icon(
-                                        painter = painterResource(
-                                            id = if (index == selectedItemIndex) navDrawerItem.selectedIcon
-                                            else navDrawerItem.unselectedIcon
-                                        ),
-                                        contentDescription = navDrawerItem.title
+                                    Text(
+                                        modifier = Modifier.padding(LocalSpacing.current.medium),
+                                        text = companyName ?: "Shop Manager",
+                                        style = MaterialTheme.typography.titleLarge,
+                                        overflow = TextOverflow.Ellipsis,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface,
                                     )
-                                },
-                                badge = {
-                                    navDrawerItem.badgeCount?.let { Text(text = it) }
                                 }
-                            )
+                            }
+                            HorizontalDivider()
 
-                            Spacer(modifier = Modifier.height(LocalSpacing.current.small))
+                            Column(
+                                modifier = Modifier
+                                    .background(Color.Transparent)
+                                    .fillMaxWidth()
+                                    .fillMaxHeight(1f)
+                                    .verticalScroll(rememberScrollState()),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Top
+                            ) {
+                                Spacer(modifier = Modifier.height(LocalSpacing.current.medium))
 
-                            if (index == 2 || index == 8 ){
-                                HorizontalDivider()
-                                Spacer(modifier = Modifier.height(LocalSpacing.current.small))
+                                homeNavDrawerItems.forEachIndexed { index, navDrawerItem ->
+                                    Spacer(modifier = Modifier.height(LocalSpacing.current.small))
+
+                                    NavigationDrawerItem(
+                                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                                        label = { Text(text = navDrawerItem.title) },
+                                        selected = index == selectedItemIndex,
+                                        onClick = {
+                                            selectedItemIndex = index
+                                            coroutineScope.launch {
+                                                drawerState.close()
+                                                if (index < 3) {
+                                                    navDrawerItem.route?.let {
+                                                        navHostController.navigate(
+                                                            it
+                                                        )
+                                                    }
+                                                } else {
+                                                    navDrawerItem.route?.let {
+                                                        navController.navigate(
+                                                            it
+                                                        )
+                                                    }
+                                                }
+
+                                                if (navDrawerItem.title == "Back up") {
+                                                    backupViewModel.absoluteRemoteBackup()
+                                                }
+                                            }
+                                        },
+                                        icon = {
+                                            Icon(
+                                                painter = painterResource(
+                                                    id = if (index == selectedItemIndex) navDrawerItem.selectedIcon
+                                                    else navDrawerItem.unselectedIcon
+                                                ),
+                                                contentDescription = navDrawerItem.title
+                                            )
+                                        },
+                                        badge = {
+                                            navDrawerItem.badgeCount?.let { Text(text = it) }
+                                        }
+                                    )
+
+                                    Spacer(modifier = Modifier.height(LocalSpacing.current.small))
+
+                                    if (index == 2 || index == 9) {
+                                        HorizontalDivider()
+                                        Spacer(modifier = Modifier.height(LocalSpacing.current.small))
+                                    }
+                                }
                             }
                         }
                     }
@@ -169,18 +299,19 @@ fun HomeScreen(
             drawerState = drawerState
         ) {
             val scaffoldState = rememberScaffoldState()
-            LaunchedEffect(key1 = true ){
-                backupViewModel.eventFlow.collectLatest { event->
-                    when(event){
+
+            LaunchedEffect(key1 = true) {
+                backupViewModel.eventFlow.collectLatest { event ->
+                    when (event) {
                         is UIEvent.ShowSnackBar -> {
                             scaffoldState.snackbarHostState.showSnackbar(
                                 message = event.message
                             )
                         }
-                        else -> {}
                     }
                 }
             }
+
             Scaffold(
                 scaffoldState = scaffoldState,
                 topBar = {
@@ -188,8 +319,12 @@ fun HomeScreen(
                         topBarTitleText = "Records",
                         personnelUserName = personnel?.userName.toNotNull(),
                         personnelIcon = if (personnelIsLoggedIn) R.drawable.ic_person_filled else R.drawable.ic_logged_out_personnel,
-                        navigateToPersonnelNavGraph = { navigateToPersonnelNavGraph(personnelIsLoggedIn) },
-                        ) {
+                        navigateToPersonnelNavGraph = {
+                            navigateToPersonnelNavGraph(
+                                personnelIsLoggedIn
+                            )
+                        },
+                    ) {
                         coroutineScope.launch {
                             drawerState.open()
                         }
@@ -205,17 +340,17 @@ fun HomeScreen(
                     HomeContent(
                         navigateToRevenueListScreen = navigateToRevenueListScreen,
                         navigateToExpenseListScreen = navigateToExpenseListScreen,
-                        navigateToInventoryItemListScreen = navigateToInventoryItemListScreen,
                         navigateToInventoryListScreen = navigateToInventoryListScreen,
-                        navigateToStockListScreen = navigateToStockListScreen,
                         navigateToDebtListScreen = navigateToDebtListScreen,
                         navigateToDebtRepaymentListScreen = navigateToDebtRepaymentListScreen,
                         navigateToSavingsListScreen = navigateToSavingsListScreen,
                         navigateToWithdrawalListScreen = navigateToWithdrawalListScreen,
+                        navigateToStockListScreen = navigateToStockListScreen,
                     )
                 }
             }
-        }
 
+
+        }
     }
 }

@@ -17,7 +17,6 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.*
 fun HomeContent(
     navigateToRevenueListScreen: () -> Unit,
     navigateToExpenseListScreen: () -> Unit,
-    navigateToInventoryItemListScreen: () -> Unit,
     navigateToInventoryListScreen: () -> Unit,
     navigateToDebtListScreen: () -> Unit,
     navigateToDebtRepaymentListScreen: () -> Unit,
@@ -92,32 +91,13 @@ fun HomeContent(
             HomeCard(
                 title = "Inventory",
                 description = "Manage all your inventory info",
-                icon = R.drawable.inventory_item,
+                icon = R.drawable.inventory,
                 descriptionColor = descriptionColor,
                 titleColor = titleColor,
                 cardContainerColor = cardBackgroundColor,
                 cardShadowColor = shadowColor
             ) {
                 navigateToInventoryListScreen()
-            }
-        }
-
-        //Inventory Item Card
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(LocalSpacing.current.small),
-        ) {
-            HomeCard(
-                title = "Inventory Item",
-                description = "Manage all your inventory items",
-                icon = R.drawable.inventory_item,
-                descriptionColor = descriptionColor,
-                titleColor = titleColor,
-                cardContainerColor = cardBackgroundColor,
-                cardShadowColor = shadowColor
-            ) {
-                navigateToInventoryItemListScreen()
             }
         }
 
@@ -130,7 +110,7 @@ fun HomeContent(
             HomeCard(
                 title = "Stock",
                 description = "Manage all your stock info",
-                icon = R.drawable.cash,
+                icon = R.drawable.stock,
                 descriptionColor = descriptionColor,
                 titleColor = titleColor,
                 cardContainerColor = cardBackgroundColor,
@@ -168,7 +148,7 @@ fun HomeContent(
             HomeCard(
                 title = "Debt Repayment",
                 description = "Manage all your debt repayment info",
-                icon = R.drawable.payment,
+                icon = R.drawable.debt_payment,
                 descriptionColor = descriptionColor,
                 titleColor = titleColor,
                 cardContainerColor = cardBackgroundColor,

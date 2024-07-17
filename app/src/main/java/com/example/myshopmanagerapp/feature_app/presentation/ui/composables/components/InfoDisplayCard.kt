@@ -32,9 +32,11 @@ fun InfoDisplayCard(
     currencyColor: Color = MaterialTheme.colorScheme.onBackground,
     bigText: String,
     bigTextSize: TextUnit,
+    bigTextFontWeight: FontWeight = FontWeight.ExtraBold,
     bigTextColor: Color = MaterialTheme.colorScheme.onBackground,
     smallText: String,
     smallTextSize: TextUnit,
+    smallTextFontWeight: FontWeight = FontWeight.SemiBold,
     smallTextColor: Color = MaterialTheme.colorScheme.onBackground,
     shape: Shape = MaterialTheme.shapes.large,
     elevation: Dp = LocalSpacing.current.noElevation,
@@ -91,7 +93,7 @@ fun InfoDisplayCard(
                     text = bigText,
                     textAlign = TextAlign.Center,
                     fontSize = bigTextSize,
-                    fontWeight = FontWeight.ExtraBold,
+                    fontWeight = bigTextFontWeight,
                     overflow = TextOverflow.Ellipsis,
                     color = bigTextColor
                 )
@@ -106,7 +108,7 @@ fun InfoDisplayCard(
                     text = smallText,
                     textAlign = TextAlign.Center,
                     fontSize = smallTextSize,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = smallTextFontWeight,
                     overflow = TextOverflow.Ellipsis,
                     color = smallTextColor
                 )
@@ -160,7 +162,7 @@ fun HorizontalInfoDisplayCard(
 
             Box(
                 modifier = Modifier
-                    .weight(name.length.toFloat())
+                    .weight(name.length.plus(1).toFloat())
                     .padding(LocalSpacing.current.small),
                 contentAlignment = Alignment.CenterStart
             ) {

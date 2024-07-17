@@ -82,17 +82,14 @@ fun HomeNavGraph(
                 navigateToDebtListScreen = {
                     navController.navigate(HomeScreens.DebtNavGraph.route)
                 },
-                navigateToWithdrawalListScreen = {
-                    navController.navigate(HomeScreens.WithdrawalNavGraph.route)
-                },
-                navigateToSavingsListScreen = {
-                    navController.navigate(HomeScreens.SavingsNavGraph.route)
-                },
                 navigateToDebtRepaymentListScreen = {
                     navController.navigate(HomeScreens.DebtRepaymentNavGraph.route)
                 },
+                navigateToWithdrawalListScreen = {
+                    navController.navigate(HomeScreens.WithdrawalNavGraph.route)
+                },
             ) {
-                navController.navigate(HomeScreens.InventoryItemNavGraph.route)
+                navController.navigate(HomeScreens.SavingsNavGraph.route)
             }
         }
 
@@ -136,7 +133,8 @@ fun HomeNavGraph(
                         easing = LinearOutSlowInEasing
                     )
                 ) + fadeOut(animationSpec = tween(500))
-            }){
+            }
+        ){
             PersonnelProfileNavGraph(isLoggedIn = isLoggedIn,
                 navController = navController)
         }

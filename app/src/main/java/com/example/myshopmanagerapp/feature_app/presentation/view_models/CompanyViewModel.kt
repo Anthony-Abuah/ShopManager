@@ -46,6 +46,9 @@ class CompanyViewModel @Inject constructor(
     var receiptInfo by mutableStateOf(ReceiptEntity(0, emptyString, emptyString, emptyString, emptyString, Date().time, emptyString, emptyString, emptyString, emptyString, emptyList(), 0.0))
         private set
 
+    var updateReceiptInfo by mutableStateOf(ReceiptEntity(0, emptyString, emptyString, emptyString, emptyString, Date().time, emptyString, emptyString, emptyString, emptyString, emptyList(), 0.0))
+        private set
+
     var addPersonnelInfo by mutableStateOf(PersonnelEntity(0, emptyString, emptyString, emptyString, emptyString, emptyString,"1234", emptyString, emptyString,emptyString, emptyString, false))
         private set
 
@@ -71,6 +74,12 @@ class CompanyViewModel @Inject constructor(
 
     private val _addReceiptState = mutableStateOf(AddCompanyState())
     val addReceiptState: State<AddCompanyState> = _addReceiptState
+
+    private val _updateReceiptState = mutableStateOf(AddCompanyState())
+    val updateReceiptState: State<AddCompanyState> = _updateReceiptState
+
+    private val _deleteReceiptState = mutableStateOf(AddCompanyState())
+    val deleteReceiptState: State<AddCompanyState> = _deleteReceiptState
 
     private val _generateInvoiceState = mutableStateOf(AddCompanyState())
     val generateInvoiceState: State<AddCompanyState> = _generateInvoiceState
@@ -188,7 +197,7 @@ class CompanyViewModel @Inject constructor(
     }
 
     fun getReceipt(uniqueReceiptId: String) = viewModelScope.launch {
-        receiptInfo = generatePDFRepository.getReceipt(uniqueReceiptId) ?: receiptInfo
+        updateReceiptInfo = generatePDFRepository.getReceipt(uniqueReceiptId) ?: updateReceiptInfo
     }
 
     fun registerShopAccount(company: CompanyEntity, passwordConfirmation: String) = viewModelScope.launch {
@@ -197,6 +206,37 @@ class CompanyViewModel @Inject constructor(
 
     fun changePassword(currentPassword: String, newPassword: String, confirmedPassword: String) = viewModelScope.launch {
         companyRepository.changePassword(currentPassword, newPassword, confirmedPassword)
+    }
+
+    fun updateReceipt() = viewModelScope.launch {
+        generatePDFRepository.updateReceipt(updateReceiptInfo).onEach { response->
+            when(response){
+                is Resource.Success ->{
+                    _updateReceiptState.value = updateReceiptState.value.copy(
+                        data = response.data.toNotNull(),
+                        message = response.data.toNotNull(),
+                        isSuccessful = true,
+                        isLoading = false
+                    )
+                }
+                is Resource.Loading ->{
+                    _updateReceiptState.value = updateReceiptState.value.copy(
+                        data = response.data.toNotNull(),
+                        message = response.data.toNotNull(),
+                        isSuccessful = false,
+                        isLoading = true
+                    )
+                }
+                is Resource.Error ->{
+                    _updateReceiptState.value = updateReceiptState.value.copy(
+                        data = response.data.toNotNull(),
+                        message = response.message.toNotNull(),
+                        isSuccessful = false,
+                        isLoading = false
+                    )
+                }
+            }
+        }.launchIn(this)
     }
 
     fun generateReceipt() = viewModelScope.launch {
@@ -220,6 +260,37 @@ class CompanyViewModel @Inject constructor(
                 }
                 is Resource.Error ->{
                     _addReceiptState.value = addReceiptState.value.copy(
+                        data = response.data.toNotNull(),
+                        message = response.message.toNotNull(),
+                        isSuccessful = false,
+                        isLoading = false
+                    )
+                }
+            }
+        }.launchIn(this)
+    }
+
+    fun deleteReceipt(uniqueReceiptId: String) = viewModelScope.launch {
+        generatePDFRepository.deleteReceipt(uniqueReceiptId).onEach { response->
+            when(response){
+                is Resource.Success ->{
+                    _deleteReceiptState.value = deleteReceiptState.value.copy(
+                        data = response.data.toNotNull(),
+                        message = response.data.toNotNull(),
+                        isSuccessful = true,
+                        isLoading = false
+                    )
+                }
+                is Resource.Loading ->{
+                    _deleteReceiptState.value = deleteReceiptState.value.copy(
+                        data = response.data.toNotNull(),
+                        message = response.data.toNotNull(),
+                        isSuccessful = false,
+                        isLoading = true
+                    )
+                }
+                is Resource.Error ->{
+                    _deleteReceiptState.value = deleteReceiptState.value.copy(
                         data = response.data.toNotNull(),
                         message = response.message.toNotNull(),
                         isSuccessful = false,
@@ -514,24 +585,10 @@ class CompanyViewModel @Inject constructor(
         )
     }
 
-    fun addReceiptPersonnel(name: String, role: String) {
-        receiptInfo = receiptInfo.copy(
-            personnelName = name
-        )
-        receiptInfo = receiptInfo.copy(
-            personnelRole = role
-        )
-    }
 
     fun addReceiptItems(items: List<ItemQuantityInfo>) {
         receiptInfo = receiptInfo.copy(
             items = items
-        )
-    }
-
-    fun addReceiptTotalAmount(amount: Double) {
-        receiptInfo = receiptInfo.copy(
-            totalAmount = amount
         )
     }
 
@@ -586,6 +643,42 @@ class CompanyViewModel @Inject constructor(
             hasAdminRights = rights
         )
     }
+
+
+    fun updateReceiptShopInfo(name: String, contact: String, location: String) {
+        updateReceiptInfo = updateReceiptInfo.copy(
+            shopName = name
+        )
+        updateReceiptInfo = updateReceiptInfo.copy(
+            shopLocation = location
+        )
+        updateReceiptInfo = updateReceiptInfo.copy(
+            shopContact = contact
+        )
+    }
+
+    fun updateReceiptCustomer(name: String, contact: String) {
+        updateReceiptInfo = updateReceiptInfo.copy(
+            customerName = name
+        )
+        updateReceiptInfo = updateReceiptInfo.copy(
+            customerContact = contact
+        )
+    }
+
+    fun updateReceiptDate(date: Long) {
+        updateReceiptInfo = updateReceiptInfo.copy(
+            date = date
+        )
+    }
+
+
+    fun updateReceiptItems(items: List<ItemQuantityInfo>) {
+        updateReceiptInfo = updateReceiptInfo.copy(
+            items = items
+        )
+    }
+
 
 
 }

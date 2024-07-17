@@ -25,7 +25,7 @@ import com.example.myshopmanagerapp.core.FormRelatedString.SupplierRoleNotAdded
 import com.example.myshopmanagerapp.core.FormRelatedString.SupplierRolePlaceholder
 import com.example.myshopmanagerapp.core.FormRelatedString.SupplierShortNotesPlaceholder
 import com.example.myshopmanagerapp.core.Functions.generateUniqueSupplierId
-import com.example.myshopmanagerapp.core.Functions.nameIsValid
+import com.example.myshopmanagerapp.core.Functions.textIsInvalid
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.TypeConverters.toSupplierRoles
 import com.example.myshopmanagerapp.core.TypeConverters.toSupplierRolesJson
@@ -79,7 +79,7 @@ fun AddSupplierContent(
                 onValueChange = {
                     supplierName = it
                     addSupplierName(it)
-                    supplierNameError = nameIsValid(it)
+                    supplierNameError = textIsInvalid(it)
                 },
                 isError = false,
                 readOnly = false,

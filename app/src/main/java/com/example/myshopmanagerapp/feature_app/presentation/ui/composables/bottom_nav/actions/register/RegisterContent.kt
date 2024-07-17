@@ -37,7 +37,7 @@ import com.example.myshopmanagerapp.core.FormRelatedString.EnterCompanyOwner
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterPassword
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterCompanyProducts
 import com.example.myshopmanagerapp.core.FormRelatedString.SaveCompany
-import com.example.myshopmanagerapp.core.Functions.nameIsValid
+import com.example.myshopmanagerapp.core.Functions.textIsInvalid
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.feature_app.data.local.entities.company.CompanyEntity
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.*
@@ -158,7 +158,7 @@ fun RegisterContent(
                         companyName = it
                         addCompanyName(companyName)
                     },
-                    isError = nameIsValid(companyName),
+                    isError = textIsInvalid(companyName),
                     readOnly = false,
                     placeholder = CompanyNamePlaceholder,
                     label = EnterCompanyName,
@@ -204,7 +204,7 @@ fun RegisterContent(
                         companyLocation = it
                         addCompanyLocation(companyLocation)
                     },
-                    isError = nameIsValid(companyLocation),
+                    isError = textIsInvalid(companyLocation),
                     readOnly = false,
                     placeholder = CompanyLocationPlaceholder,
                     label = EnterCompanyLocation,

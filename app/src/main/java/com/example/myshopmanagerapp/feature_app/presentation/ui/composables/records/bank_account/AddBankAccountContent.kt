@@ -21,7 +21,7 @@ import com.example.myshopmanagerapp.core.FormRelatedString.EnterBankContact
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterBankLocation
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterBankName
 import com.example.myshopmanagerapp.core.FormRelatedString.SaveBank
-import com.example.myshopmanagerapp.core.Functions.nameIsValid
+import com.example.myshopmanagerapp.core.Functions.textIsInvalid
 import com.example.myshopmanagerapp.core.Functions.generateUniqueBankId
 import com.example.myshopmanagerapp.feature_app.data.local.entities.banks.BankAccountEntity
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.*
@@ -61,7 +61,7 @@ fun AddBankAccountContent(
                     value = bankAccountName,
                     onValueChange = {
                         bankAccountName = it
-                        bankAccountNameIsInvalid = nameIsValid(it)
+                        bankAccountNameIsInvalid = textIsInvalid(it)
                     },
                     readOnly = false,
                     isError = bankAccountNameIsInvalid,
@@ -80,7 +80,7 @@ fun AddBankAccountContent(
                     value = bankName,
                     onValueChange = {
                         bankName = it
-                        bankNameIsInvalid = nameIsValid(it)
+                        bankNameIsInvalid = textIsInvalid(it)
                     },
                     readOnly = false,
                     isError = bankNameIsInvalid,

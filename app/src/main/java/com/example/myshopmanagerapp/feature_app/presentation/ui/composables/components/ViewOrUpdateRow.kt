@@ -26,7 +26,7 @@ import com.example.myshopmanagerapp.core.Constants.Zero
 import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.FormRelatedString.SelectDate
 import com.example.myshopmanagerapp.core.Functions.amountIsNotValid
-import com.example.myshopmanagerapp.core.Functions.nameIsValid
+import com.example.myshopmanagerapp.core.Functions.textIsInvalid
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
 
 @Composable
@@ -127,7 +127,7 @@ fun ViewOrUpdateTextValueRow(
                         value = updatedValue,
                         onValueChange = {
                             updatedValue = it
-                            nameIsInvalid = nameIsValid(it)
+                            nameIsInvalid = textIsInvalid(it)
                         },
                         isError = nameIsInvalid,
                         readOnly = false,
