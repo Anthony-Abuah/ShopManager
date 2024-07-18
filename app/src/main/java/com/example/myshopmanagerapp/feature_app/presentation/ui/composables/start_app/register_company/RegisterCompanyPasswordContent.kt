@@ -129,8 +129,10 @@ fun RegisterCompanyPasswordContent(
             contentAlignment = Alignment.Center
         ) {
             BasicButton(buttonName = SaveCompany) {
-                addCompany(company)
-                confirmationInfoDialog = !confirmationInfoDialog
+                if (!(company.email.isEmpty() || company.password.isEmpty())) {
+                    addCompany(company)
+                    confirmationInfoDialog = !confirmationInfoDialog
+                }
             }
 
         }

@@ -16,9 +16,7 @@ fun RegisterCompanyInfoScreen(
     companyViewModel: CompanyViewModel,
     navigateToNextScreen: () -> Unit,
 ) {
-
     Scaffold(
-        // topBar = { FirstScreenTopBar(topBarTitleText = "Company Info") }
     ){
         Column(modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -29,7 +27,7 @@ fun RegisterCompanyInfoScreen(
                 addCompanyName = {name-> companyViewModel.addCompanyName(name.trim())},
                 addCompanyContact = {contact-> companyViewModel.addCompanyContact(contact.trim())},
                 addCompanyLocation = {location-> companyViewModel.addCompanyLocation(location.trim())},
-                navigateToNextScreen = navigateToNextScreen,
+                navigateToNextScreen = navigateToNextScreen
             )
         }
     }

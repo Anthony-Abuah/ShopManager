@@ -1,6 +1,8 @@
 package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.start_app.login_personnel
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
@@ -17,12 +19,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.myshopmanagerapp.R
 import com.example.myshopmanagerapp.core.Constants.emptyString
-import com.example.myshopmanagerapp.core.FormRelatedString.EnterCompanyEmail
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterPassword
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterPersonnelUserName
 import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelNamePlaceholder
 import com.example.myshopmanagerapp.core.Functions.toNotNull
-import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.*
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicTextFieldWithTrailingIconError
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.ConfirmationInfoDialog
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.PasswordTextField
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
 
 

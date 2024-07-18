@@ -39,6 +39,8 @@ interface CompanyRepository {
 
     suspend fun deleteAllCompanies()
 
+    fun restartApp()
+
     /*
     suspend fun syncCompanyInfo()
 

@@ -12,7 +12,6 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.comp
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.start_app.login_personnel.LoginPersonnelContent
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.CompanyViewModel
 
-
 @Composable
 fun LoginPersonnelScreen(
     companyViewModel: CompanyViewModel,
@@ -37,7 +36,9 @@ fun LoginPersonnelScreen(
                 login = {userName, password->
                     companyViewModel.loginPersonnel(userName, password)
                 },
-                createNewAccount = { navigateToCreateNewAccount() }) {
+                createNewAccount = { navigateToCreateNewAccount() }
+            ) {
+                navigateToBottomNav()
             }
         }
     }

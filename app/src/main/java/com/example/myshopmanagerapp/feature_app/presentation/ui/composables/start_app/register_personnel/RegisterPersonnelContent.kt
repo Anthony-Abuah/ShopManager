@@ -23,6 +23,7 @@ import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelContactPlace
 import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelDescription
 import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelNamePlaceholder
 import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelRolePlaceholder
+import com.example.myshopmanagerapp.core.FormRelatedString.RegisterPersonnel
 import com.example.myshopmanagerapp.core.FormRelatedString.SavePersonnel
 import com.example.myshopmanagerapp.core.Functions.generateUniquePersonnelId
 import com.example.myshopmanagerapp.core.Functions.textIsInvalid
@@ -54,7 +55,6 @@ fun RegisterPersonnelContent(
     addAdminRights: (Boolean) -> Unit,
     addOtherInfo: (String) -> Unit,
     addPersonnel: (personnel: PersonnelEntity) -> Unit,
-    onTakePhoto: () -> Unit,
     navigateToBottomNav: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -231,16 +231,6 @@ fun RegisterPersonnelContent(
             )
         }
 
-        // Photo
-        Box(
-            modifier = Modifier.padding(LocalSpacing.current.small),
-            contentAlignment = Alignment.Center
-        ) {
-            PhotoTextField {
-                onTakePhoto()
-            }
-        }
-
         // Company Password
         Box(
             modifier = Modifier.padding(LocalSpacing.current.smallMedium),
@@ -327,7 +317,7 @@ fun RegisterPersonnelContent(
             ),
             contentAlignment = Alignment.Center
         ) {
-            BasicButton(buttonName = SavePersonnel) {
+            BasicButton(buttonName = RegisterPersonnel) {
                 when(true){
                     userNameError->{
                         Toast.makeText(context, "${personnel.userName} is not valid", Toast.LENGTH_LONG).show()

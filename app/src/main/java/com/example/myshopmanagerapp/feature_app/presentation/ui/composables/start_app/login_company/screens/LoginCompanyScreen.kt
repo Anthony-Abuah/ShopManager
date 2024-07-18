@@ -14,8 +14,7 @@ import com.example.myshopmanagerapp.feature_app.presentation.view_models.Company
 @Composable
 fun LoginCompanyScreen(
     companyViewModel: CompanyViewModel,
-    navigateToCreateNewAccount: () -> Unit,
-    navigateToBottomNav: () -> Unit
+    navigateToCreateNewAccount: () -> Unit
 ) {
     Scaffold{
         Column(modifier = Modifier.fillMaxSize(),
@@ -28,7 +27,7 @@ fun LoginCompanyScreen(
                 },
                 createNewAccount = navigateToCreateNewAccount
             ) {
-                navigateToBottomNav()
+                companyViewModel.restartApp()
             }
         }
     }

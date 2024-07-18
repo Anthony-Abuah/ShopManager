@@ -37,13 +37,15 @@ fun PersonnelProfileNavGraph (
                 navController.popBackStack()
             }
         }
+
         composable(route = PersonnelNavScreens.Login.route){
             val companyViewModel = it.sharedViewModel<CompanyViewModel>(navHostController = mainNavController)
-            LoginPersonnelScreen(companyViewModel = companyViewModel,
-                navigateToCreateNewAccount = { mainNavController.navigate(PersonnelNavScreens.Register.route) }) {
-                navController.popBackStack()
-            }
+            LoginPersonnelScreen(
+                companyViewModel = companyViewModel,
+                navigateToCreateNewAccount = { mainNavController.navigate(PersonnelNavScreens.Register.route) }
+            ) { navController.popBackStack() }
         }
+
         composable(route = PersonnelNavScreens.Register.route){
             val companyViewModel = it.sharedViewModel<CompanyViewModel>(navHostController = mainNavController)
             RegisterPersonnelScreen(companyViewModel = companyViewModel,

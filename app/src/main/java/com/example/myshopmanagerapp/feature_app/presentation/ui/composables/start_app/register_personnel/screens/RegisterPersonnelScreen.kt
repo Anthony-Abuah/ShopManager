@@ -15,14 +15,13 @@ import com.example.myshopmanagerapp.feature_app.presentation.view_models.Company
 @Composable
 fun RegisterPersonnelScreen(
     companyViewModel: CompanyViewModel,
-    //navigateToTakePhoto: () -> Unit,
     navigateToBottomNav: () -> Unit,
     navigateBack: () -> Unit,
 ) {
 
     Scaffold(
         topBar = {
-            BasicScreenTopBar(topBarTitleText = "Add Personnel") {
+            BasicScreenTopBar(topBarTitleText = "Register Personnel") {
                 navigateBack()
             }
         }
@@ -38,19 +37,17 @@ fun RegisterPersonnelScreen(
                 isSavingPersonnel = companyViewModel.addPersonnelState.value.isLoading,
                 personnelSavingIsSuccessful = companyViewModel.addPersonnelState.value.isSuccessful,
                 personnelSavingMessage = companyViewModel.addPersonnelState.value.message,
-                addFirstName = {name-> companyViewModel.addPersonnelFirstName(name)},
-                addLastName = {lastName-> companyViewModel.addPersonnelLastName(lastName)},
-                addOtherNames = {name-> companyViewModel.addPersonnelOtherName(name)},
-                addContact = {contact-> companyViewModel.addPersonnelContact(contact)},
-                addRole = {role-> companyViewModel.addPersonnelRole(role)},
-                addPassword = {_password-> companyViewModel.addPersonnelPassword(_password)},
                 addUserName = {_username-> companyViewModel.addPersonnelUsername(_username)},
+                addFirstName = {name-> companyViewModel.addPersonnelFirstName(name.trim())},
+                addLastName = {lastName-> companyViewModel.addPersonnelLastName(lastName.trim())},
+                addOtherNames = {name-> companyViewModel.addPersonnelOtherName(name.trim())},
+                addContact = {contact-> companyViewModel.addPersonnelContact(contact.trim())},
+                addRole = {role-> companyViewModel.addPersonnelRole(role.trim())},
+                addPassword = {_password-> companyViewModel.addPersonnelPassword(_password)},
                 addAdminRights = {adminRights-> companyViewModel.addPersonnelHasAdminRight(adminRights)},
-                addOtherInfo = {otherInfo-> companyViewModel.addPersonnelOtherInfo(otherInfo)},
-                onTakePhoto = {/*navigateToTakePhoto()*/},
+                addOtherInfo = {otherInfo-> companyViewModel.addPersonnelOtherInfo(otherInfo.trim())},
                 addPersonnel = {_personnel->
                     companyViewModel.registerPersonnel(_personnel)
-
                 }
             ) {
                 navigateToBottomNav()

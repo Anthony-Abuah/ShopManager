@@ -19,10 +19,12 @@ import com.example.myshopmanagerapp.core.FormRelatedString.CompanyShortNotes
 import com.example.myshopmanagerapp.core.FormRelatedString.CompanyShortNotesPlaceholder
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterCompanyOwner
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterCompanyProducts
-import com.example.myshopmanagerapp.core.FormRelatedString.SaveCompany
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.feature_app.data.local.entities.company.CompanyEntity
-import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.*
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicButton
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenColumnWithoutBottomBar
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicTextFieldWithTrailingIconError
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.DescriptionTextFieldWithTrailingIcon
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
 
 
@@ -50,7 +52,7 @@ fun RegisterCompanyMoreInfoContent(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(LocalSpacing.current.small),
-                painter = painterResource(id = R.drawable.shop),
+                painter = painterResource(id = R.drawable.logo),
                 contentDescription = emptyString
             )
         }

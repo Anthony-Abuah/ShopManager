@@ -317,7 +317,7 @@ fun HomeScreen(
                 topBar = {
                     HomeScreenTopBar(
                         topBarTitleText = "Records",
-                        personnelUserName = personnel?.userName.toNotNull(),
+                        personnelUserName = personnel?.userName.toNotNull().ifBlank { "Tap to login" },
                         personnelIcon = if (personnelIsLoggedIn) R.drawable.ic_person_filled else R.drawable.ic_logged_out_personnel,
                         navigateToPersonnelNavGraph = {
                             navigateToPersonnelNavGraph(

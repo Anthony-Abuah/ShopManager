@@ -58,6 +58,7 @@ object Constants{
     const val InventoryStock_Table = "InventoryStockTable"
 
     const val Loan = "Loan"
+    const val Email = "Email"
     const val Password = "1234"
     const val NotAvailable = "N/A"
     const val UnknownItem = "Unknown Item"
@@ -91,6 +92,7 @@ object Constants{
     const val IOException_HttpExceptionMessage = "IOExceptionOrHttpExceptionMessage"
     const val ShopInfo = "shopInfo"
     const val IsRegistered = "isRegistered"
+    const val ListOfShopLoginInfo = "listOfShopLoginInfo"
     const val IsLoggedIn = "isLoggedIn"
     const val Personnel_IsLoggedIn = "PersonnelIsLoggedIn"
     const val PersonnelEntityInfo = "PersonnelEntityInfo"

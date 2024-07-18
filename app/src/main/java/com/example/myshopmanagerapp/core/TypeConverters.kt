@@ -6,6 +6,7 @@ import com.example.myshopmanagerapp.feature_app.data.util.GsonParser
 import com.example.myshopmanagerapp.feature_app.data.util.JsonParser
 import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
 import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItemWithDate
+import com.example.myshopmanagerapp.feature_app.domain.model.ShopLoginInfo
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.time.LocalDate
@@ -26,6 +27,48 @@ object TypeConverters {
         return jsonParser.toJson(
             this,
             object : TypeToken<PeriodDropDownItem>(){}.type
+        ) ?: "[]"
+    }
+
+    fun String?.toListOfShopLoginInfo(): List<ShopLoginInfo> {
+        return this?.let {
+            jsonParser.fromJson<List<ShopLoginInfo>>(
+                it, object : TypeToken<List<ShopLoginInfo>>(){}.type)
+        }?: emptyList()
+    }
+
+    fun ListOfShopLoginInfo?.toListOfShopLoginInfoJson(): String{
+        return jsonParser.toJson(
+            this,
+            object : TypeToken<ListOfShopLoginInfo>(){}.type
+        ) ?: "[]"
+    }
+
+    fun String?.toListOfCompanyEntities(): CompanyEntities{
+        return this?.let {
+            jsonParser.fromJson<CompanyEntities>(
+                it, object : TypeToken<CompanyEntities>(){}.type)
+        }?: emptyList()
+    }
+
+    fun CompanyEntities?.toListOfCompanyEntitiesJson(): String{
+        return jsonParser.toJson(
+            this,
+            object : TypeToken<CompanyEntities>(){}.type
+        ) ?: "[]"
+    }
+
+    fun String?.toShopLoginInfo(): ShopLoginInfo {
+        return this?.let {
+            jsonParser.fromJson<ShopLoginInfo>(
+                it, object : TypeToken<ShopLoginInfo>(){}.type)
+        }?: ShopLoginInfo(emptyString, emptyString, emptyString)
+    }
+
+    fun ShopLoginInfo?.toShopLoginInfoJson(): String{
+        return jsonParser.toJson(
+            this,
+            object : TypeToken<ShopLoginInfo>(){}.type
         ) ?: "[]"
     }
 

@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.first
 
 
 @Composable
-fun StartScreen(
+fun SplashScreen(
     navigateToStartScreen: (Boolean) -> Unit,
 ) {
     val context = LocalContext.current
@@ -31,14 +31,14 @@ fun StartScreen(
     }
     val alphaAnim = animateFloatAsState(
         targetValue = if (startAnimation) 1f else 0f,
-        animationSpec = tween(3000)
+        animationSpec = tween(2000)
     )
 
     LaunchedEffect(Unit){
         val userPreferences = UserPreferences(context)
         val isLoggedIn = userPreferences.getLoggedInState.first() ?: false
         startAnimation = true
-        delay(3000)
+        delay(2000)
         navigateToStartScreen(isLoggedIn)
     }
     Scaffold {

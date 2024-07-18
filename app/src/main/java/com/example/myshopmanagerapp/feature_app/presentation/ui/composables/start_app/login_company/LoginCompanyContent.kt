@@ -30,7 +30,7 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpaci
 fun LoginCompanyContent(
     login: (String, String) -> Unit,
     createNewAccount: () -> Unit,
-    navigateToBottomNav: () -> Unit,
+    restartApp: () -> Unit,
 ) {
     val context = LocalContext.current
     val userPreferences = UserPreferences(context)
@@ -213,7 +213,7 @@ fun LoginCompanyContent(
         confirmedDeleteToastText = null
     ) {
         if (loginIsSuccessful){
-            navigateToBottomNav()
+            restartApp()
         }
         confirmationInfoDialog = false
     }

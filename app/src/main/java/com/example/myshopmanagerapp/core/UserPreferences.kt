@@ -23,6 +23,7 @@ import com.example.myshopmanagerapp.core.Constants.IOException_HttpExceptionMess
 import com.example.myshopmanagerapp.core.Constants.PersonnelEntityInfo
 import com.example.myshopmanagerapp.core.Constants.Personnel_IsLoggedIn
 import com.example.myshopmanagerapp.core.Constants.RevenueTypes
+import com.example.myshopmanagerapp.core.Constants.ListOfShopLoginInfo
 import com.example.myshopmanagerapp.core.Constants.SupplierRole
 import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.Functions.toNotNull
@@ -41,6 +42,7 @@ class UserPreferences(private val context: Context) {
         val IS_REGISTERED = booleanPreferencesKey(IsRegistered)
         val THERE_IS_IO_EXCEPTION_HTTP_EXCEPTION = booleanPreferencesKey(IOException_HttpException)
         val IO_EXCEPTION_HTTP_EXCEPTION_MESSAGE = stringPreferencesKey(IOException_HttpExceptionMessage)
+        val LIST_OF_SHOP_LOGIN_INFO = stringPreferencesKey(ListOfShopLoginInfo)
         val PERSONNEL_ENTITY_INFO = stringPreferencesKey(PersonnelEntityInfo)
         val API_RESPONSE_MESSAGE = stringPreferencesKey(RegisterMessage)
         val SHOP_INFO = stringPreferencesKey(ShopInfo)
@@ -56,6 +58,15 @@ class UserPreferences(private val context: Context) {
         val STRING_VALUE = stringPreferencesKey(StringValue)
         val DOUBLE_VALUE = doublePreferencesKey(DoubleValue)
         val INT_VALUE = intPreferencesKey(IntValue)
+    }
+
+    //get the Log in Status
+    val getListOfShopLogInInfo: Flow<String?> = context.dataStore.data
+        .map { preferences -> preferences[LIST_OF_SHOP_LOGIN_INFO] ?: emptyString }
+
+    //save the Log in status
+    suspend fun saveListOfShopLogInInfo(value: String) {
+        context.dataStore.edit { preferences -> preferences[LIST_OF_SHOP_LOGIN_INFO] = value }
     }
 
     //get the Log in Status

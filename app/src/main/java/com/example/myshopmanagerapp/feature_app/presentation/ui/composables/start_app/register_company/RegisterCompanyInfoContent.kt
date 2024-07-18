@@ -53,14 +53,14 @@ fun RegisterCompanyInfoContent(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(LocalSpacing.current.small),
-                painter = painterResource(id = R.drawable.shop),
+                painter = painterResource(id = R.drawable.logo),
                 contentDescription = emptyString
             )
         }
 
         Spacer(modifier = Modifier.height(LocalSpacing.current.large))
 
-        // Company route
+        // Company name
         Box(
             modifier = Modifier.padding(LocalSpacing.current.smallMedium),
             contentAlignment = Alignment.Center
@@ -138,10 +138,10 @@ fun RegisterCompanyInfoContent(
             BasicButton(buttonName = "Next") {
                 when(true){
                     company.companyName.isBlank()->{
-                        Toast.makeText(context, "Enter company route", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, "Enter company name", Toast.LENGTH_LONG).show()
                     }
                     (company.companyName.length < 3 )->{
-                        Toast.makeText(context, "Enter valid company route", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, "Enter valid company name", Toast.LENGTH_LONG).show()
                     }
                     else->{
                         navigateToNextScreen()

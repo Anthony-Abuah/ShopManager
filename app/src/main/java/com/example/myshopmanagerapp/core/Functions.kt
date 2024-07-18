@@ -45,6 +45,7 @@ object Functions {
     val shortDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(shortDateFormat)!!
     val longDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(longDateFormat)!!
     fun String?.toNotNull(): String = this ?: emptyString
+    fun Boolean?.toNotNull(): Boolean = this ?: false
     fun Long?.toNotNull(): Long = this ?: 0.toLong()
     fun Double?.toNotNull(): Double = this ?: 0.0
     fun Double?.toRoundedInt(): Int = if (this?.isNaN() == true) 0 else this?.roundToInt() ?: 0

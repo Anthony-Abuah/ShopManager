@@ -337,6 +337,7 @@ object FormRelatedString{
     const val UpdatePersonnelRole = "Update personnel role"
     const val PersonnelShortNotes = "Short notes/description"
     const val SavePersonnel = "Save Personnel"
+    const val RegisterPersonnel = "Register Personnel"
     const val PersonnelInformation = "Personnel Information"
     const val UniquePersonnelId = "Unique Personnel Id"
     const val PersonnelUserName = "Username"

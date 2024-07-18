@@ -10,7 +10,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.Resource
-import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntityJson
 import com.example.myshopmanagerapp.core.UIEvent
 import com.example.myshopmanagerapp.core.UserPreferences
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
@@ -28,10 +27,7 @@ import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.company.ReceiptEntitiesState
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.revenue.ItemValueState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
@@ -43,13 +39,17 @@ class CompanyViewModel @Inject constructor(
     private val generatePDFRepository: GeneratePDFRepository
 ): ViewModel() {
 
+    var isLoggedIn by mutableStateOf<Boolean?>(null)
+        private set
+
     var receiptInfo by mutableStateOf(ReceiptEntity(0, emptyString, emptyString, emptyString, emptyString, Date().time, emptyString, emptyString, emptyString, emptyString, emptyList(), 0.0))
         private set
 
     var updateReceiptInfo by mutableStateOf(ReceiptEntity(0, emptyString, emptyString, emptyString, emptyString, Date().time, emptyString, emptyString, emptyString, emptyString, emptyList(), 0.0))
         private set
 
-    var addPersonnelInfo by mutableStateOf(PersonnelEntity(0, emptyString, emptyString, emptyString, emptyString, emptyString,"1234", emptyString, emptyString,emptyString, emptyString, false))
+    var addPersonnelInfo by mutableStateOf(PersonnelEntity(0, emptyString, emptyString, emptyString, emptyString, emptyString,
+        emptyString, emptyString, emptyString,emptyString, emptyString, false))
         private set
 
 
@@ -106,6 +106,13 @@ class CompanyViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UIEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
+
+    init {
+        viewModelScope.launch {
+            val context = MyShopManagerApp.applicationContext()
+            isLoggedIn = UserPreferences(context).getLoggedInState.first() ?: false
+        }
+    }
 
     fun registerPersonnel(personnel: PersonnelEntity) = viewModelScope.launch {
         personnelRepository.registerAndLogIn(personnel.copy(hasAdminRights = true)).onEach { response->
@@ -464,50 +471,14 @@ class CompanyViewModel @Inject constructor(
         companyRepository.companyLogin(email, password)
     }
 
-    fun updateCompany(company: CompanyEntity) = viewModelScope.launch {
-        companyRepository.updateCompany(company )
+    fun restartApp() = viewModelScope.launch {
+        companyRepository.restartApp()
     }
+
 
     fun deleteCompany(uniqueCompanyId: String) = viewModelScope.launch {
         companyRepository.deleteCompany(uniqueCompanyId)
     }
-
-    fun updateCompanyName(name: String) {
-        companyInfo = companyInfo?.copy(
-            companyName = name
-        )
-    }
-
-    fun updateCompanyContact(contact: String) {
-        companyInfo = companyInfo?.copy(
-            companyContact = contact
-        )
-    }
-
-    fun updateCompanyLocation(location: String) {
-        companyInfo = companyInfo?.copy(
-            companyLocation = location
-        )
-    }
-
-    fun updateCompanyOtherInfo(info: String) {
-        companyInfo = companyInfo?.copy(
-            otherInfo = info
-        )
-    }
-
-    fun updateCompanyItemsSold(itemsSold: String) {
-        companyInfo = companyInfo?.copy(
-            companyProductsAndServices = itemsSold
-        )
-    }
-
-    fun updateCompanyOwners(owners: String) {
-        companyInfo = companyInfo?.copy(
-            companyOwners = owners
-        )
-    }
-
 
     fun addCompanyName(name: String) {
         addCompanyInfo = addCompanyInfo.copy(
@@ -527,7 +498,7 @@ class CompanyViewModel @Inject constructor(
 
     fun addCompanyProductAndServices(products: String) {
         addCompanyInfo = addCompanyInfo.copy(
-            otherInfo = products
+            companyProductsAndServices = products
         )
     }
     fun addPassword(password: String) {
@@ -543,11 +514,7 @@ class CompanyViewModel @Inject constructor(
             email = email
         )
     }
-    fun addCompanyItemsSold(itemsSold: String) {
-        addCompanyInfo = addCompanyInfo.copy(
-            companyProductsAndServices = itemsSold
-        )
-    }
+
     fun addCompanyOwners(owners: String) {
         addCompanyInfo = addCompanyInfo.copy(
             companyOwners = owners
@@ -613,11 +580,7 @@ class CompanyViewModel @Inject constructor(
             contact = contact
         )
     }
-    fun addPersonnelPhoto(location: String?) {
-        addPersonnelInfo = addPersonnelInfo.copy(
-            personnelPhoto = location
-        )
-    }
+
     fun addPersonnelOtherInfo(info: String?) {
         addPersonnelInfo = addPersonnelInfo.copy(
             otherInfo = info

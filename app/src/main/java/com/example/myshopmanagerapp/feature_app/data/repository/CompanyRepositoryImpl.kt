@@ -1,7 +1,9 @@
 package com.example.myshopmanagerapp.feature_app.data.repository
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.util.Log
 import com.example.myshopmanagerapp.core.CompanyEntities
 import com.example.myshopmanagerapp.core.Constants
@@ -13,7 +15,9 @@ import com.example.myshopmanagerapp.core.Functions.toCompanyEntityJson
 import com.example.myshopmanagerapp.core.Functions.toCompanyInfoDto
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.Resource
-import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntities
+import com.example.myshopmanagerapp.core.TypeConverters.toListOfCompanyEntities
+import com.example.myshopmanagerapp.core.TypeConverters.toListOfCompanyEntitiesJson
+import com.example.myshopmanagerapp.core.TypeConverters.toListOfShopLoginInfo
 import com.example.myshopmanagerapp.core.UserPreferences
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
@@ -361,7 +365,8 @@ class CompanyRepositoryImpl(
                 }
             }
 
-        }catch (e: IOException){
+        }
+        catch (e: IOException){
             emit(Resource.Error(
                 data = "Could not log in to cloud account. Trying to log in to local account",
                 message = e.message
@@ -394,9 +399,7 @@ class CompanyRepositoryImpl(
                             UserPreferences(MyShopManagerApp.applicationContext()).saveShopInfo(
                                 company.toCompanyEntityJson().toNotNull()
                             )
-                            UserPreferences(MyShopManagerApp.applicationContext()).saveLoggedInState(
-                                true
-                            )
+                            UserPreferences(MyShopManagerApp.applicationContext()).saveLoggedInState(true)
                             emit(
                                 Resource.Success(
                                     data = "You have been successfully logged in",
@@ -419,7 +422,8 @@ class CompanyRepositoryImpl(
                     message = e.message ?: "Unknown Error"
                 ))
             }
-        }catch (e: Exception){
+        }
+        catch (e: Exception){
             emit(Resource.Error(
                 data = "Failed to log in",
                 message = e.message
@@ -456,10 +460,12 @@ class CompanyRepositoryImpl(
                     if (loginStatus != true){
                         userPreferences.saveRepositoryJobMessage("Failed to log in\n${loginMessage.toNotNull()}")
                         userPreferences.saveRepositoryJobSuccessValue(false)
-                    }else if (shopInfo == null){
+                    }
+                    else if (shopInfo == null){
                         userPreferences.saveRepositoryJobMessage("Failed to log in\n${loginMessage.toNotNull()}")
                         userPreferences.saveRepositoryJobSuccessValue(false)
-                    }else{
+                    }
+                    else{
                         val isLoggedIn = userPreferences.getLoggedInState.first()
                         val thisShop = userPreferences.getShopInfo.first()
                         Log.d("CompanyRepository", "1st is logged in = $isLoggedIn")
@@ -480,7 +486,6 @@ class CompanyRepositoryImpl(
 
                 }
             }
-
         }
         catch (e: IOException){
             val context = MyShopManagerApp.applicationContext()
@@ -489,32 +494,37 @@ class CompanyRepositoryImpl(
             userPreferences.saveRepositoryJobMessage("Could not log in to cloud account.\nTrying to log in to local account\n${e.message ?: "Unknown error"}")
             userPreferences.saveRepositoryJobSuccessValue(false)
             try {
+                val listOfCompanyEntitiesInfo = userPreferences.getListOfShopLogInInfo.first().toListOfCompanyEntities()
                 val thisEmail = email.trim()
                 val invalidParameters = thisEmail.isBlank() || password.isBlank()
-                val company = appDatabase.companyDao.getAllCompanies()?.firstOrNull{(it.email.trim() == thisEmail) && (it.password.trim() == password)}
+                val companyEntityInfo = listOfCompanyEntitiesInfo.firstOrNull{(it.email.trim() == thisEmail) && (it.password.trim() == password)}
                 when(true) {
                     invalidParameters -> {
                         userPreferences.saveRepositoryJobMessage("Failed to log in.\nEmail or password field is empty")
                         userPreferences.saveRepositoryJobSuccessValue(false)
                     }
-                    (company == null) -> {
+                    (companyEntityInfo == null) -> {
                         userPreferences.saveRepositoryJobMessage("Failed to log in.\nEmail and password do not match any account created locally on this device")
                         userPreferences.saveRepositoryJobSuccessValue(false)
                     }
                     else -> {
                         UserPreferences(MyShopManagerApp.applicationContext()).saveShopInfo(
-                            company.toCompanyEntityJson().toNotNull()
+                            companyEntityInfo.toCompanyEntityJson().toNotNull()
                         )
-                        restoreDatabase(context, company.companyName, userPreferences)
+                        restoreDatabase(context, companyEntityInfo.companyName, userPreferences)
                         UserPreferences(MyShopManagerApp.applicationContext()).saveLoggedInState(true)
-                        userPreferences.saveRepositoryJobMessage("You have been successfully logged in")
+                        userPreferences.saveRepositoryJobMessage("You have been successfully logged in" +
+                                "\nClick OK to complete the restoration of backed up database. \nNB: The app will be restarted. If for some reason it doesn't restart, open the app again")
                         userPreferences.saveRepositoryJobSuccessValue(true)
-                        if (userPreferences.getLoggedInState.first() == true) {
-                            val i = context.packageManager.getLaunchIntentForPackage(context.packageName)
-                            i!!.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                            context.startActivity(i)
-                            exitProcess(0)
-                        }
+
+
+                        /*
+                        val i = context.packageManager.getLaunchIntentForPackage(context.packageName)
+                        i!!.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        context.startActivity(i)
+                        exitProcess(0)
+                        */
+
                     }
                 }
             }
@@ -530,27 +540,37 @@ class CompanyRepositoryImpl(
             userPreferences.saveRepositoryJobMessage("Could not log in to cloud account.\nTrying to log in to local account\n${e.message ?: "Unknown error"}")
             userPreferences.saveRepositoryJobSuccessValue(false)
             try {
+                val listOfCompanyEntitiesInfo = userPreferences.getListOfShopLogInInfo.first().toListOfCompanyEntities()
                 val thisEmail = email.trim()
                 val invalidParameters = thisEmail.isBlank() || password.isBlank()
-                val company = appDatabase.companyDao.getAllCompanies()?.firstOrNull{(it.email.trim() == thisEmail) && (it.password.trim() == password)}
+                val companyEntityInfo = listOfCompanyEntitiesInfo.firstOrNull{(it.email.trim() == thisEmail) && (it.password.trim() == password)}
                 when(true) {
                     invalidParameters -> {
                         userPreferences.saveRepositoryJobMessage("Failed to log in.\nEmail or password field is empty")
                         userPreferences.saveRepositoryJobSuccessValue(false)
                     }
-                    (company == null) -> {
+                    (companyEntityInfo == null) -> {
                         userPreferences.saveRepositoryJobMessage("Failed to log in.\nEmail and password do not match any account created locally on this device")
                         userPreferences.saveRepositoryJobSuccessValue(false)
                     }
                     else -> {
                         UserPreferences(MyShopManagerApp.applicationContext()).saveShopInfo(
-                            company.toCompanyEntityJson().toNotNull()
+                            companyEntityInfo.toCompanyEntityJson().toNotNull()
                         )
-                        val personnel = company.companyPersonnel.toPersonnelEntities()
-                        appDatabase.personnelDao.addPersonnel(personnel)
+                        restoreDatabase(context, companyEntityInfo.companyName, userPreferences)
                         UserPreferences(MyShopManagerApp.applicationContext()).saveLoggedInState(true)
-                        userPreferences.saveRepositoryJobMessage("You have been successfully logged in")
+                        userPreferences.saveRepositoryJobMessage("You have been successfully logged in" +
+                                "\nClick OK to complete the restoration of backed up database. \nNB: The app will be restarted. If for some reason it doesn't restart, open the app again")
                         userPreferences.saveRepositoryJobSuccessValue(true)
+
+
+                        /*
+                        val i = context.packageManager.getLaunchIntentForPackage(context.packageName)
+                        i!!.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        context.startActivity(i)
+                        exitProcess(0)
+                        */
+
                     }
                 }
             }
@@ -591,17 +611,21 @@ class CompanyRepositoryImpl(
         try {
             val context = MyShopManagerApp.applicationContext()
             val userPreferences = UserPreferences(context)
+            val company = userPreferences.getShopInfo.first().toCompanyEntity()
             val companyName = userPreferences.getShopInfo.first().toCompanyEntity()?.companyName ?: ShopAppDatabase
+            val listOfShopLoginInfo = userPreferences.getListOfShopLogInInfo.first().toListOfCompanyEntities()
+            val newListOfShopLoginInfo = listOfShopLoginInfo.plus(company).filterNotNull()
             backupDatabase(context, companyName, userPreferences)
             userPreferences.saveLoggedInState(false)
             userPreferences.saveShopInfo(emptyString)
             userPreferences.savePersonnelLoggedInState(false)
             userPreferences.savePersonnelInfo(emptyString)
+            userPreferences.saveListOfShopLogInInfo(newListOfShopLoginInfo.toListOfCompanyEntitiesJson())
             appDatabase.companyDao.deleteAllTables()
             userPreferences.saveRepositoryJobMessage("Log out successful")
-            userPreferences.saveRepositoryJobSuccessValue(false)
+            userPreferences.saveRepositoryJobSuccessValue(true)
         }catch (e: Exception){
-            UserPreferences(MyShopManagerApp.applicationContext()).saveRepositoryJobMessage("Could not retrieve data.\n${e.message ?: "Unknown Error"}")
+            UserPreferences(MyShopManagerApp.applicationContext()).saveRepositoryJobMessage("Could not log out.\n${e.message ?: "Unknown Error"}")
             UserPreferences(MyShopManagerApp.applicationContext()).saveRepositoryJobSuccessValue(false)
         }
     }
@@ -793,7 +817,8 @@ class CompanyRepositoryImpl(
             if (backupSHMFile.exists()) backupSHMFile.copyTo(databaseSHMFile,true)
             checkpoint()
             userPreferences.saveRepositoryJobMessage("Data successfully restored")
-            userPreferences.saveRepositoryJobSuccessValue(false)
+            userPreferences.saveRepositoryJobSuccessValue(true)
+
         } catch (e: IOException) {
             userPreferences.saveRepositoryJobMessage("Could not retrieve data.\n${e.message ?: "Unknown Error"}")
             userPreferences.saveRepositoryJobSuccessValue(false)
@@ -804,6 +829,15 @@ class CompanyRepositoryImpl(
         val db = appDatabase.openHelper.writableDatabase
         db.query("PRAGMA wal_checkpoint(FULL);", emptyArray())
         db.query("PRAGMA wal_checkpoint(TRUNCATE);", emptyArray())
+    }
+    override fun restartApp() {
+        val context = MyShopManagerApp.applicationContext()
+        val packageManager: PackageManager = context.packageManager
+        val intent: Intent = packageManager.getLaunchIntentForPackage(context.packageName)!!
+        val componentName: ComponentName = intent.component!!
+        val restartIntent: Intent = Intent.makeRestartActivityTask(componentName)
+        context.startActivity(restartIntent)
+        Runtime.getRuntime().exit(0)
     }
 
 }
