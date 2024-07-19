@@ -45,6 +45,7 @@ fun HomeScreen(
     backupViewModel: BackupViewModel = hiltViewModel(),
     navController: NavHostController,
     navHostController: NavHostController,
+    navigateToStartNavGraph: () -> Unit,
     navigateToPersonnelNavGraph: (Boolean) -> Unit,
     navigateToRevenueListScreen: () -> Unit,
     navigateToExpenseListScreen: () -> Unit,
@@ -58,6 +59,7 @@ fun HomeScreen(
 
     val context = LocalContext.current
     val userPreferences = UserPreferences(context)
+    val userIsLoggedIn = userPreferences.getLoggedInState.collectAsState(initial = false).value ?: false
     val personnelIsLoggedIn = userPreferences.getPersonnelLoggedInState.collectAsState(initial = false).value ?: false
     val personnelJson = userPreferences.getPersonnelInfo.collectAsState(initial = emptyString).value ?: emptyString
     val personnel = personnelJson.toPersonnelEntity()
@@ -320,9 +322,17 @@ fun HomeScreen(
                         personnelUserName = personnel?.userName.toNotNull().ifBlank { "Tap to login" },
                         personnelIcon = if (personnelIsLoggedIn) R.drawable.ic_person_filled else R.drawable.ic_logged_out_personnel,
                         navigateToPersonnelNavGraph = {
-                            navigateToPersonnelNavGraph(
-                                personnelIsLoggedIn
-                            )
+                            when(true){
+                                !userIsLoggedIn->{
+                                    navigateToStartNavGraph()
+                                }
+                                else->{
+                                    navigateToPersonnelNavGraph(
+                                        personnelIsLoggedIn
+                                    )
+                                }
+                            }
+
                         },
                     ) {
                         coroutineScope.launch {

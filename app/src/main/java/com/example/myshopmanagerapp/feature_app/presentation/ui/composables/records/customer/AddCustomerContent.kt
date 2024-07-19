@@ -32,7 +32,6 @@ fun AddCustomerContent(
     isSavingCustomer: Boolean,
     customerSavingMessage: String?,
     customerSavingIsSuccessful: Boolean,
-    onTakePhoto: () -> Unit,
     addCustomerName: (String) -> Unit,
     addCustomerContact: (String) -> Unit,
     addCustomerLocation: (String) -> Unit,
@@ -115,12 +114,6 @@ fun AddCustomerContent(
             )
         }
 
-
-        Box(modifier = Modifier.padding(LocalSpacing.current.small),
-            contentAlignment = Alignment.Center
-        ){
-            PhotoTextField { onTakePhoto() }
-        }
 
         Box(modifier = Modifier.padding(LocalSpacing.current.small),
             contentAlignment = Alignment.Center

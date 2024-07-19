@@ -3,6 +3,7 @@ package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bot
 sealed class HomeScreens(val route: String){
     object MainHomeScreen: HomeScreens("to_main_home_screen")
     object PersonnelProfileNavGraph: HomeScreens("to_personnelProfile_nav_graph")
+    object StartNavGraph: HomeScreens("to_start_nav_graph")
     object RevenueNavGraph: HomeScreens("to_revenue_nav_graph")
     object WithdrawalNavGraph: HomeScreens("to_withdrawal_nav_graph")
     object SavingsNavGraph: HomeScreens("to_savings_nav_graph")

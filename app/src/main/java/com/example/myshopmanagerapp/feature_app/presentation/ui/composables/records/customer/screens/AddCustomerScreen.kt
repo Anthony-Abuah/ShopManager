@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenTopBar
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.records.customer.AddCustomerContent
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.CustomerViewModel
@@ -36,17 +35,9 @@ fun AddCustomerScreen(
         ) {
             AddCustomerContent(
                 customer = customerViewModel.addCustomerInfo,
-                customerSavingIsSuccessful = customerViewModel.addCustomerState.value.isSuccessful,
-                customerSavingMessage = customerViewModel.addCustomerState.value.message,
                 isSavingCustomer = customerViewModel.addCustomerState.value.isLoading,
-                onTakePhoto = {
-                    val customer = customerViewModel.addCustomerInfo
-                    customerViewModel.addCustomerName(customer.customerName)
-                    customerViewModel.addCustomerContact(customer.customerContact)
-                    customerViewModel.addCustomerLocation(customer.customerLocation.toNotNull())
-                    customerViewModel.addAnyOtherInfo(customer.otherInfo.toNotNull())
-                    navigateToTakePhotoScreen()
-                },
+                customerSavingMessage = customerViewModel.addCustomerState.value.message,
+                customerSavingIsSuccessful = customerViewModel.addCustomerState.value.isSuccessful,
                 addCustomerName = { value-> customerViewModel.addCustomerName(value) },
                 addCustomerContact = { value-> customerViewModel.addCustomerContact(value) },
                 addCustomerLocation = { value-> customerViewModel.addCustomerLocation(value) },

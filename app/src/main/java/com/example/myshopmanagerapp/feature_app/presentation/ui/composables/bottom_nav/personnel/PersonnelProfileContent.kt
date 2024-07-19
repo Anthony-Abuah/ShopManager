@@ -131,7 +131,7 @@ fun PersonnelProfileContent(
                 contentAlignment = Alignment.Center
             ){
                 InfoDisplayCard(
-                    icon = R.drawable.personnel,
+                    image = R.drawable.personnel,
                     imageWidth = 75.dp,
                     bigText = userName,
                     bigTextSize = 20.sp,
@@ -294,7 +294,7 @@ fun PersonnelProfileContent(
             ){
                 val isAdmin = personnel.hasAdminRights == true
                 InfoDisplayCard(
-                    icon = if (isAdmin) R.drawable.ic_check else R.drawable.ic_cancel,
+                    image = if (isAdmin) R.drawable.ic_check else R.drawable.ic_cancel,
                     imageWidth = 32.dp,
                     bigText = if (isAdmin) Yes else No,
                     bigTextSize = 18.sp,
@@ -321,7 +321,7 @@ fun PersonnelProfileContent(
             ){
                 val isActive = personnel.isActive == true
                 InfoDisplayCard(
-                    icon = if (isActive) R.drawable.ic_check else R.drawable.ic_cancel,
+                    image = if (isActive) R.drawable.ic_check else R.drawable.ic_cancel,
                     imageWidth = 32.dp,
                     bigText = if (isActive) Yes else No,
                     bigTextSize = 18.sp,
@@ -451,6 +451,7 @@ fun PersonnelProfileContent(
                     }
                 )
             }
+
             HorizontalDivider()
         }
 

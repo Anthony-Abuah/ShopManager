@@ -7,13 +7,14 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.start_app.login_company.LoginCompanyContent
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.CompanyViewModel
 
 
 @Composable
 fun LoginCompanyScreen(
-    companyViewModel: CompanyViewModel,
+    companyViewModel: CompanyViewModel = hiltViewModel(),
     navigateToCreateNewAccount: () -> Unit
 ) {
     Scaffold{

@@ -79,7 +79,7 @@ fun MainExpenseReportContent(
                 contentAlignment = Alignment.Center
             ){
                 InfoDisplayCard(
-                    icon = R.drawable.expense,
+                    image = R.drawable.expense,
                     currency = currency,
                     currencySize = 36.sp,
                     bigText = "$currency $totalExpenseAmount",
@@ -110,7 +110,7 @@ fun MainExpenseReportContent(
                     contentAlignment = Alignment.Center
                 ){
                     InfoDisplayCard(
-                        icon = R.drawable.days,
+                        image = R.drawable.days,
                         imageWidth = 40.dp,
                         currency = currency,
                         currencySize = 36.sp,
@@ -134,7 +134,7 @@ fun MainExpenseReportContent(
                     contentAlignment = Alignment.Center
                 ){
                     InfoDisplayCard(
-                        icon = R.drawable.percentage,
+                        image = R.drawable.percentage,
                         imageWidth = 40.dp,
                         currency = currency,
                         currencySize = 36.sp,
@@ -180,7 +180,7 @@ fun MainExpenseReportContent(
                         contentAlignment = Alignment.Center
                     ) {
                         InfoDisplayCard(
-                            icon = R.drawable.highest_revenue,
+                            image = R.drawable.highest_revenue,
                             imageWidth = 32.dp,
                             currency = currency,
                             currencySize = 20.sp,
@@ -202,7 +202,7 @@ fun MainExpenseReportContent(
                         contentAlignment = Alignment.Center
                     ) {
                         InfoDisplayCard(
-                            icon = R.drawable.lowest_revenue,
+                            image = R.drawable.lowest_revenue,
                             imageWidth = 32.dp,
                             currency = currency,
                             currencySize = 20.sp,
@@ -229,7 +229,7 @@ fun MainExpenseReportContent(
                         contentAlignment = Alignment.Center
                     ) {
                         InfoDisplayCard(
-                            icon = R.drawable.cash,
+                            image = R.drawable.cash,
                             imageWidth = 32.dp,
                             currency = currency,
                             currencySize = 20.sp,
@@ -251,7 +251,7 @@ fun MainExpenseReportContent(
                         contentAlignment = Alignment.Center
                     ) {
                         InfoDisplayCard(
-                            icon = R.drawable.cash,
+                            image = R.drawable.cash,
                             imageWidth = 32.dp,
                             currency = currency,
                             currencySize = 20.sp,

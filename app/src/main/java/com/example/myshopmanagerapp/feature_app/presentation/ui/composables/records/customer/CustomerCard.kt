@@ -1,5 +1,6 @@
 package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.records.customer
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -15,15 +16,25 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.example.myshopmanagerapp.R
 import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.Functions.convertToDouble
+import com.example.myshopmanagerapp.core.Functions.toEllipses
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.*
 
 @Composable
 fun CustomerCard(
+    cardHeight: Dp = 110.dp,
+    cardShadowColor: Color = MaterialTheme.colorScheme.surface,
+    cardContainerColor: Color = MaterialTheme.colorScheme.background,
+    mainContentColor: Color = MaterialTheme.colorScheme.onSurface,
+    secondaryContentColor: Color = MaterialTheme.colorScheme.onSurface,
+    image: Int = R.drawable.customer,
+    imageWidth: Dp = 64.dp,
+    imagePadding: Dp = LocalSpacing.current.small,
     customerName: String,
     customerContact: String,
     customerLocation: String,
@@ -32,8 +43,6 @@ fun CustomerCard(
     onOpenCustomer: () -> Unit,
     onDelete: () -> Unit,
 ){
-    val contentColor = MaterialTheme.colorScheme.onSurface
-    val cardContainerColor = MaterialTheme.colorScheme.surface
 
     val density = LocalDensity.current
 
@@ -49,183 +58,194 @@ fun CustomerCard(
 
     val dropDownOptions = listOf("Edit", "Delete")
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp)
-            .background(Color.Transparent)
-            .clickable { onOpenCustomer() },
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
+    Card(modifier = Modifier
+        .fillMaxWidth()
+        .height(cardHeight)
+        .clickable { onOpenCustomer() },
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = cardShadowColor
+        ),
+        elevation = CardDefaults.cardElevation(LocalSpacing.current.extraSmall)
     ) {
-        Card(
+        Row(
             modifier = Modifier
-                .padding(LocalSpacing.current.default)
-                .width(LocalSpacing.current.extraLarge)
-                .fillMaxHeight(),
-            shape = MaterialTheme.shapes.small,
-            colors = CardDefaults.cardColors(
-                containerColor = cardContainerColor
-            ),
-            elevation = CardDefaults.cardElevation(LocalSpacing.current.smallMedium)
+                .fillMaxWidth()
+                .fillMaxHeight(0.95f)
+                .background(cardContainerColor, MaterialTheme.shapes.medium),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+            Card(
+                modifier = Modifier
+                    .padding(imagePadding)
+                    .width(imageWidth)
+                    .fillMaxHeight(0.9f),
+                shape = MaterialTheme.shapes.medium,
+                colors = CardDefaults.cardColors(
+                    containerColor = cardContainerColor
+                ),
+                elevation = CardDefaults.cardElevation(LocalSpacing.current.small)
             ) {
-                Icon(
+                Box(
                     modifier = Modifier.fillMaxSize(),
-                    painter = painterResource(id = R.drawable.ic_person_filled),
-                    contentDescription = emptyString,
-                    tint = contentColor
-                )
-            }
-        }
-
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.Start
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(LocalSpacing.current.extraSmall),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = customerName,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.SemiBold,
-                    color = contentColor
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(LocalSpacing.current.extraSmall),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "Contact: $customerContact",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Normal,
-                    color = contentColor,
-
-                    )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(LocalSpacing.current.extraSmall),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "Location: $customerLocation",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Normal,
-                    color = contentColor,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(LocalSpacing.current.extraSmall),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                val color = if (convertToDouble(customerDebt) > 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
-                Text(
-                    text = "Debt: $customerDebt",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = color,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-        }
-
-        Column(modifier = Modifier
-            .width(LocalSpacing.current.medium)
-            .fillMaxHeight(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ){
-            Column(modifier = Modifier
-                .weight(1f)
-                .onSizeChanged { itemHeight = with(density) { it.height.toDp() } }
-                .pointerInput(true) {
-                    detectTapGestures(
-                        onPress = {
-                            expandOptionsDropDown = true
-                            pressOffset = DpOffset(it.x.toDp(), it.y.toDp())
-                        }
-                    )
-                },
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top
-            ) {
-                Spacer(modifier = Modifier.height(LocalSpacing.current.extraSmall))
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_options),
-                    contentDescription = emptyString,
-                    tint = contentColor
-                )
-                DropdownMenu(modifier = Modifier
-                    .width(150.dp),
-                    expanded = expandOptionsDropDown,
-                    onDismissRequest = { expandOptionsDropDown = false },
-                    offset = pressOffset
+                    contentAlignment = Alignment.Center
                 ) {
-                    dropDownOptions.forEachIndexed{ index, value->
-                        Box(modifier = Modifier
-                            .height(LocalSpacing.current.dropDownItem),
-                            contentAlignment = Alignment.CenterStart
-                        ) {
-                            DropdownMenuItem(
-                                modifier = Modifier.fillMaxWidth(),
-                                text = {
-                                    Row(modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.Start,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(
-                                            text = value,
-                                            color = MaterialTheme.colorScheme.onSurface,
-                                            style = MaterialTheme.typography.bodyLarge,
-                                            fontWeight = FontWeight.Normal
-                                        )
-                                    }
-                                },
-                                onClick = {
-                                    if (index == 0){ onOpenCustomer() }else{ onDelete() }
-                                    expandOptionsDropDown = false
-                                }
-                            )
-                        }
-                    }
+                    Image(
+                        modifier = Modifier.fillMaxSize(),
+                        painter = painterResource(id = image),
+                        contentDescription = emptyString,
+                    )
                 }
             }
 
-            Box(modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.BottomCenter
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start
             ) {
-                Text(text = number,
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Light,
-                    maxLines = 1,
-                    color = contentColor,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(LocalSpacing.current.extraSmall),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Text(
+                        text = customerName.toEllipses(30),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = mainContentColor
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(LocalSpacing.current.extraSmall),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Text(
+                        text = "Contact: $customerContact".toEllipses(30),
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 1,
+                        fontWeight = FontWeight.Normal,
+                        color = secondaryContentColor,
+
+                        )
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(LocalSpacing.current.extraSmall),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Text(
+                        text = "Location: $customerLocation".toEllipses(30),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Normal,
+                        color = secondaryContentColor,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(LocalSpacing.current.extraSmall),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    val debtColor = if (convertToDouble(customerDebt) > 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+                    Text(
+                        text = "Debt: $customerDebt".toEllipses(25),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = debtColor,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+
+            Column(modifier = Modifier
+                .width(LocalSpacing.current.medium)
+                .fillMaxHeight(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                Column(modifier = Modifier
+                    .weight(1f)
+                    .onSizeChanged { itemHeight = with(density) { it.height.toDp() } }
+                    .pointerInput(true) {
+                        detectTapGestures(
+                            onPress = {
+                                expandOptionsDropDown = true
+                                pressOffset = DpOffset(it.x.toDp(), it.y.toDp())
+                            }
+                        )
+                    },
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top
+                ) {
+                    Spacer(modifier = Modifier.height(LocalSpacing.current.extraSmall))
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_options),
+                        contentDescription = emptyString,
+                        tint = mainContentColor
+                    )
+                    DropdownMenu(modifier = Modifier
+                        .width(150.dp),
+                        expanded = expandOptionsDropDown,
+                        onDismissRequest = { expandOptionsDropDown = false },
+                        offset = pressOffset
+                    ) {
+                        dropDownOptions.forEachIndexed{ index, value->
+                            Box(modifier = Modifier
+                                .height(LocalSpacing.current.dropDownItem),
+                                contentAlignment = Alignment.CenterStart
+                            ) {
+                                DropdownMenuItem(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    text = {
+                                        Row(modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.Start,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = value,
+                                                color = secondaryContentColor,
+                                                style = MaterialTheme.typography.bodyLarge,
+                                                fontWeight = FontWeight.Normal
+                                            )
+                                        }
+                                    },
+                                    onClick = {
+                                        if (index == 0){ onOpenCustomer() }else{ onDelete() }
+                                        expandOptionsDropDown = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Box(modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.BottomCenter
+                ) {
+                    Text(text = number,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Light,
+                        maxLines = 1,
+                        color = secondaryContentColor,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
         }
     }
+
 }
 

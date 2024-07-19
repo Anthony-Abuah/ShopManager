@@ -1,6 +1,7 @@
 package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.records.customer
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -16,7 +17,7 @@ import com.example.myshopmanagerapp.feature_app.data.local.entities.customers.Cu
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenColumnWithoutBottomBar
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.ConfirmationInfoDialog
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.DeleteConfirmationDialog
-import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
+import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.*
 
 
 @Composable
@@ -57,14 +58,19 @@ fun CustomerListContent(
         }
     }
     else {
+        val secondaryContentColor = if (isSystemInDarkTheme()) Grey70 else Grey40
+        val contentColor = if (isSystemInDarkTheme()) Grey99 else Grey10
+
         BasicScreenColumnWithoutBottomBar {
+            HorizontalDivider(modifier = Modifier.padding(bottom = LocalSpacing.current.small))
             customers.forEachIndexed { index, customer ->
-                if (index == 0){ HorizontalDivider() }
                 Box(
                     modifier = Modifier.padding(LocalSpacing.current.extraSmall),
                     contentAlignment = Alignment.Center
                 ) {
                     CustomerCard(
+                        mainContentColor = contentColor,
+                        secondaryContentColor = secondaryContentColor,
                         customerName = customer.customerName,
                         customerContact = customer.customerContact,
                         customerLocation = customer.customerLocation ?: emptyString,
@@ -77,7 +83,6 @@ fun CustomerListContent(
                         openDeleteConfirmation = !openDeleteConfirmation
                     }
                 }
-                HorizontalDivider()
             }
         }
         DeleteConfirmationDialog(

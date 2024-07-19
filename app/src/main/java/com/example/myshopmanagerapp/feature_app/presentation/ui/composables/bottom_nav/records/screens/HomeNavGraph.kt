@@ -27,6 +27,7 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.reco
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.records.stock.screens.StockNavGraph
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.records.supplier.screens.SupplierNavGraph
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.records.withdrawal.screens.WithdrawalNavGraph
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.start_app.StartAppNavGraph
 
 @Composable
 fun HomeNavGraph(
@@ -66,6 +67,9 @@ fun HomeNavGraph(
                 navigateToPersonnelNavGraph = {
                     isLoggedIn = it
                     navController.navigate(HomeScreens.PersonnelProfileNavGraph.route)
+                },
+                navigateToStartNavGraph = {
+                    navController.navigate(HomeScreens.StartNavGraph.route)
                 },
                 navigateToRevenueListScreen = {
                     navController.navigate(HomeScreens.RevenueNavGraph.route)
@@ -111,8 +115,32 @@ fun HomeNavGraph(
                         easing = LinearOutSlowInEasing
                     )
                 ) + fadeOut(animationSpec = tween(500))
-            }){
+            }
+        ){
             RevenueNavGraph(navHostController = navController)
+        }
+
+        composable(route = HomeScreens.StartNavGraph.route,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { 500 },
+                    animationSpec = tween(
+                        durationMillis = 500,
+                        easing = LinearOutSlowInEasing
+                    )
+                ) + fadeIn(animationSpec = tween(500))
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { -500 },
+                    animationSpec = tween(
+                        durationMillis = 500,
+                        easing = LinearOutSlowInEasing
+                    )
+                ) + fadeOut(animationSpec = tween(500))
+            }
+        ){
+            StartAppNavGraph(navController = navController)
         }
 
         composable(route = HomeScreens.PersonnelProfileNavGraph.route,

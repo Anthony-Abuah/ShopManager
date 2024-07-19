@@ -88,7 +88,7 @@ fun InventoryAndStockReportContent(
                 contentAlignment = Alignment.Center
             ) {
                 InfoDisplayCard(
-                    icon = R.drawable.inventory_item,
+                    image = R.drawable.inventory_item,
                     currency = currency,
                     currencySize = 36.sp,
                     bigText = "$currency $totalInventoryItemsValue",
@@ -230,7 +230,7 @@ fun InventoryAndStockReportContent(
                     contentAlignment = Alignment.Center
                 ) {
                     InfoDisplayCard(
-                        icon = R.drawable.quantity,
+                        image = R.drawable.quantity,
                         imageWidth = 32.dp,
                         currency = currency,
                         currencySize = 20.sp,
@@ -251,7 +251,7 @@ fun InventoryAndStockReportContent(
                     contentAlignment = Alignment.Center
                 ) {
                     InfoDisplayCard(
-                        icon = R.drawable.quantity,
+                        image = R.drawable.quantity,
                         imageWidth = 32.dp,
                         currency = currency,
                         currencySize = 20.sp,
@@ -273,7 +273,7 @@ fun InventoryAndStockReportContent(
                     contentAlignment = Alignment.Center
                 ) {
                     InfoDisplayCard(
-                        icon = R.drawable.price,
+                        image = R.drawable.price,
                         imageWidth = 32.dp,
                         currency = currency,
                         currencySize = 20.sp,
@@ -295,7 +295,7 @@ fun InventoryAndStockReportContent(
                     contentAlignment = Alignment.Center
                 ) {
                     InfoDisplayCard(
-                        icon = R.drawable.price,
+                        image = R.drawable.price,
                         imageWidth = 32.dp,
                         currency = currency,
                         currencySize = 20.sp,

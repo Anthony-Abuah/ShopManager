@@ -38,9 +38,9 @@ fun ViewCustomerScreen(
             ViewCustomerContent(
                 customer = customerViewModel.customerInfo,
                 currency = "GHS",
-                customerUpdatingIsSuccessful = customerViewModel.updateCustomerState.value.isSuccessful,
-                isUpdatingCustomer = customerViewModel.updateCustomerState.value.isLoading,
                 customerUpdatingMessage = customerViewModel.updateCustomerState.value.message,
+                isUpdatingCustomer = customerViewModel.updateCustomerState.value.isLoading,
+                customerUpdatingIsSuccessful = customerViewModel.updateCustomerState.value.isSuccessful,
                 updateCustomerName = {_customerName ->
                     customerViewModel.updateCustomerName(_customerName)
                 },
@@ -57,8 +57,7 @@ fun ViewCustomerScreen(
                     customerViewModel.customerInfo.let { _customer ->
                         customerViewModel.updateCustomer(_customer)
                     }
-                },
-                takePhoto = { navigateToTakePhotoScreen() }
+                }
             ) {
                 navigateBack()
             }

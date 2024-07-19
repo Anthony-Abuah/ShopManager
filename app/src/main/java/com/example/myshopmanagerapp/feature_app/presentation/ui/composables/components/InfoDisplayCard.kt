@@ -25,7 +25,7 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpaci
 
 @Composable
 fun InfoDisplayCard(
-    icon: Int = R.drawable.ic_inventory_item,
+    image: Int = R.drawable.ic_inventory_item,
     imageWidth: Dp = 40.dp,
     currency: String = emptyString,
     currencySize: TextUnit = 32.sp,
@@ -76,7 +76,7 @@ fun InfoDisplayCard(
                         modifier = Modifier
                             .size(imageWidth)
                             .aspectRatio(1f),
-                        painter = painterResource(id = icon),
+                        painter = painterResource(id = image),
                         contentDescription = emptyString
                     )
                 }
