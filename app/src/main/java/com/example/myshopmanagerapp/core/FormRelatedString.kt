@@ -3,6 +3,7 @@ package com.example.myshopmanagerapp.core
 
 object FormRelatedString{
 
+    const val Location = "Location"
     const val ShortNotes = "Short Notes/Description"
     const val UpdateShortNotes = "Update short notes/description"
     const val UpdateChanges = "Update Changes"
@@ -50,9 +51,10 @@ object FormRelatedString{
     const val ClickToRestoreDatabaseToFile = "Click to restore database from file"
     const val ClickToBackupDataRemotely = "Click to backup data remotely"
     const val ClickToSyncData = "Click to sync remote data with local data"
+    const val ProductsSold = "Products sold"
+    const val ShopOwners = "Shop Owner(s)"
 
     const val ShopName = "Shop Name"
-    const val ItemsSold = "Products/Items Sold"
     const val InventoryItemValue = "Total value of all inventory items"
     const val ExpectedSales = "Expected sales revenue"
     const val ExpectedProfit = "Expected gross profit "
@@ -61,7 +63,6 @@ object FormRelatedString{
     const val LeastAvailableItem = "Least available inventory item"
     const val MostExpensiveItem = "Most expensive inventory item"
     const val LeastExpensiveItem = "Least expensive inventory item"
-    const val ShowAllCategories = "Show all item categories"
     const val NumberOfInventoryItems = "Number of inventory items"
     const val NumberOfActivePersonnel = "Number of active personnel"
     const val NumberOfOwingCustomers = "Number of owing customers"
@@ -340,11 +341,10 @@ object FormRelatedString{
     const val RegisterPersonnel = "Register Personnel"
     const val PersonnelInformation = "Personnel Information"
     const val UniquePersonnelId = "Unique Personnel Id"
-    const val PersonnelUserName = "Username"
     const val PersonnelFirstName = "First Name"
     const val PersonnelLastName = "Last Name"
     const val PersonnelOtherNames = "Other Names"
-    const val PersonnelContact = "Contact"
+    const val Contact = "Contact"
     const val PersonnelRole = "Personnel Role"
     const val PersonnelHasAdminRights = "Has Admin Privileges"
     const val PersonnelIsActive = "Is Active"

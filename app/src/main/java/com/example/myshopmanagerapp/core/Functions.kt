@@ -119,10 +119,14 @@ object Functions {
         return remainingItemQuantities.plus(nullableCategorizations.filterNotNull()).sortedBy { it.unitsPerSize }
     }
 
-    fun String.toEllipses(length: Int): String {
-        return if (this.length > length){
-            "${this.take(length.minus(3))}..."
-        }else this
+    fun String?.toEllipses(length: Int): String {
+        return if (this.toNotNull().length > length){
+            if (length > 4) {
+                "${this.toNotNull().take(length.minus(3))}..."
+            }else{
+                this.toNotNull()
+            }
+        }else this.toNotNull()
     }
 
     fun Double.toNearestCeiling(): Double {

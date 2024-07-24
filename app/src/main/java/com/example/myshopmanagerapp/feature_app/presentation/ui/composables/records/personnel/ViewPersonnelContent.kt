@@ -13,7 +13,7 @@ import com.example.myshopmanagerapp.core.Constants.Yes
 import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.FormRelatedString.PasswordResetSuccessful
 import com.example.myshopmanagerapp.core.FormRelatedString.PasswordResetUnsuccessful
-import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelContact
+import com.example.myshopmanagerapp.core.FormRelatedString.Contact
 import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelFirstName
 import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelHasAdminRights
 import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelInformation
@@ -79,14 +79,14 @@ fun ViewPersonnelContent(
         HorizontalDivider()
 
         ViewTextValueRow(
-            viewTitle = PersonnelContact,
+            viewTitle = Contact,
             viewValue = personnel.contact
         )
 
         HorizontalDivider()
 
         ViewTextValueRow(
-            viewTitle = PersonnelContact,
+            viewTitle = Contact,
             viewValue = personnel.contact
         )
 

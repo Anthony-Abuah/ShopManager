@@ -29,7 +29,7 @@ import com.example.myshopmanagerapp.core.FormRelatedString.EnterPersonnelOtherNa
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterPersonnelRole
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterPersonnelUserName
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterShortDescription
-import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelContact
+import com.example.myshopmanagerapp.core.FormRelatedString.Contact
 import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelContactPlaceholder
 import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelHasAdminRights
 import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelIsActive
@@ -404,7 +404,7 @@ fun PersonnelProfileContent(
                 contentAlignment = Alignment.Center
             ) {
                 VerticalDisplayAndEditTextValues(
-                    firstText = PersonnelContact,
+                    firstText = Contact,
                     firstTextColor = titleColor,
                     secondText = personnel.contact,
                     secondTextColor = descriptionColor,
@@ -484,173 +484,6 @@ fun PersonnelProfileContent(
             }
         }
     }
-
-    /*
-    BasicScreenColumnWithoutBottomBar {
-        // Personnel Photo
-        ViewPhoto(icon = R.drawable.ic_personnel)
-
-        HorizontalDivider(thickness = LocalSpacing.current.extraSmall)
-
-        //Personnel Info
-        ViewInfo(PersonnelInformation)
-
-        HorizontalDivider(thickness = LocalSpacing.current.extraSmall)
-
-        // Unique PersonnelId Id
-        ViewTextValueRow(
-            viewTitle = UniquePersonnelId,
-            viewValue = personnel.uniquePersonnelId
-        )
-
-        HorizontalDivider()
-
-        // Personnel User Name
-        ViewOrUpdateTextValueRow(
-            viewTitle = PersonnelUserName,
-            viewValue = personnel.userName,
-            placeholder = PersonnelNamePlaceholder,
-            label = EnterPersonnelUserName,
-            icon = R.drawable.ic_edit,
-            getUpdatedValue = {
-                updateUsername  (it)
-                updateConfirmationInfo = !updateConfirmationInfo
-            }
-        )
-
-        HorizontalDivider()
-
-        // Personnel First Name
-        ViewOrUpdateTextValueRow(
-            viewTitle = PersonnelFirstName,
-            viewValue = personnel.firstName,
-            placeholder = PersonnelNamePlaceholder,
-            label = EnterPersonnelFirstName,
-            icon = R.drawable.ic_edit,
-            getUpdatedValue = {
-                updateFirstName(it)
-                updateConfirmationInfo = !updateConfirmationInfo }
-        )
-
-        HorizontalDivider()
-
-        // Personnel Last Name
-        ViewOrUpdateTextValueRow(
-            viewTitle = PersonnelLastName,
-            viewValue = personnel.lastName,
-            placeholder = PersonnelNamePlaceholder,
-            label = EnterPersonnelLastName,
-            icon = R.drawable.ic_edit,
-            getUpdatedValue = {updateLastName(it)
-                updateConfirmationInfo = !updateConfirmationInfo}
-        )
-
-        HorizontalDivider()
-
-        // Personnel Other Names
-        ViewOrUpdateTextValueRow(
-            viewTitle = PersonnelOtherNames,
-            viewValue = personnel.otherNames.toNotNull(),
-            placeholder = PersonnelNamePlaceholder,
-            label = EnterPersonnelOtherName,
-            icon = R.drawable.ic_edit,
-            getUpdatedValue = {updateOtherNames(it)
-                updateConfirmationInfo = !updateConfirmationInfo}
-        )
-
-        HorizontalDivider()
-
-        // Personnel Contact
-        ViewOrUpdateNumberValueRow(
-            viewTitle = PersonnelContact,
-            viewValue = personnel.contact,
-            placeholder = PersonnelContactPlaceholder,
-            label = EnterPersonnelContact,
-            icon = R.drawable.ic_edit,
-            getUpdatedValue = {updateContact(it)
-                updateConfirmationInfo = !updateConfirmationInfo}
-        )
-
-        HorizontalDivider()
-
-        // Personnel PersonnelRole
-        ViewOrUpdateAutoCompleteValueRow(
-            viewTitle = PersonnelRole,
-            viewValue = personnel.role.toNotNull(),
-            placeholder = PersonnelRolePlaceholder,
-            label = EnterPersonnelRole,
-            expandedIcon = R.drawable.ic_person_filled,
-            unexpandedIcon = R.drawable.ic_person_outline,
-            listItems = personnelRoles.toPersonnelRoles().map { it.personnelRole },
-            onClickAddButton = { openRolesDialog = !openRolesDialog },
-            getUpdatedValue = { updatePersonnelRole(it)
-                updateConfirmationInfo = !updateConfirmationInfo }
-        )
-
-        HorizontalDivider()
-
-        // Personnel Has Admin Right
-        ViewTextValueRow(
-            viewTitle = PersonnelHasAdminRights,
-            viewValue = if (personnel.hasAdminRights == true) "Yes" else "No"
-        )
-
-        HorizontalDivider()
-
-        // Personnel Is Active
-        ViewTextValueRow(
-            viewTitle = PersonnelIsActive,
-            viewValue = if (personnel.isActive == true) "Yes" else "No"
-        )
-
-        HorizontalDivider()
-
-        // Personnel Short Notes
-        ViewOrUpdateNumberValueRow(
-            viewTitle = PersonnelShortNotes,
-            viewValue = personnel.otherInfo.toNotNull(),
-            placeholder = emptyString,
-            label = EnterShortDescription,
-            icon = R.drawable.ic_edit,
-            getUpdatedValue = {updateOtherInfo(it)
-                updateConfirmationInfo = !updateConfirmationInfo
-            }
-        )
-
-        HorizontalDivider()
-
-        Box(modifier = Modifier
-            .padding(LocalSpacing.current.smallMedium)
-            .fillMaxWidth()
-            .height(LocalSpacing.current.buttonHeight)
-            .background(MaterialTheme.colorScheme.primary, MaterialTheme.shapes.small)
-            .clickable { confirmLogout = true },
-            contentAlignment = Alignment.Center
-        ){
-            Row(modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Box(modifier = Modifier.padding(LocalSpacing.current.small)){
-                    androidx.compose.material.Icon(
-                        painter = painterResource(id = R.drawable.ic_logout),
-                        contentDescription = emptyString,
-                        tint = MaterialTheme.colorScheme.onPrimary
-                    )
-                }
-                Box(modifier = Modifier.padding(LocalSpacing.current.small)){
-                    Text(
-                        text = "Logout",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        overflow = TextOverflow.Ellipsis,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-            }
-        }
-    }
-    */
 
     BasicTextFieldAlertDialog(
         openDialog = openRolesDialog,

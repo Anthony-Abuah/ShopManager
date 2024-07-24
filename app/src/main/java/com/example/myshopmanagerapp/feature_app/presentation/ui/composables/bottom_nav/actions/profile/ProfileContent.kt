@@ -1,9 +1,6 @@
 package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.profile
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
@@ -13,25 +10,46 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.myshopmanagerapp.R
+import com.example.myshopmanagerapp.core.Constants.Email
+import com.example.myshopmanagerapp.core.Constants.NotAvailable
 import com.example.myshopmanagerapp.core.Constants.emptyString
+import com.example.myshopmanagerapp.core.FormRelatedString
 import com.example.myshopmanagerapp.core.FormRelatedString.AccountInformation
+import com.example.myshopmanagerapp.core.FormRelatedString.CompanyContactPlaceholder
+import com.example.myshopmanagerapp.core.FormRelatedString.CompanyEmailPlaceholder
+import com.example.myshopmanagerapp.core.FormRelatedString.CompanyLocationPlaceholder
+import com.example.myshopmanagerapp.core.FormRelatedString.CompanyNamePlaceholder
+import com.example.myshopmanagerapp.core.FormRelatedString.CompanyOwnerPlaceholder
+import com.example.myshopmanagerapp.core.FormRelatedString.CompanyProductPlaceholder
+import com.example.myshopmanagerapp.core.FormRelatedString.Contact
+import com.example.myshopmanagerapp.core.FormRelatedString.EnterCompanyContact
+import com.example.myshopmanagerapp.core.FormRelatedString.EnterCompanyEmail
+import com.example.myshopmanagerapp.core.FormRelatedString.EnterCompanyName
+import com.example.myshopmanagerapp.core.FormRelatedString.EnterCompanyOwner
+import com.example.myshopmanagerapp.core.FormRelatedString.EnterCompanyProducts
+import com.example.myshopmanagerapp.core.FormRelatedString.EnterCustomerLocation
+import com.example.myshopmanagerapp.core.FormRelatedString.Location
+import com.example.myshopmanagerapp.core.FormRelatedString.ProductsSold
+import com.example.myshopmanagerapp.core.FormRelatedString.ShopName
+import com.example.myshopmanagerapp.core.FormRelatedString.ShopOwners
 import com.example.myshopmanagerapp.core.Functions.toDate
+import com.example.myshopmanagerapp.core.Functions.toEllipses
 import com.example.myshopmanagerapp.core.Functions.toLocalDate
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.feature_app.data.local.entities.company.CompanyEntity
-import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenColumnWithoutBottomBar
-import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.ConfirmationInfoDialog
-import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.DeleteConfirmationDialog
-import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.Blue40
-import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.Blue90
-import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.*
+import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.*
 import java.util.*
 
 
@@ -45,6 +63,26 @@ fun ProfileContent(
     openLoginPage: ()-> Unit,
     openSignUpPage: ()-> Unit,
 ) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
+    val mainBackgroundColor = if (isSystemInDarkTheme()) Grey10 else Grey99
+    val alternateBackgroundColor = if (isSystemInDarkTheme()) Grey15 else Grey95
+    val cardBackgroundColor = if (isSystemInDarkTheme()) Grey15 else BlueGrey90
+
+    val shadowColor = if (isSystemInDarkTheme()) Grey5 else Grey80
+    val descriptionColor = if (isSystemInDarkTheme()) Grey70 else Grey40
+    val titleColor = if (isSystemInDarkTheme()) Grey99 else Grey10
+
+    val greenBackground = if (isSystemInDarkTheme()) Green5 else Green95
+    val greenContentLight = if (isSystemInDarkTheme()) Grey70 else Green30
+    val greenContent = if (isSystemInDarkTheme()) Grey99 else Green20
+
+    val logoutBackground = if (isSystemInDarkTheme()) Red5 else Red95
+    val logoutContentLight = if (isSystemInDarkTheme()) Grey70 else Red30
+    val logoutContent = if (isSystemInDarkTheme()) Grey99 else Red20
+
+
     var confirmationInfoDialog by remember {
         mutableStateOf(false)
     }
@@ -139,9 +177,222 @@ fun ProfileContent(
             }
 
         }
-    }else {
+    }
+
+    else {
         BasicScreenColumnWithoutBottomBar {
-            // Shop route
+            val shopName = shopInfo?.companyName?.toNotNull().toEllipses(30)
+            val contact = "Contact: ${shopInfo?.companyContact?.toNotNull().toEllipses(25)}"
+            val location = "Location: ${shopInfo?.companyLocation?.toNotNull().toEllipses(25)}"
+            Box(modifier = Modifier
+                .background(Color.Transparent)
+                .fillMaxWidth()
+                .height(200.dp)
+                .padding(LocalSpacing.current.noPadding),
+                contentAlignment = Alignment.Center
+            ){
+                InfoDisplayCard(
+                    image = R.drawable.shop,
+                    imageWidth = 75.dp,
+                    bigText = shopName,
+                    bigTextSize = 20.sp,
+                    smallTextFontWeight = FontWeight.Normal,
+                    smallText = "$contact\n$location",
+                    smallTextSize = 15.sp,
+                    smallTextColor = descriptionColor,
+                    backgroundColor = Color.Transparent,
+                    elevation = LocalSpacing.current.small,
+                    isAmount = false
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .padding(vertical = LocalSpacing.current.medium)
+                    .background(alternateBackgroundColor, MaterialTheme.shapes.large),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top,
+            ) {
+
+                Box(
+                    modifier = Modifier
+                        .background(Color.Transparent)
+                        .padding(LocalSpacing.current.default,)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    VerticalDisplayAndEditTextValues(
+                        firstText = ShopName,
+                        firstTextColor = titleColor,
+                        secondText = shopInfo?.companyName.toNotNull().ifBlank { NotAvailable },
+                        secondTextColor = descriptionColor,
+                        value = shopInfo?.companyName.toNotNull().ifBlank { NotAvailable },
+                        leadingIcon = R.drawable.ic_shop_name,
+                        leadingIconWidth = 32.dp,
+                        onBackgroundColor = titleColor,
+                        keyboardType = KeyboardType.Text,
+                        label = EnterCompanyName,
+                        placeholder = CompanyNamePlaceholder,
+                        textFieldIcon = R.drawable.ic_edit,
+                        getUpdatedValue = {}
+                    )
+                }
+
+
+                Box(
+                    modifier = Modifier
+                        .background(Color.Transparent)
+                        .padding(LocalSpacing.current.default)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    VerticalDisplayAndEditTextValues(
+                        firstText = Contact,
+                        firstTextColor = titleColor,
+                        secondText = shopInfo?.companyContact.toNotNull().ifBlank { NotAvailable },
+                        secondTextColor = descriptionColor,
+                        value = shopInfo?.companyContact.toNotNull().ifBlank { NotAvailable },
+                        leadingIcon = R.drawable.ic_contact,
+                        leadingIconWidth = 32.dp,
+                        onBackgroundColor = titleColor,
+                        keyboardType = KeyboardType.Phone,
+                        label = EnterCompanyContact,
+                        placeholder = CompanyContactPlaceholder,
+                        textFieldIcon = R.drawable.ic_edit,
+                        getUpdatedValue = {}
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .background(Color.Transparent)
+                        .padding(LocalSpacing.current.default)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    VerticalDisplayAndEditTextValues(
+                        firstText = Location,
+                        firstTextColor = titleColor,
+                        secondText = shopInfo?.companyLocation.toNotNull().ifBlank { NotAvailable },
+                        secondTextColor = descriptionColor,
+                        value = shopInfo?.companyLocation.toNotNull().ifBlank { NotAvailable },
+                        leadingIcon = R.drawable.ic_location,
+                        leadingIconWidth = 32.dp,
+                        onBackgroundColor = titleColor,
+                        keyboardType = KeyboardType.Text,
+                        label = EnterCustomerLocation,
+                        placeholder = CompanyLocationPlaceholder,
+                        textFieldIcon = R.drawable.ic_edit,
+                        getUpdatedValue = {}
+                    )
+                }
+            }
+
+
+            Column(
+                modifier = Modifier
+                    .padding(vertical = LocalSpacing.current.large)
+                    .background(alternateBackgroundColor, MaterialTheme.shapes.medium),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .background(Color.Transparent)
+                        .padding(LocalSpacing.current.noPadding)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    HorizontalDisplayAndEditTextValues(
+                        modifier = Modifier.padding(
+                            horizontal = LocalSpacing.current.smallMedium,
+                            vertical = LocalSpacing.current.default,
+                        ),
+                        leadingIcon = null,
+                        firstText = "Other Information",
+                        firstTextSize = 14.sp,
+                        secondText = emptyString,
+                        readOnly = true
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .background(mainBackgroundColor)
+                        .padding(LocalSpacing.current.small)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    HorizontalDisplayAndEditTextValues(
+                        modifier = Modifier.padding(vertical = LocalSpacing.current.smallMedium),
+                        firstText = shopInfo?.email.toNotNull().ifBlank { NotAvailable },
+                        secondText = Email,
+                        secondTextFontWeight = FontWeight.Normal,
+                        secondTextColor = MaterialTheme.colorScheme.primary,
+                        value = shopInfo?.email.toNotNull().ifBlank { NotAvailable },
+                        trailingIcon = R.drawable.ic_keyboard_arrow_right,
+                        trailingIconWidth = 32.dp,
+                        leadingIcon = R.drawable.ic_email,
+                        onBackgroundColor = titleColor,
+                        label = EnterCompanyEmail,
+                        placeholder = CompanyEmailPlaceholder,
+                        keyboardType = KeyboardType.Email,
+                        textFieldIcon = R.drawable.ic_edit,
+                        getUpdatedValue = {}
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .background(Color.Transparent)
+                        .padding(LocalSpacing.current.default,)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    VerticalDisplayAndEditTextValues(
+                        firstText = ProductsSold,
+                        firstTextColor = titleColor,
+                        secondText = shopInfo?.companyProductsAndServices.toNotNull().ifBlank { NotAvailable },
+                        secondTextColor = descriptionColor,
+                        value = shopInfo?.companyProductsAndServices.toNotNull().ifBlank { NotAvailable },
+                        leadingIcon = R.drawable.ic_product,
+                        leadingIconWidth = 32.dp,
+                        onBackgroundColor = titleColor,
+                        keyboardType = KeyboardType.Text,
+                        label = EnterCompanyProducts,
+                        placeholder = CompanyProductPlaceholder,
+                        textFieldIcon = R.drawable.ic_edit,
+                        getUpdatedValue = {}
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .background(Color.Transparent)
+                        .padding(LocalSpacing.current.default,)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    VerticalDisplayAndEditTextValues(
+                        firstText = ShopOwners,
+                        firstTextColor = titleColor,
+                        secondText = shopInfo?.companyOwners.toNotNull().ifBlank { NotAvailable },
+                        secondTextColor = descriptionColor,
+                        value = shopInfo?.companyOwners.toNotNull().ifBlank { NotAvailable },
+                        leadingIcon = R.drawable.ic_person_filled,
+                        leadingIconWidth = 32.dp,
+                        onBackgroundColor = titleColor,
+                        keyboardType = KeyboardType.Text,
+                        label = EnterCompanyOwner,
+                        placeholder = CompanyOwnerPlaceholder,
+                        textFieldIcon = R.drawable.ic_edit,
+                        getUpdatedValue = {}
+                    )
+                }
+
+            }
+
+
+            // Shop name
             if (shopInfo != null) {
                 Column(
                     modifier = Modifier
@@ -173,7 +424,7 @@ fun ProfileContent(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "Shop route: ${shopInfo.companyName}",
+                            text = "Shop name: ${shopInfo.companyName}",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onBackground,
                             overflow = TextOverflow.Ellipsis,
@@ -696,6 +947,7 @@ fun ProfileContent(
             }
         }
     }
+    
     DeleteConfirmationDialog(
         openDialog = confirmLogout,
         title = "Logout",
