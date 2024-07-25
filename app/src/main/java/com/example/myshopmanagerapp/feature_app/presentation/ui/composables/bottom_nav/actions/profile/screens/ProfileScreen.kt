@@ -37,10 +37,12 @@ fun ProfileScreen(
     Scaffold(
         topBar = {
             ProfileScreenTopBar(
-                topBarTitleText = "My Account",
+                topBarTitleText = "Shop Profile",
                 profileDropDownItems = listOfDropDownItems,
                 onClickItem = {
-                    navigateToChangePasswordScreen()
+                    if (isLoggedIn.toNotNull()) {
+                        navigateToChangePasswordScreen()
+                    }
                 }
             ) {
                 navigateBack()
@@ -59,7 +61,7 @@ fun ProfileScreen(
                 logoutMessage = companyLogOutMessage.toNotNull(),
                 isLoggingOut = false,
                 logout = { companyViewModel.companyLogout() },
-                openSignUpPage = { openSignUpPage() },
+                openRegisterPage = { openSignUpPage() },
                 openLoginPage = { openLoginPage() },
             )
         }

@@ -1,18 +1,15 @@
 package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.profile
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Icon
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -24,8 +21,6 @@ import com.example.myshopmanagerapp.R
 import com.example.myshopmanagerapp.core.Constants.Email
 import com.example.myshopmanagerapp.core.Constants.NotAvailable
 import com.example.myshopmanagerapp.core.Constants.emptyString
-import com.example.myshopmanagerapp.core.FormRelatedString
-import com.example.myshopmanagerapp.core.FormRelatedString.AccountInformation
 import com.example.myshopmanagerapp.core.FormRelatedString.CompanyContactPlaceholder
 import com.example.myshopmanagerapp.core.FormRelatedString.CompanyEmailPlaceholder
 import com.example.myshopmanagerapp.core.FormRelatedString.CompanyLocationPlaceholder
@@ -43,10 +38,11 @@ import com.example.myshopmanagerapp.core.FormRelatedString.Location
 import com.example.myshopmanagerapp.core.FormRelatedString.ProductsSold
 import com.example.myshopmanagerapp.core.FormRelatedString.ShopName
 import com.example.myshopmanagerapp.core.FormRelatedString.ShopOwners
-import com.example.myshopmanagerapp.core.Functions.toDate
+import com.example.myshopmanagerapp.core.Functions.toDateString
 import com.example.myshopmanagerapp.core.Functions.toEllipses
 import com.example.myshopmanagerapp.core.Functions.toLocalDate
 import com.example.myshopmanagerapp.core.Functions.toNotNull
+import com.example.myshopmanagerapp.core.Functions.toTimestamp
 import com.example.myshopmanagerapp.feature_app.data.local.entities.company.CompanyEntity
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.*
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.*
@@ -61,11 +57,8 @@ fun ProfileContent(
     isLoggingOut: Boolean,
     logout: ()-> Unit,
     openLoginPage: ()-> Unit,
-    openSignUpPage: ()-> Unit,
+    openRegisterPage: ()-> Unit,
 ) {
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-
     val mainBackgroundColor = if (isSystemInDarkTheme()) Grey10 else Grey99
     val alternateBackgroundColor = if (isSystemInDarkTheme()) Grey15 else Grey95
     val cardBackgroundColor = if (isSystemInDarkTheme()) Grey15 else BlueGrey90
@@ -74,14 +67,12 @@ fun ProfileContent(
     val descriptionColor = if (isSystemInDarkTheme()) Grey70 else Grey40
     val titleColor = if (isSystemInDarkTheme()) Grey99 else Grey10
 
-    val greenBackground = if (isSystemInDarkTheme()) Green5 else Green95
     val greenContentLight = if (isSystemInDarkTheme()) Grey70 else Green30
     val greenContent = if (isSystemInDarkTheme()) Grey99 else Green20
 
-    val logoutBackground = if (isSystemInDarkTheme()) Red5 else Red95
+    val logoutBackground = if (isSystemInDarkTheme()) Red10 else Red95
     val logoutContentLight = if (isSystemInDarkTheme()) Grey70 else Red30
     val logoutContent = if (isSystemInDarkTheme()) Grey99 else Red20
-
 
     var confirmationInfoDialog by remember {
         mutableStateOf(false)
@@ -160,11 +151,11 @@ fun ProfileContent(
                 }
                 Box(modifier = Modifier
                     .padding(LocalSpacing.current.extraSmall)
-                    .clickable { openSignUpPage() },
+                    .clickable { openRegisterPage() },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Sign up",
+                        text = "Register",
                         style = MaterialTheme.typography.titleMedium,
                         color = if (isSystemInDarkTheme()) Blue90 else Blue40,
                         overflow = TextOverflow.Ellipsis,
@@ -188,7 +179,7 @@ fun ProfileContent(
                 .background(Color.Transparent)
                 .fillMaxWidth()
                 .height(200.dp)
-                .padding(LocalSpacing.current.noPadding),
+                .padding(LocalSpacing.current.default),
                 contentAlignment = Alignment.Center
             ){
                 InfoDisplayCard(
@@ -201,6 +192,32 @@ fun ProfileContent(
                     smallTextSize = 15.sp,
                     smallTextColor = descriptionColor,
                     backgroundColor = Color.Transparent,
+                    elevation = LocalSpacing.current.noElevation,
+                    isAmount = false
+                )
+            }
+
+            Box(modifier = Modifier
+                .padding(vertical = LocalSpacing.current.default)
+                .height(120.dp)
+                .background(Color.Transparent)
+                .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ){
+                val registeredDate = shopInfo?.dateCreated?.toLocalDate()
+                val registeredDay = registeredDate?.dayOfWeek?.toString()?.lowercase()
+                    ?.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+                val registeredDateString = registeredDate?.toDateString()
+                InfoDisplayCard(
+                    image = R.drawable.days,
+                    imageWidth = 45.dp,
+                    bigText = "$registeredDay, $registeredDateString",
+                    bigTextSize = 18.sp,
+                    smallTextFontWeight = FontWeight.SemiBold,
+                    smallText = "Date Registered",
+                    smallTextSize = 14.sp,
+                    smallTextColor = descriptionColor,
+                    backgroundColor = cardBackgroundColor,
                     elevation = LocalSpacing.current.small,
                     isAmount = false
                 )
@@ -208,7 +225,7 @@ fun ProfileContent(
 
             Column(
                 modifier = Modifier
-                    .padding(vertical = LocalSpacing.current.medium)
+                    .padding(vertical = LocalSpacing.current.default)
                     .background(alternateBackgroundColor, MaterialTheme.shapes.large),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top,
@@ -217,7 +234,7 @@ fun ProfileContent(
                 Box(
                     modifier = Modifier
                         .background(Color.Transparent)
-                        .padding(LocalSpacing.current.default,)
+                        .padding(LocalSpacing.current.default)
                         .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
@@ -289,10 +306,68 @@ fun ProfileContent(
             }
 
 
+            Row(
+                modifier = Modifier
+                    .padding(vertical = LocalSpacing.current.default),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ){
+                Box(modifier = Modifier
+                    .background(Color.Transparent)
+                    .weight(1f)
+                    .height(120.dp)
+                    .padding(horizontal = LocalSpacing.current.small),
+                    contentAlignment = Alignment.Center
+                ){
+                    val isSubscribed = shopInfo?.subscriptionPackage.isNullOrBlank()
+                    InfoDisplayCard(
+                        image = if (!isSubscribed) R.drawable.ic_check else R.drawable.ic_cancel,
+                        imageWidth = 32.dp,
+                        bigText = "\n${shopInfo?.subscriptionPackage.toNotNull().ifBlank { "Not Subscribed" }}",
+                        bigTextSize = 18.sp,
+                        bigTextColor = greenContent,
+                        smallTextFontWeight = FontWeight.SemiBold,
+                        smallText = emptyString,
+                        smallTextSize = 2.sp,
+                        smallTextColor = greenContentLight,
+                        backgroundColor = cardBackgroundColor,
+                        elevation = LocalSpacing.current.small,
+                        isAmount = false
+                    )
+                }
+
+                Box(modifier = Modifier
+                    .background(Color.Transparent)
+                    .weight(1f)
+                    .height(120.dp)
+                    .padding(horizontal = LocalSpacing.current.small),
+                    contentAlignment = Alignment.Center
+                ){
+                    val endDate = shopInfo?.subscriptionEndDate?.toLocalDate()
+                    val endDateDay = endDate?.dayOfWeek?.toString()?.take(3).toNotNull().lowercase()
+                        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
+                    val endDateString = endDate?.toDateString().toNotNull()
+                    InfoDisplayCard(
+                        image = R.drawable.days,
+                        imageWidth = 32.dp,
+                        bigText = if (endDate.toTimestamp() < Date().time) "$endDateDay, $endDateString" else "Not Subscribed",
+                        bigTextSize = 16.sp,
+                        bigTextColor = greenContent,
+                        smallTextFontWeight = FontWeight.SemiBold,
+                        smallText = "Subscription End date",
+                        smallTextSize = 14.sp,
+                        smallTextColor = descriptionColor,
+                        backgroundColor = cardBackgroundColor,
+                        elevation = LocalSpacing.current.small,
+                        isAmount = false
+                    )
+                }
+            }
+
             Column(
                 modifier = Modifier
-                    .padding(vertical = LocalSpacing.current.large)
-                    .background(alternateBackgroundColor, MaterialTheme.shapes.medium),
+                    .padding(vertical = LocalSpacing.current.default)
+                    .background(alternateBackgroundColor, MaterialTheme.shapes.large),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top,
             ) {
@@ -316,23 +391,22 @@ fun ProfileContent(
                     )
                 }
 
+
                 Box(
                     modifier = Modifier
                         .background(mainBackgroundColor)
-                        .padding(LocalSpacing.current.small)
+                        .padding(LocalSpacing.current.default)
                         .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    HorizontalDisplayAndEditTextValues(
-                        modifier = Modifier.padding(vertical = LocalSpacing.current.smallMedium),
-                        firstText = shopInfo?.email.toNotNull().ifBlank { NotAvailable },
-                        secondText = Email,
-                        secondTextFontWeight = FontWeight.Normal,
-                        secondTextColor = MaterialTheme.colorScheme.primary,
+                    VerticalDisplayAndEditTextValues(
+                        firstText = Email,
+                        firstTextColor = titleColor,
+                        secondText = shopInfo?.email.toNotNull().ifBlank { NotAvailable },
+                        secondTextColor = descriptionColor,
                         value = shopInfo?.email.toNotNull().ifBlank { NotAvailable },
-                        trailingIcon = R.drawable.ic_keyboard_arrow_right,
-                        trailingIconWidth = 32.dp,
                         leadingIcon = R.drawable.ic_email,
+                        leadingIconWidth = 32.dp,
                         onBackgroundColor = titleColor,
                         label = EnterCompanyEmail,
                         placeholder = CompanyEmailPlaceholder,
@@ -341,10 +415,11 @@ fun ProfileContent(
                         getUpdatedValue = {}
                     )
                 }
+
                 Box(
                     modifier = Modifier
-                        .background(Color.Transparent)
-                        .padding(LocalSpacing.current.default,)
+                        .background(mainBackgroundColor)
+                        .padding(LocalSpacing.current.default)
                         .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
@@ -367,12 +442,13 @@ fun ProfileContent(
 
                 Box(
                     modifier = Modifier
-                        .background(Color.Transparent)
-                        .padding(LocalSpacing.current.default,)
+                        .background(mainBackgroundColor)
+                        .padding(LocalSpacing.current.default)
                         .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
                     VerticalDisplayAndEditTextValues(
+                        modifier = Modifier.fillMaxWidth(),
                         firstText = ShopOwners,
                         firstTextColor = titleColor,
                         secondText = shopInfo?.companyOwners.toNotNull().ifBlank { NotAvailable },
@@ -391,559 +467,25 @@ fun ProfileContent(
 
             }
 
-
-            // Shop name
-            if (shopInfo != null) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = LocalSpacing.current.default),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Top
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(150.dp)
-                            .background(MaterialTheme.colorScheme.surface, CircleShape)
-                            .padding(LocalSpacing.current.noPadding),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Image(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(LocalSpacing.current.small),
-                            painter = painterResource(id = R.drawable.shop),
-                            contentDescription = emptyString
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight()
-                            .padding(LocalSpacing.current.small),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Shop name: ${shopInfo.companyName}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            overflow = TextOverflow.Ellipsis,
-                            textAlign = TextAlign.Center,
-                            maxLines = 1,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-                }
-
-                HorizontalDivider(
-                    modifier = Modifier.padding(
-                        top = LocalSpacing.current.default,
-                        bottom = LocalSpacing.current.smallMedium
-                    ),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    thickness = LocalSpacing.current.divider
-                )
-
-                // Account Info Title
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(LocalSpacing.current.small),
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    Text(
-                        text = AccountInformation,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        overflow = TextOverflow.Ellipsis,
-                        fontWeight = FontWeight.Bold
+            Box(
+                modifier = Modifier
+                    .background(Color.Transparent)
+                    .padding(
+                        vertical = LocalSpacing.current.medium,
+                        horizontal = LocalSpacing.current.default
                     )
-                }
-
-
-
-                HorizontalDivider(
-                    modifier = Modifier.padding(
-                        top = LocalSpacing.current.default,
-                        bottom = LocalSpacing.current.small
-                    ),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    thickness = LocalSpacing.current.divider
-                )
-
-                // Date Registered
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(LocalSpacing.current.small)
-                    ) {
-                        Column(
-                            modifier = Modifier.weight(6f),
-                            horizontalAlignment = Alignment.Start,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = LocalSpacing.current.small),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Text(
-                                    text = "Date registered",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontWeight = FontWeight.Light
-                                )
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(end = LocalSpacing.current.small),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                val dateRegistered = shopInfo.dateCreated
-                                val localDate = dateRegistered.toLocalDate()
-                                val dayOfWeek = localDate.dayOfWeek.toString().lowercase()
-                                    .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-                                Text(
-                                    text = "$dayOfWeek, $localDate",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontWeight = FontWeight.Normal
-                                )
-                            }
-                        }
-                    }
-                }
-
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = LocalSpacing.current.small),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    thickness = 0.25.dp
-                )
-
-                // Shop Email
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(LocalSpacing.current.small)
-                    ) {
-                        Column(
-                            modifier = Modifier.weight(6f),
-                            horizontalAlignment = Alignment.Start,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = LocalSpacing.current.small),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Text(
-                                    text = "Shop Email",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontWeight = FontWeight.Light
-                                )
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(end = LocalSpacing.current.small),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Text(
-                                    text = shopInfo.email,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontWeight = FontWeight.Normal
-                                )
-                            }
-                        }
-                    }
-                }
-
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = LocalSpacing.current.small),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    thickness = 0.25.dp
-                )
-
-                // Shop Contact
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(LocalSpacing.current.small)
-                    ) {
-                        Column(
-                            modifier = Modifier.weight(6f),
-                            horizontalAlignment = Alignment.Start,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = LocalSpacing.current.small),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Text(
-                                    text = "Shop Contact",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontWeight = FontWeight.Light
-                                )
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(end = LocalSpacing.current.small),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Text(
-                                    text = shopInfo.companyContact,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontWeight = FontWeight.Normal
-                                )
-                            }
-                        }
-                    }
-                }
-
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = LocalSpacing.current.small),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    thickness = 0.25.dp
-                )
-
-
-                // Shop Location
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(LocalSpacing.current.small)
-                    ) {
-                        Column(
-                            modifier = Modifier.weight(6f),
-                            horizontalAlignment = Alignment.Start,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = LocalSpacing.current.small),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Text(
-                                    text = "Shop Location",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontWeight = FontWeight.Light
-                                )
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(end = LocalSpacing.current.small),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Text(
-                                    text = shopInfo.companyLocation.toNotNull(),
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontWeight = FontWeight.Normal
-                                )
-                            }
-                        }
-                    }
-                }
-
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = LocalSpacing.current.small),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    thickness = 0.25.dp
-                )
-
-                // Shop Products
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(LocalSpacing.current.small)
-                    ) {
-                        Column(
-                            modifier = Modifier.weight(6f),
-                            horizontalAlignment = Alignment.Start,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = LocalSpacing.current.small),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Text(
-                                    text = "Shop Products",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontWeight = FontWeight.Light
-                                )
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(end = LocalSpacing.current.small),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Text(
-                                    text = shopInfo.companyProductsAndServices.toNotNull(),
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontWeight = FontWeight.Normal
-                                )
-                            }
-                        }
-                    }
-                }
-
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = LocalSpacing.current.small),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    thickness = 0.25.dp
-                )
-
-                // Shop Owners
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(LocalSpacing.current.small)
-                    ) {
-                        Column(
-                            modifier = Modifier.weight(6f),
-                            horizontalAlignment = Alignment.Start,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = LocalSpacing.current.small),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Text(
-                                    text = "Shop Owner(s)",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontWeight = FontWeight.Light
-                                )
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(end = LocalSpacing.current.small),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Text(
-                                    text = shopInfo.companyOwners.toNotNull(),
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontWeight = FontWeight.Normal
-                                )
-                            }
-                        }
-                    }
-                }
-
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = LocalSpacing.current.small),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    thickness = 0.25.dp
-                )
-
-                // Shop Subscription Package
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(LocalSpacing.current.small)
-                    ) {
-                        Column(
-                            modifier = Modifier.weight(6f),
-                            horizontalAlignment = Alignment.Start,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = LocalSpacing.current.small),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Text(
-                                    text = "Shop Subscription package",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontWeight = FontWeight.Light
-                                )
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(end = LocalSpacing.current.small),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Text(
-                                    text = if (shopInfo.subscriptionPackage.isNullOrEmpty()) "Not subscribed to any package" else shopInfo.subscriptionPackage.toNotNull(),
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontWeight = FontWeight.Normal
-                                )
-                            }
-                        }
-                    }
-                }
-
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = LocalSpacing.current.small),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    thickness = 0.25.dp
-                )
-
-                // Shop Subscription End date
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(LocalSpacing.current.small)
-                    ) {
-                        Column(
-                            modifier = Modifier.weight(6f),
-                            horizontalAlignment = Alignment.Start,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = LocalSpacing.current.small),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Text(
-                                    text = "Shop subscription end date",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontWeight = FontWeight.Light
-                                )
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(end = LocalSpacing.current.small),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                val subscriptionEndDate = shopInfo.subscriptionEndDate?.toDate()
-                                val localDate = subscriptionEndDate?.toLocalDate()
-                                val dayOfWeek = localDate?.dayOfWeek.toString().lowercase()
-                                    .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-                                Text(
-                                    text = if (shopInfo.subscriptionPackage.isNullOrEmpty()) "Not Subscribed" else "$dayOfWeek, $localDate",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontWeight = FontWeight.Normal
-                                )
-                            }
-                        }
-                    }
-                }
-
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = LocalSpacing.current.small),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    thickness = 0.25.dp
-                )
-
-                Box(modifier = Modifier
-                    .padding(LocalSpacing.current.small)
-                    .fillMaxWidth()
-                    .height(LocalSpacing.current.buttonHeight)
-                    .background(MaterialTheme.colorScheme.primary, MaterialTheme.shapes.small)
-                    .clickable { confirmLogout = true },
-                    contentAlignment = Alignment.Center
-                ){
-                    Row(modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Box(modifier = Modifier.padding(LocalSpacing.current.small)){
-                            Icon(painter = painterResource(id = R.drawable.ic_logout),
-                                contentDescription = emptyString,
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
-                        }
-                        Box(modifier = Modifier.padding(LocalSpacing.current.small)){
-                            Text(
-                                text = "Logout",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                overflow = TextOverflow.Ellipsis,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(LocalSpacing.current.medium))
-
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ){
+                HomeCard(
+                    title = "Logout",
+                    description = "Click here to log out",
+                    icon = R.drawable.ic_logout,
+                    titleColor = logoutContent,
+                    descriptionColor = logoutContentLight,
+                    cardContainerColor = logoutBackground,
+                    cardShadowColor = shadowColor
+                ) { confirmLogout = !confirmLogout }
             }
         }
     }

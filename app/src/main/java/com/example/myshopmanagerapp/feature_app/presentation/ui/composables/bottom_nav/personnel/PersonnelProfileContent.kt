@@ -81,11 +81,11 @@ fun PersonnelProfileContent(
     val descriptionColor = if (isSystemInDarkTheme()) Grey70 else Grey40
     val titleColor = if (isSystemInDarkTheme()) Grey99 else Grey10
 
-    val greenBackground = if (isSystemInDarkTheme()) Green5 else Green95
+    val greenBackground = if (isSystemInDarkTheme()) Green10 else Green95
     val greenContentLight = if (isSystemInDarkTheme()) Grey70 else Green30
     val greenContent = if (isSystemInDarkTheme()) Grey99 else Green20
 
-    val logoutBackground = if (isSystemInDarkTheme()) Red5 else Red95
+    val logoutBackground = if (isSystemInDarkTheme()) Red10 else Red95
     val logoutContentLight = if (isSystemInDarkTheme()) Grey70 else Red30
     val logoutContent = if (isSystemInDarkTheme()) Grey99 else Red20
 

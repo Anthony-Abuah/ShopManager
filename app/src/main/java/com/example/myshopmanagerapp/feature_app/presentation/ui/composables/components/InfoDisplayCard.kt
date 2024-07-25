@@ -1,6 +1,7 @@
 package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Card
 import androidx.compose.material.Text
@@ -50,7 +51,8 @@ fun InfoDisplayCard(
         backgroundColor = backgroundColor
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
+                .background(backgroundColor),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
