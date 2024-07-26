@@ -1,4 +1,4 @@
-package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.susu_collectors
+package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.bank_personnel
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column

@@ -39,9 +39,20 @@ fun ViewPersonnelScreen(
         ) {
             ViewPersonnelContent(
                 personnel = personnelViewModel.personnelInfo,
-                passwordResetMessage = personnelViewModel.resetPasswordState.value.message.toNotNull(),
-            ) {uniquePersonnelId->
-                personnelViewModel.resetPassword(uniquePersonnelId)
+                updateFirstName = { personnelViewModel.updatePersonnel(personnelViewModel.personnelInfo.copy(firstName = it)) },
+                updateContact = { personnelViewModel.updatePersonnel(personnelViewModel.personnelInfo.copy(contact = it)) },
+                updateLastName = { personnelViewModel.updatePersonnel(personnelViewModel.personnelInfo.copy(lastName = it)) },
+                updateOtherNames = { personnelViewModel.updatePersonnel(personnelViewModel.personnelInfo.copy(otherNames = it)) },
+                updateUsername = { personnelViewModel.updatePersonnel(personnelViewModel.personnelInfo.copy(userName = it)) },
+                updatePersonnelRole = { personnelViewModel.updatePersonnel(personnelViewModel.personnelInfo.copy(role = it)) },
+                updateOtherInfo = { personnelViewModel.updatePersonnel(personnelViewModel.personnelInfo.copy(otherInfo = it)) },
+                updatePersonnelHasAdminRights = { personnelViewModel.updatePersonnel(personnelViewModel.personnelInfo.copy(hasAdminRights = it)) },
+                updatePersonnelIsActive = { personnelViewModel.updatePersonnel(personnelViewModel.personnelInfo.copy(isActive = it)) },
+                updateIsSuccessful = personnelViewModel.updatePersonnelState.value.isSuccessful,
+                updatePersonnelMessage = personnelViewModel.updatePersonnelState.value.message.toNotNull(),
+                isUpdatingPersonnel = personnelViewModel.updatePersonnelState.value.isLoading
+            ) {
+                personnelViewModel.getPersonnel(uniquePersonnelId)
             }
         }
     }

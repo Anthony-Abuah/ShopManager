@@ -4,8 +4,6 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
@@ -22,6 +20,7 @@ import com.example.myshopmanagerapp.core.Constants.No
 import com.example.myshopmanagerapp.core.Constants.NotAvailable
 import com.example.myshopmanagerapp.core.Constants.Yes
 import com.example.myshopmanagerapp.core.Constants.emptyString
+import com.example.myshopmanagerapp.core.FormRelatedString.Contact
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterPersonnelContact
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterPersonnelFirstName
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterPersonnelLastName
@@ -29,7 +28,6 @@ import com.example.myshopmanagerapp.core.FormRelatedString.EnterPersonnelOtherNa
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterPersonnelRole
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterPersonnelUserName
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterShortDescription
-import com.example.myshopmanagerapp.core.FormRelatedString.Contact
 import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelContactPlaceholder
 import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelHasAdminRights
 import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelIsActive
@@ -75,13 +73,13 @@ fun PersonnelProfileContent(
 
     val mainBackgroundColor = if (isSystemInDarkTheme()) Grey10 else Grey99
     val alternateBackgroundColor = if (isSystemInDarkTheme()) Grey15 else Grey95
-    val cardBackgroundColor = if (isSystemInDarkTheme()) Grey15 else BlueGrey90
+    // val cardBackgroundColor = if (isSystemInDarkTheme()) Grey15 else BlueGrey90
 
     val shadowColor = if (isSystemInDarkTheme()) Grey5 else Grey80
     val descriptionColor = if (isSystemInDarkTheme()) Grey70 else Grey40
     val titleColor = if (isSystemInDarkTheme()) Grey99 else Grey10
 
-    val greenBackground = if (isSystemInDarkTheme()) Green10 else Green95
+    val greenBackground = if (isSystemInDarkTheme()) Grey15 else Green95
     val greenContentLight = if (isSystemInDarkTheme()) Grey70 else Green30
     val greenContent = if (isSystemInDarkTheme()) Grey99 else Green20
 
@@ -104,47 +102,33 @@ fun PersonnelProfileContent(
     }
     var personnelRoles = UserPreferences(context).getPersonnelRoles.collectAsState(initial = null).value
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(mainBackgroundColor)
-            .padding(LocalSpacing.current.noPadding)
-            .verticalScroll(state = rememberScrollState(), enabled = true),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top,
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(vertical = LocalSpacing.current.small)
-                .background(Color.Transparent),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top,
-        ) {
-            val userName = personnel.userName.toEllipses(30)
-            val contact = "Contact: ${personnel.contact}"
-            val uniqueId = "Id: ${personnel.uniquePersonnelId}"
-            Box(modifier = Modifier
-                .background(mainBackgroundColor)
-                .fillMaxWidth()
-                .height(200.dp)
-                .padding(LocalSpacing.current.small),
-                contentAlignment = Alignment.Center
-            ){
-                InfoDisplayCard(
-                    image = R.drawable.personnel,
-                    imageWidth = 75.dp,
-                    bigText = userName,
-                    bigTextSize = 20.sp,
-                    smallTextFontWeight = FontWeight.Normal,
-                    smallText = "${contact.toEllipses(30)}\n${uniqueId.toEllipses(40)}",
-                    smallTextSize = 15.sp,
-                    smallTextColor = descriptionColor,
-                    backgroundColor = cardBackgroundColor,
-                    elevation = LocalSpacing.current.small,
-                    isAmount = false
-                )
-            }
+    BasicScreenColumnWithoutBottomBar {
+
+        val userName = personnel.userName.toEllipses(30)
+        val contact = "Contact: ${personnel.contact}"
+        val uniqueId = "Id: ${personnel.uniquePersonnelId}"
+        Box(modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+            .fillMaxWidth()
+            .height(200.dp)
+            .padding(LocalSpacing.current.small),
+            contentAlignment = Alignment.Center
+        ){
+            InfoDisplayCard(
+                image = R.drawable.personnel,
+                imageWidth = 75.dp,
+                bigText = userName,
+                bigTextSize = 20.sp,
+                smallTextFontWeight = FontWeight.Normal,
+                smallText = "${contact.toEllipses(30)}\n${uniqueId.toEllipses(40)}",
+                smallTextSize = 15.sp,
+                smallTextColor = descriptionColor,
+                backgroundColor = MaterialTheme.colorScheme.background,
+                elevation = LocalSpacing.current.noElevation,
+                isAmount = false
+            )
         }
+
 
         Box(
             modifier = Modifier
@@ -285,7 +269,7 @@ fun PersonnelProfileContent(
             Box(modifier = Modifier
                 .background(Color.Transparent)
                 .weight(1f)
-                .height(120.dp)
+                .height(130.dp)
                 .padding(
                     horizontal = LocalSpacing.current.small,
                     vertical = LocalSpacing.current.medium,
@@ -305,21 +289,24 @@ fun PersonnelProfileContent(
                     smallTextColor = greenContentLight,
                     backgroundColor = greenBackground,
                     elevation = LocalSpacing.current.small,
-                    isAmount = false
+                    isAmount = false,
+                    isBoolean = true,
+                    isChecked = isAdmin,
+
                 )
             }
 
             Box(modifier = Modifier
                 .background(Color.Transparent)
                 .weight(1f)
-                .height(120.dp)
+                .height(130.dp)
                 .padding(
                     horizontal = LocalSpacing.current.small,
                     vertical = LocalSpacing.current.medium
                 ),
                 contentAlignment = Alignment.Center
             ){
-                val isActive = personnel.isActive == true
+                var isActive = personnel.isActive == true
                 InfoDisplayCard(
                     image = if (isActive) R.drawable.ic_check else R.drawable.ic_cancel,
                     imageWidth = 32.dp,
@@ -332,7 +319,9 @@ fun PersonnelProfileContent(
                     smallTextColor = greenContentLight,
                     backgroundColor = greenBackground,
                     elevation = LocalSpacing.current.small,
-                    isAmount = false
+                    isAmount = false,
+                    isBoolean = true,
+                    isChecked = isActive,
                 )
             }
         }
@@ -399,7 +388,7 @@ fun PersonnelProfileContent(
             Box(
                 modifier = Modifier
                     .background(Color.Transparent)
-                    .padding(LocalSpacing.current.default,)
+                    .padding(LocalSpacing.current.default)
                     .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {

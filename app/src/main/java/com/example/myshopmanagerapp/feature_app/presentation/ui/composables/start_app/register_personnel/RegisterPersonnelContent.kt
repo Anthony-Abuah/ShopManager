@@ -1,8 +1,11 @@
 package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.start_app.register_personnel
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,7 +27,6 @@ import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelDescription
 import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelNamePlaceholder
 import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelRolePlaceholder
 import com.example.myshopmanagerapp.core.FormRelatedString.RegisterPersonnel
-import com.example.myshopmanagerapp.core.FormRelatedString.SavePersonnel
 import com.example.myshopmanagerapp.core.Functions.generateUniquePersonnelId
 import com.example.myshopmanagerapp.core.Functions.textIsInvalid
 import com.example.myshopmanagerapp.core.Functions.toNotNull
@@ -233,7 +235,7 @@ fun RegisterPersonnelContent(
 
         // Company Password
         Box(
-            modifier = Modifier.padding(LocalSpacing.current.smallMedium),
+            modifier = Modifier.padding(LocalSpacing.current.small),
             contentAlignment = Alignment.Center
         ) {
             var password by remember {
@@ -253,7 +255,7 @@ fun RegisterPersonnelContent(
 
         // Confirm Company Password
         Box(
-            modifier = Modifier.padding(LocalSpacing.current.smallMedium),
+            modifier = Modifier.padding(LocalSpacing.current.small),
             contentAlignment = Alignment.Center
         ) {
             PasswordTextField(
@@ -269,24 +271,53 @@ fun RegisterPersonnelContent(
 
         // Admin Rights?
         Box(
-            modifier = Modifier.padding(LocalSpacing.current.small),
+            modifier = Modifier
+                .padding(
+                    horizontal = LocalSpacing.current.small,
+                    vertical = LocalSpacing.current.default,
+                )
+                .fillMaxWidth()
+                .height(LocalSpacing.current.textFieldHeight)
+                .border(
+                    color = MaterialTheme.colorScheme.onBackground,
+                    width = LocalSpacing.current.borderStroke,
+                    shape = MaterialTheme.shapes.small
+                ).background(
+                    color = MaterialTheme.colorScheme.surface,
+                    shape = MaterialTheme.shapes.small
+                ),
             contentAlignment = Alignment.Center
         ) {
             var thisPersonnelHasAdminRights by remember {
-                mutableStateOf(personnel.hasAdminRights)
+                mutableStateOf(personnel.hasAdminRights == true)
             }
-            AutoCompleteTextField(
-                label = DoesPersonnelHaveAdminRights,
-                placeholder = DoesPersonnelHaveAdminRights,
-                readOnly = true,
-                expandedIcon = R.drawable.ic_admin,
-                unexpandedIcon = R.drawable.ic_admin,
-                listItems = listOf("Yes", "No"),
-                getSelectedItem = { _adminRights ->
-                    thisPersonnelHasAdminRights = _adminRights == "Yes"
-                    addAdminRights(thisPersonnelHasAdminRights!!)
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Box(modifier = Modifier.weight(2f)
+                    .fillMaxHeight(),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Text(
+                        modifier = Modifier.padding(start = LocalSpacing.current.smallMedium),
+                        text = DoesPersonnelHaveAdminRights,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                 }
-            )
+                Box(modifier = Modifier.weight(1f)
+                    .fillMaxHeight()
+                    .padding(end = LocalSpacing.current.default),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
+                    ToggleSwitchCard(
+                        isEnabled = true,
+                        checkValue = thisPersonnelHasAdminRights,
+                        getCheckedValue = {_adminRights ->
+                            thisPersonnelHasAdminRights = _adminRights
+                            addAdminRights(thisPersonnelHasAdminRights)
+                        }
+                    )
+                }
+            }
         }
 
         // Any Other Description

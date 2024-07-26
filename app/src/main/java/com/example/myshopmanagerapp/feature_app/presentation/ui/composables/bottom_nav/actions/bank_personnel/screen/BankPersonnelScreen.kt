@@ -1,4 +1,4 @@
-package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.susu_collectors.screen
+package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.bank_personnel.screen
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +17,7 @@ import com.example.myshopmanagerapp.core.TypeConverters.toBankPersonnelJson
 import com.example.myshopmanagerapp.core.TypeConverters.toBankPersonnelList
 import com.example.myshopmanagerapp.core.UserPreferences
 import com.example.myshopmanagerapp.feature_app.domain.model.BankPersonnel
-import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.susu_collectors.BankPersonnelContent
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.bank_personnel.BankPersonnelContent
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.AddFloatingActionButton
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenTopBar
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicTextFieldAlertDialog
@@ -36,7 +36,7 @@ fun BankPersonnelScreen(
     }
     Scaffold(
         topBar = {
-            BasicScreenTopBar(topBarTitleText = "Susu Collectors") {
+            BasicScreenTopBar(topBarTitleText = "Bank Personnel") {
                 navigateBack()
             }
         },
@@ -60,11 +60,11 @@ fun BankPersonnelScreen(
             openDialog = openSusuCollectors,
             title = "Add Susu Collector",
             textContent = emptyString,
-            placeholder = "Eg: Cristiano Ronaldo",
-            label = "Add susu collector",
+            placeholder = "Eg: Mary Mensah",
+            label = "Add bank personnel",
             icon = R.drawable.ic_bank,
             keyboardType = KeyboardType.Text,
-            unconfirmedUpdatedToastText = "Susu collector's route not added",
+            unconfirmedUpdatedToastText = "Bank personnel's name not added",
             confirmedUpdatedToastText = "Successfully added",
             getValue = { _bankPersonnel ->
                 val mutableBankPersonnel = mutableListOf<BankPersonnel>()
@@ -75,7 +75,7 @@ fun BankPersonnelScreen(
                 coroutineScope.launch {
                     userPreferences.saveBankPersonnel(newMutableSusuCollectorJson)
                 }
-                Toast.makeText(context,"Susu Collector's route successfully added", Toast.LENGTH_LONG).show()
+                Toast.makeText(context,"Bank Personnel's name successfully added", Toast.LENGTH_LONG).show()
             }
         ) {
             openSusuCollectors = false

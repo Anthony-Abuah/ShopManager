@@ -1,6 +1,7 @@
 package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.records.personnel
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -16,7 +17,7 @@ import com.example.myshopmanagerapp.core.PersonnelEntities
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenColumnWithoutBottomBar
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.ConfirmationInfoDialog
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.DeleteConfirmationDialog
-import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
+import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.*
 
 
 @Composable
@@ -42,6 +43,9 @@ fun PersonnelListContent(
         mutableStateOf(emptyString)
     }
 
+    val secondaryContentColor = if (isSystemInDarkTheme()) Grey70 else Grey40
+    val contentColor = if (isSystemInDarkTheme()) Grey99 else Grey10
+
 
     if (personnel.isEmpty()) {
         Box(
@@ -59,16 +63,17 @@ fun PersonnelListContent(
     }
     else {
         BasicScreenColumnWithoutBottomBar {
+            HorizontalDivider()
+
             personnel.forEachIndexed { index, personnel ->
-                if (index ==0){
-                    HorizontalDivider()
-                }
                 Box(
                     modifier = Modifier.padding(LocalSpacing.current.extraSmall),
                     contentAlignment = Alignment.Center
                 ) {
                     PersonnelCard(
                         personnel = personnel,
+                        mainContentColor = contentColor,
+                        secondaryContentColor = secondaryContentColor,
                         number = index.plus(1).toString(),
                         onDelete = {
                             personnelName = "${personnel.firstName} ${personnel.lastName}"
@@ -79,7 +84,6 @@ fun PersonnelListContent(
                         navigateToViewPersonnelScreen(personnel.uniquePersonnelId)
                     }
                 }
-                HorizontalDivider()
             }
         }
         DeleteConfirmationDialog(

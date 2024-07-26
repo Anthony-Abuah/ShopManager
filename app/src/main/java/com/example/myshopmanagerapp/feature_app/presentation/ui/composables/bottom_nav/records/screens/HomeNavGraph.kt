@@ -140,7 +140,7 @@ fun HomeNavGraph(
                 ) + fadeOut(animationSpec = tween(500))
             }
         ){
-            StartAppNavGraph(navController = navController)
+            StartAppNavGraph(navController = navHostController)
         }
 
         composable(route = HomeScreens.PersonnelProfileNavGraph.route,

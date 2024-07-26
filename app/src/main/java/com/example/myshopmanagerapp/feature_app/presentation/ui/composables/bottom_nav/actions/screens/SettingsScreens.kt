@@ -4,6 +4,7 @@ sealed class SettingsScreens(val route: String){
     object MainSettingsScreen: SettingsScreens("to_main_home_screen")
     object ProfileScreen: SettingsScreens("to_profile_screen")
     object LoginScreen: SettingsScreens("to_login_screen")
+    object GenerateReceiptNavGraph: SettingsScreens("to_generate_receipt_nav_graph")
     object RegisterScreen: SettingsScreens("to_register_screen")
     object ChangePasswordScreen: SettingsScreens("to_change_password_screen")
     object ExpenseTypeScreen: SettingsScreens("to_expense_type_screen")

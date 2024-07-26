@@ -9,10 +9,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.myshopmanagerapp.R
-import com.example.myshopmanagerapp.core.Functions.toNotNull
+import com.example.myshopmanagerapp.core.Constants.emptyString
+import com.example.myshopmanagerapp.core.UserPreferences
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenColumnWithoutBottomBar
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.ConfirmationInfoDialog
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
@@ -20,26 +22,30 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpaci
 
 @Composable
 fun SettingsContent(
-    isGeneratingPDF: Boolean,
-    generatePDFMessage: String,
-    navigateToProfileScreen: ()-> Unit,
-    navigateToRegisterScreen: ()-> Unit,
-    navigateToLoginScreen: ()-> Unit,
-    navigateToExpenseTypeScreen: ()-> Unit,
-    navigateToExpenseNameScreen: ()-> Unit,
-    navigateToManufacturersScreen: ()-> Unit,
-    navigateToItemCategoryScreen: ()-> Unit,
-    navigateToPersonnelRolesScreen: ()-> Unit,
-    navigateToSusuCollectorsScreen: ()-> Unit,
-    navigateToBackupAndRestoreScreen: ()-> Unit,
-    navigateToSupplierRoleScreen: ()-> Unit,
-    navigateToPreferencesScreen: ()-> Unit,
-    generateInvoice: ()-> Unit,
-    ) {
-    var confirmationInfoDialog by remember {
+    navigateToProfileScreen: () -> Unit,
+    navigateToRegisterScreen: () -> Unit,
+    navigateToLoginScreen: () -> Unit,
+    navigateToExpenseTypeScreen: () -> Unit,
+    navigateToExpenseNameScreen: () -> Unit,
+    navigateToManufacturersScreen: () -> Unit,
+    navigateToItemCategoryScreen: () -> Unit,
+    navigateToPersonnelRolesScreen: () -> Unit,
+    navigateToSusuCollectorsScreen: () -> Unit,
+    navigateToBackupAndRestoreScreen: () -> Unit,
+    navigateToSupplierRoleScreen: () -> Unit,
+    navigateToPreferencesScreen: () -> Unit,
+    navigateToGenerateInvoiceScreen: () -> Unit
+) {
+    val context = LocalContext.current
+    val userPreferences = UserPreferences(context)
+    val loggedInValue = userPreferences.getLoggedInState.collectAsState(initial = false).value
+    val isLoggedIn = loggedInValue == true
+    var openAlertDialog by remember {
         mutableStateOf(false)
     }
-
+    var alertDialogMessage by remember {
+        mutableStateOf(emptyString)
+    }
     BasicScreenColumnWithoutBottomBar {
         Box(modifier = Modifier
             .fillMaxWidth()
@@ -60,7 +66,14 @@ fun SettingsContent(
                 end = LocalSpacing.current.smallMedium,
                 bottom = LocalSpacing.current.smallMedium,
             )
-            .clickable { navigateToProfileScreen() },
+            .clickable {
+                if (isLoggedIn) {
+                    navigateToProfileScreen()
+                } else {
+                    alertDialogMessage = "You're not logged in.\nPlease log in to view profile"
+                    openAlertDialog = !openAlertDialog
+                }
+            },
         ) {
             SettingsContentCard(
                 icon = R.drawable.ic_shop,
@@ -71,8 +84,15 @@ fun SettingsContent(
 
         Box(modifier = Modifier
             .fillMaxWidth()
-            .padding(LocalSpacing.current.smallMedium,)
-            .clickable { navigateToRegisterScreen() },
+            .padding(LocalSpacing.current.smallMedium)
+            .clickable {
+                if (isLoggedIn){
+                    alertDialogMessage = "You're already logged in.\nTo create a new account, please log out"
+                    openAlertDialog = !openAlertDialog
+                }else{
+                    navigateToRegisterScreen()
+                }
+            },
         ) {
             SettingsContentCard(
                 icon = R.drawable.ic_register,
@@ -84,7 +104,14 @@ fun SettingsContent(
         Box(modifier = Modifier
             .fillMaxWidth()
             .padding(LocalSpacing.current.smallMedium)
-            .clickable { navigateToLoginScreen() },
+            .clickable {
+                if (isLoggedIn){
+                    alertDialogMessage = "You're already logged in.\nTo login into a new account, please log out first"
+                    openAlertDialog = !openAlertDialog
+                }else{
+                    navigateToLoginScreen()
+                }
+           },
         ) {
             SettingsContentCard(
                 icon = R.drawable.ic_login,
@@ -114,9 +141,8 @@ fun SettingsContent(
             .fillMaxWidth()
             .padding(LocalSpacing.current.smallMedium)
             .clickable {
-                generateInvoice()
-                confirmationInfoDialog = !confirmationInfoDialog
-                       },
+                navigateToGenerateInvoiceScreen()
+            },
         ) {
             SettingsContentCard(
                 icon = R.drawable.ic_money_filled,
@@ -257,13 +283,14 @@ fun SettingsContent(
 
     }
     ConfirmationInfoDialog(
-        openDialog = confirmationInfoDialog,
-        isLoading = isGeneratingPDF,
-        title = null,
-        textContent = generatePDFMessage.toNotNull(),
+        openDialog = openAlertDialog,
+        isLoading = false,
+        title = emptyString,
+        textContent = alertDialogMessage,
         unconfirmedDeletedToastText = null,
         confirmedDeleteToastText = null
     ) {
-        confirmationInfoDialog = false
+        openAlertDialog = false
     }
+
 }

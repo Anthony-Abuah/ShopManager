@@ -20,6 +20,7 @@ data class PersonnelEntity(
     val otherInfo: String?,
     val role: String?,
     val hasAdminRights: Boolean?,
+    val isPrincipalAdmin: Boolean = false,
     val isActive: Boolean? = true
 ){
     fun toPersonnelInfoDto(uniqueCompanyId: String): PersonnelInfoDto{

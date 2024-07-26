@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,7 +42,11 @@ fun InfoDisplayCard(
     shape: Shape = MaterialTheme.shapes.large,
     elevation: Dp = LocalSpacing.current.noElevation,
     backgroundColor: Color = Color.Transparent,
-    isAmount: Boolean = false
+    isAmount: Boolean = false,
+    isBoolean: Boolean = false,
+    isChecked: Boolean = false,
+    isEnabled: Boolean = false,
+    getCheckedValue: (Boolean)-> Unit = {},
 ) {
     Card(
         modifier = Modifier.fillMaxSize(),
@@ -51,7 +55,8 @@ fun InfoDisplayCard(
         backgroundColor = backgroundColor
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .background(backgroundColor),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -74,13 +79,22 @@ fun InfoDisplayCard(
                     )
                 }
                 else {
-                    Image(
-                        modifier = Modifier
-                            .size(imageWidth)
-                            .aspectRatio(1f),
-                        painter = painterResource(id = image),
-                        contentDescription = emptyString
-                    )
+                    if (isBoolean){
+                        ToggleSwitchCard(
+                            modifier = Modifier.size(LocalSpacing.current.large),
+                            checkValue = isChecked,
+                            isEnabled = isEnabled,
+                            getCheckedValue = { getCheckedValue(it) }
+                        )
+                    }else {
+                        Image(
+                            modifier = Modifier
+                                .size(imageWidth)
+                                .aspectRatio(1f),
+                            painter = painterResource(id = image),
+                            contentDescription = emptyString
+                        )
+                    }
                 }
             }
 
@@ -164,7 +178,11 @@ fun HorizontalInfoDisplayCard(
 
             Box(
                 modifier = Modifier
-                    .weight(name.length.plus(1).toFloat())
+                    .weight(
+                        name.length
+                            .plus(1)
+                            .toFloat()
+                    )
                     .padding(LocalSpacing.current.small),
                 contentAlignment = Alignment.CenterStart
             ) {

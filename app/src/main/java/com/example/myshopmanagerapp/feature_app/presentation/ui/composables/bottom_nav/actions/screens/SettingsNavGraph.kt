@@ -23,9 +23,10 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bott
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.profile.screens.ProfileScreen
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.register.screens.RegisterScreen
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.supplier_role.screen.SupplierRoleScreen
-import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.susu_collectors.screen.BankPersonnelScreen
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.bank_personnel.screen.BankPersonnelScreen
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.personnel.screens.PersonnelProfileNavGraph
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.records.screens.HomeScreens
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.records.generate_receipt.screen.ReceiptNavGraph
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.start_app.StartAppScreens
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.start_app.login_company.screens.LoginCompanyScreen
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.start_app.register_company.screens.RegisterCompanyInfoScreen
@@ -98,12 +99,37 @@ fun SettingsNavGraph(
                 navigateToSupplierRoleScreen = {
                     navController.navigate(SettingsScreens.SupplierRoleScreen.route)
                 },
+                navigateToGenerateInvoiceScreen = {
+                    navController.navigate(SettingsScreens.GenerateReceiptNavGraph.route)
+                },
                 navigateToPreferencesScreen = {
                     navController.navigate(SettingsScreens.PreferenceScreen.route)
                 }
             ) {
                 navHostController.popBackStack()
             }
+        }
+
+        composable(route = SettingsScreens.GenerateReceiptNavGraph.route,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { 500 },
+                    animationSpec = tween(
+                        durationMillis = 500,
+                        easing = LinearOutSlowInEasing
+                    )
+                ) + fadeIn(animationSpec = tween(500))
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { -500 },
+                    animationSpec = tween(
+                        durationMillis = 500,
+                        easing = LinearOutSlowInEasing
+                    )
+                ) + fadeOut(animationSpec = tween(500))
+            }){
+            ReceiptNavGraph(navHostController = navController)
         }
 
         composable(route = StartAppScreens.LogInCompanyScreen.route,

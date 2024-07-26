@@ -61,8 +61,9 @@ class PersonnelRepositoryImpl(
                     emit(Resource.Error("Unable to add personnel \nPersonnel with provided names already exists"))
                 }
                 else->{
+                    val personnelContainsPrincipalAdmin = allPersonnel.map { it.isPrincipalAdmin }.contains(true)
                     val uniquePersonnelId = generateUniquePersonnelId(name)
-                    val newPersonnel = personnel.copy(uniquePersonnelId = uniquePersonnelId, hasAdminRights = true)
+                    val newPersonnel = personnel.copy(uniquePersonnelId = uniquePersonnelId, hasAdminRights = true, isPrincipalAdmin = !personnelContainsPrincipalAdmin)
                     val existingPersonnel = company.companyPersonnel.toPersonnelEntities()
                     val currentPersonnel = existingPersonnel.plus(newPersonnel)
                     val newCompany = company.copy(companyPersonnel = currentPersonnel.toPersonnelEntitiesJson())

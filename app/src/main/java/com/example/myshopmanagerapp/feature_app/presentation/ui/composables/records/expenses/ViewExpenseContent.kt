@@ -40,10 +40,13 @@ import com.example.myshopmanagerapp.core.TypeConverters.toExpenseTypes
 import com.example.myshopmanagerapp.core.TypeConverters.toExpenseTypesJson
 import com.example.myshopmanagerapp.core.UserPreferences
 import com.example.myshopmanagerapp.feature_app.data.local.entities.expenses.ExpenseEntity
+import com.example.myshopmanagerapp.feature_app.data.local.entities.personnel.PersonnelEntity
 import com.example.myshopmanagerapp.feature_app.domain.model.ExpenseName
 import com.example.myshopmanagerapp.feature_app.domain.model.ExpenseType
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.*
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
+import com.example.myshopmanagerapp.feature_app.presentation.view_models.CompanyViewModel
+import com.example.myshopmanagerapp.feature_app.presentation.view_models.PersonnelViewModel
 import kotlinx.coroutines.launch
 import java.util.*
 
