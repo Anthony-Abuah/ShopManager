@@ -73,7 +73,13 @@ fun StartAppNavGraph (navController: NavHostController){
                         }
                     }
                 }
-            ) {}
+            ) {
+                navController.navigate(BottomNavScreens.Records.route){
+                    popUpTo(BottomNavScreens.Records.route) {
+                        inclusive = true
+                    }
+                }
+            }
         }
 
         composable(route = StartAppScreens.BottomNavGraph.route){

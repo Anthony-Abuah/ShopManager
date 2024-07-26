@@ -49,7 +49,9 @@ fun PersonnelProfileNavGraph (
         composable(route = PersonnelNavScreens.Register.route){
             val companyViewModel = it.sharedViewModel<CompanyViewModel>(navHostController = mainNavController)
             RegisterPersonnelScreen(companyViewModel = companyViewModel,
-                navigateToBottomNav = { navController.popBackStack() }) {
+                navigateToBottomNav = { navController.popBackStack() }
+            ) {
+                navController.popBackStack()
             }
         }
     }

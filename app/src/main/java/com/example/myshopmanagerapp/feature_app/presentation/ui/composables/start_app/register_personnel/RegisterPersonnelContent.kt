@@ -297,7 +297,7 @@ fun RegisterPersonnelContent(
                     contentAlignment = Alignment.CenterStart
                 ) {
                     Text(
-                        modifier = Modifier.padding(start = LocalSpacing.current.smallMedium),
+                        modifier = Modifier.padding(start = LocalSpacing.current.medium),
                         text = DoesPersonnelHaveAdminRights,
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurface
