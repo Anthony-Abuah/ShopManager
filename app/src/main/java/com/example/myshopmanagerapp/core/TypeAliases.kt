@@ -21,7 +21,7 @@ import com.example.myshopmanagerapp.feature_app.domain.model.*
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.revenue.ItemValueState
 
 typealias ListOfShopLoginInfo = List<ShopLoginInfo>
-typealias ItemValueStates = List<ItemValueState>
+typealias ItemQuantityInfoList = List<ItemQuantityInfo>
 typealias UniqueIds = List<UniqueId>
 typealias Prices = List<Price>
 typealias ReceiptEntities = List<ReceiptEntity>

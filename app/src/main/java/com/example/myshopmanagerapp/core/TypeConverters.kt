@@ -4,6 +4,7 @@ import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.feature_app.data.local.entities.personnel.PersonnelEntity
 import com.example.myshopmanagerapp.feature_app.data.util.GsonParser
 import com.example.myshopmanagerapp.feature_app.data.util.JsonParser
+import com.example.myshopmanagerapp.feature_app.domain.model.ItemQuantityInfo
 import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
 import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItemWithDate
 import com.example.myshopmanagerapp.feature_app.domain.model.ShopLoginInfo
@@ -210,6 +211,21 @@ object TypeConverters {
             object : TypeToken<ExpenseTypes>(){}.type
         ) ?: "[]"
     }
+
+    fun String?.toItemQuantityInfoList(): ItemQuantityInfoList {
+        return this?.let {
+            jsonParser.fromJson<ItemQuantityInfoList>(
+                it, object : TypeToken<ItemQuantityInfoList>(){}.type)
+        }?: emptyList()
+    }
+
+    fun ItemQuantityInfoList?.toItemQuantityInfoListJson(): String{
+        return jsonParser.toJson(
+            this,
+            object : TypeToken<ItemQuantityInfoList>(){}.type
+        ) ?: "[]"
+    }
+
 
     fun String?.toManufacturers(): Manufacturers {
         return this?.let {

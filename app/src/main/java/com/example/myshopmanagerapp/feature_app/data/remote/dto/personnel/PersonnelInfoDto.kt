@@ -1,5 +1,6 @@
 package com.example.myshopmanagerapp.feature_app.data.remote.dto.personnel
 
+import com.example.myshopmanagerapp.core.Constants.Password
 import com.example.myshopmanagerapp.feature_app.data.local.entities.personnel.PersonnelEntity
 
 
@@ -9,11 +10,15 @@ data class PersonnelInfoDto(
     val firstName: String,
     val lastName: String,
     val otherNames: String?,
-    val personnelContact: String,
+    val userName: String = lastName,
+    val contact: String,
+    val password: String = Password,
     val personnelPhoto: String?,
     val otherInfo: String?,
-    val personnelRole: String?,
-    val hasAdminRights: Boolean?
+    val role: String?,
+    val hasAdminRights: Boolean?,
+    val isPrincipalAdmin: Boolean = false,
+    val isActive: Boolean? = true
 ){
     fun toPersonnelEntity(): PersonnelEntity{
         return PersonnelEntity(
@@ -22,11 +27,15 @@ data class PersonnelInfoDto(
             firstName = firstName,
             lastName = lastName,
             otherNames = otherNames,
-            contact = personnelContact,
+            userName = userName,
+            contact = contact,
             personnelPhoto = personnelPhoto,
             otherInfo = otherInfo,
-            role = personnelRole,
-            hasAdminRights = hasAdminRights
+            role = role,
+            hasAdminRights = hasAdminRights,
+            password = password,
+            isPrincipalAdmin = isPrincipalAdmin,
+            isActive = isActive
         )
     }
 }

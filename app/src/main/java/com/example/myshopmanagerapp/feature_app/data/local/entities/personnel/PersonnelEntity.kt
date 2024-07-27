@@ -30,11 +30,15 @@ data class PersonnelEntity(
             firstName = firstName,
             lastName = lastName,
             otherNames = otherNames,
-            personnelContact = contact,
+            userName = userName,
+            contact = contact,
+            password = password,
             personnelPhoto = personnelPhoto,
             otherInfo = otherInfo,
-            personnelRole = role,
-            hasAdminRights = hasAdminRights
+            role = role,
+            hasAdminRights = hasAdminRights,
+            isPrincipalAdmin = isPrincipalAdmin,
+            isActive = isActive
         )
     }
 }

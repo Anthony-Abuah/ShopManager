@@ -39,7 +39,10 @@ data class StockEntity(
             lastStockDate = dateOfLastStock?.toLocalDate().toTimestamp(),
             changeInNumberOfUnits = changeInNumberOfUnits,
             isInventoryStock = isInventoryStock,
-            otherInfo = otherInfo
+            otherInfo = otherInfo,
+            uniquePersonnelId = uniquePersonnelId,
+            unitCostPrice = unitCostPrice,
+            totalCostPrice = totalCostPrice
         )
     }
 }
