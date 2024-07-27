@@ -11,11 +11,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.myshopmanagerapp.core.Constants
+import com.example.myshopmanagerapp.core.Constants.listOfChangePassword
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntityJson
 import com.example.myshopmanagerapp.core.UserPreferences
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.personnel.PersonnelProfileContent
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenTopBar
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.ProfileScreenTopBar
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.CompanyViewModel
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.PersonnelViewModel
 import kotlinx.coroutines.launch
@@ -26,6 +29,7 @@ fun PersonnelProfileScreen(
     companyViewModel: CompanyViewModel,
     personnelViewModel: PersonnelViewModel = hiltViewModel(),
     uniquePersonnelId: String,
+    navigateToChangePasswordScreen: () -> Unit,
     navigateBack: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -36,7 +40,13 @@ fun PersonnelProfileScreen(
 
     Scaffold(
         topBar = {
-            BasicScreenTopBar(topBarTitleText = "Personnel") {
+            ProfileScreenTopBar(
+                topBarTitleText = "Personnel",
+                profileDropDownItems = listOfChangePassword,
+                onClickItem = {
+                    navigateToChangePasswordScreen()
+                }
+            ) {
                 navigateBack()
             }
         }
@@ -59,8 +69,11 @@ fun PersonnelProfileScreen(
                 updateOtherNames = {personnelViewModel.updatePersonnelOtherName(it)},
                 updateContact = {personnelViewModel.updatePersonnelContact(it)},
                 updatePersonnelRole = {personnelViewModel.updatePersonnelRole(it)},
-                reloadPersonnel = { personnelViewModel.getPersonnel(uniquePersonnelId)
-                    coroutineScope.launch { UserPreferences(context).savePersonnelInfo(personnelViewModel.personnelInfo.toPersonnelEntityJson()) }
+                reloadPersonnel = {
+                    personnelViewModel.getPersonnel(uniquePersonnelId)
+                    coroutineScope.launch {
+                        UserPreferences(context).savePersonnelInfo(personnelViewModel.personnelInfo.toPersonnelEntityJson())
+                    }
                 },
                 logout = { companyViewModel.logoutPersonnel() },
                 updateOtherInfo = {personnelViewModel.updatePersonnelOtherInfo(it)}
@@ -69,4 +82,5 @@ fun PersonnelProfileScreen(
             }
         }
     }
+
 }

@@ -74,7 +74,7 @@ fun BankAccountCard(
             ) {
                 Icon(
                     modifier = Modifier.fillMaxSize(),
-                    painter = painterResource(id = R.drawable.ic_bank),
+                    painter = painterResource(id = R.drawable.ic_bank_account),
                     contentDescription = emptyString,
                     tint = contentColor
                 )

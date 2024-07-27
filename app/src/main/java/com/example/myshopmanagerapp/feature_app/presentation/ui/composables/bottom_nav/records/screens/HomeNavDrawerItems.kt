@@ -9,8 +9,8 @@ object HomeNavDrawerItems {
     val homeNavDrawerItems = listOf(
         NavDrawerItem(
             title = "Records",
-            selectedIcon = R.drawable.ic_home,
-            unselectedIcon = R.drawable.ic_home,
+            selectedIcon = R.drawable.ic_records,
+            unselectedIcon = R.drawable.ic_records,
             badgeCount = null
         ),
         NavDrawerItem(
@@ -22,8 +22,8 @@ object HomeNavDrawerItems {
         ),
         NavDrawerItem(
             title = "Actions",
-            selectedIcon = R.drawable.ic_settings,
-            unselectedIcon = R.drawable.ic_settings,
+            selectedIcon = R.drawable.ic_activity,
+            unselectedIcon = R.drawable.ic_activity,
             badgeCount = null,
             route = BottomNavScreens.Actions.route
         ),
@@ -43,22 +43,22 @@ object HomeNavDrawerItems {
         ),
         NavDrawerItem(
             title = "Personnel",
-            selectedIcon = R.drawable.ic_person_filled,
-            unselectedIcon = R.drawable.ic_person_filled,
+            selectedIcon = R.drawable.ic_personnel,
+            unselectedIcon = R.drawable.ic_personnel,
             badgeCount = null,
             route = HomeScreens.PersonnelNavGraph.route
         ),
         NavDrawerItem(
             title = "Supplier",
-            selectedIcon = R.drawable.ic_person_filled,
-            unselectedIcon = R.drawable.ic_person_outline,
+            selectedIcon = R.drawable.ic_supplier,
+            unselectedIcon = R.drawable.ic_supplier,
             badgeCount = null,
             route = HomeScreens.SupplierNavGraph.route
         ),
         NavDrawerItem(
             title = "Bank Account",
-            selectedIcon = R.drawable.ic_bank,
-            unselectedIcon = R.drawable.ic_bank,
+            selectedIcon = R.drawable.ic_bank_account,
+            unselectedIcon = R.drawable.ic_bank_account,
             badgeCount = null,
             route = HomeScreens.BankNavGraph.route
         ),
@@ -70,16 +70,9 @@ object HomeNavDrawerItems {
             route = HomeScreens.ReceiptNavGraph.route
         ),
         NavDrawerItem(
-            title = "Company",
-            selectedIcon = R.drawable.ic_company,
-            unselectedIcon = R.drawable.ic_company,
-            badgeCount = null,
-            route = HomeScreens.CompanyNavGraph.route
-        ),
-        NavDrawerItem(
             title = "Preferences",
-            selectedIcon = R.drawable.ic_person_filled,
-            unselectedIcon = R.drawable.ic_person_outline,
+            selectedIcon = R.drawable.ic_preferences,
+            unselectedIcon = R.drawable.ic_preferences,
             badgeCount = null
         ),
         NavDrawerItem(
@@ -90,8 +83,8 @@ object HomeNavDrawerItems {
         ),
         NavDrawerItem(
             title = "User Guide",
-            selectedIcon = R.drawable.ic_settings,
-            unselectedIcon = R.drawable.ic_settings,
+            selectedIcon = R.drawable.ic_user_guide,
+            unselectedIcon = R.drawable.ic_user_guide,
             badgeCount = null
         ),
     )

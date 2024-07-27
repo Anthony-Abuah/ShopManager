@@ -83,7 +83,7 @@ fun ViewBankAccountContent(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(LocalSpacing.current.small),
-                    painter = painterResource(id = R.drawable.ic_bank),
+                    painter = painterResource(id = R.drawable.ic_bank_account),
                     tint = MaterialTheme.colorScheme.onBackground,
                     contentDescription = emptyString
                 )
@@ -127,7 +127,7 @@ fun ViewBankAccountContent(
             viewValue = bankInfo.bankAccountName,
             placeholder = BankAccountNamePlaceholder,
             label = UpdateBankAccountName,
-            icon = R.drawable.ic_bank,
+            icon = R.drawable.ic_bank_account,
             getUpdatedValue = { getUpdatedBankAccountName(it) }
         )
 
@@ -139,7 +139,7 @@ fun ViewBankAccountContent(
             viewValue = bankInfo.bankName,
             placeholder = BankNamePlaceholder,
             label = UpdateBankName,
-            icon = R.drawable.ic_bank,
+            icon = R.drawable.ic_bank_account,
             getUpdatedValue = { getUpdatedBankName(it) }
         )
 

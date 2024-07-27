@@ -263,7 +263,7 @@ fun SettingsContent(
             .clickable { navigateToSusuCollectorsScreen() },
         ) {
             SettingsContentCard(
-                icon = R.drawable.ic_bank,
+                icon = R.drawable.ic_bank_account,
                 title = "Susu Collectors",
                 info = null
             )

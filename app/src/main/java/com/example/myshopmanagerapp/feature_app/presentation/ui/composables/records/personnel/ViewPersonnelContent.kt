@@ -33,8 +33,8 @@ import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelHasAdminRigh
 import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelIsActive
 import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelNamePlaceholder
 import com.example.myshopmanagerapp.core.FormRelatedString.PersonnelRole
+import com.example.myshopmanagerapp.core.FormRelatedString.ShortNotes
 import com.example.myshopmanagerapp.core.FormRelatedString.ShortNotesPlaceholder
-import com.example.myshopmanagerapp.core.FormRelatedString.UpdateChanges
 import com.example.myshopmanagerapp.core.Functions
 import com.example.myshopmanagerapp.core.Functions.toEllipses
 import com.example.myshopmanagerapp.core.Functions.toNotNull
@@ -202,7 +202,7 @@ fun ViewPersonnelContent(
                 placeholder = PersonnelNamePlaceholder,
                 textFieldIcon = R.drawable.ic_edit,
                 getUpdatedValue = {
-                    if (canBeUpdated || isPrincipalAdmin) {
+                    if (isPrincipalAdmin) {
                         updateLastName(it)
                         updateConfirmationInfo = !updateConfirmationInfo
                     }else{
@@ -312,11 +312,11 @@ fun ViewPersonnelContent(
                     isChecked = isAdmin,
                     isEnabled = true,
                     getCheckedValue = {
-                        if (canBeUpdated || isPrincipalAdmin) {
+                        if (isPrincipalAdmin && (thisPersonnelUniqueId != personnel.uniquePersonnelId)) {
                             updatePersonnelHasAdminRights(it)
                             updateConfirmationInfo = !updateConfirmationInfo
                         }else{
-                            confirmationInfoMessage = "You do not have administrative rights to update this personnel's info"
+                            confirmationInfoMessage = "A principal admin will always has administrative rights"
                             openConfirmationInfoDialog = !openConfirmationInfoDialog
                         }
                     }
@@ -351,11 +351,11 @@ fun ViewPersonnelContent(
                     isChecked = isActive,
                     isEnabled = true,
                     getCheckedValue = {
-                        if (isPrincipalAdmin) {
+                        if (isPrincipalAdmin && (thisPersonnelUniqueId != personnel.uniquePersonnelId)) {
                             updatePersonnelIsActive(it)
                             updateConfirmationInfo = !updateConfirmationInfo
                         }else{
-                            confirmationInfoMessage = "You do not have administrative rights to update this personnel's info"
+                            confirmationInfoMessage = "A principal admin will always has be active"
                             openConfirmationInfoDialog = !openConfirmationInfoDialog
                         }
                     }
@@ -470,7 +470,7 @@ fun ViewPersonnelContent(
             ) {
                 val otherInfo = personnel.otherInfo
                 VerticalDisplayAndEditTextValues(
-                    firstText = FormRelatedString.ShortNotes,
+                    firstText = ShortNotes,
                     firstTextColor = titleColor,
                     secondText = if (otherInfo.isNullOrBlank()) NotAvailable else otherInfo,
                     secondTextColor = descriptionColor,

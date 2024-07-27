@@ -13,8 +13,8 @@ sealed class BottomNavScreens(
     object Records: BottomNavScreens(
         name = "Records",
         route = "to_records",
-        focused_icon = R.drawable.ic_home,
-        unfocused_icon = R.drawable.ic_home
+        focused_icon = R.drawable.ic_records,
+        unfocused_icon = R.drawable.ic_records
     )
     object Report: BottomNavScreens(
         name = "Report",
@@ -25,8 +25,8 @@ sealed class BottomNavScreens(
     object Actions: BottomNavScreens(
         name = "Actions",
         route = "to_actions",
-        focused_icon = R.drawable.ic_settings,
-        unfocused_icon = R.drawable.ic_settings
+        focused_icon = R.drawable.ic_activity,
+        unfocused_icon = R.drawable.ic_activity
     )
 
 }

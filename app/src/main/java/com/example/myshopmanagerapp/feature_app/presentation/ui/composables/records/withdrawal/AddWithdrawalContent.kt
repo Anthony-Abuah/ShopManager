@@ -117,8 +117,8 @@ fun AddWithdrawalContent(
                 label = SelectBankAccount,
                 placeholder = BankAccountNamePlaceholder,
                 readOnly = true,
-                expandedIcon = R.drawable.ic_bank,
-                unexpandedIcon = R.drawable.ic_bank,
+                expandedIcon = R.drawable.ic_bank_account,
+                unexpandedIcon = R.drawable.ic_bank_account,
                 listItems = mapOfBanks.keys.toList(),
                 onClickAddButton = { addBank() },
                 getSelectedItem = {

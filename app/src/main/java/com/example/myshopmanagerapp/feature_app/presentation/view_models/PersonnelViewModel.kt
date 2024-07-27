@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myshopmanagerapp.core.Constants.emptyString
+import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.UIEvent
 import com.example.myshopmanagerapp.feature_app.data.local.entities.personnel.PersonnelEntity
@@ -41,6 +42,9 @@ class PersonnelViewModel @Inject constructor(
 
     private val _resetPasswordState = mutableStateOf(ItemValueState())
     val resetPasswordState: State<ItemValueState> = _resetPasswordState
+
+    private val _changePasswordState = mutableStateOf(ItemValueState())
+    val changePasswordState: State<ItemValueState> = _changePasswordState
 
     private val _updatePersonnelState = mutableStateOf(ItemValueState())
     val updatePersonnelState: State<ItemValueState> = _updatePersonnelState
@@ -79,6 +83,34 @@ class PersonnelViewModel @Inject constructor(
                         isLoading = false
                     )
                     _eventFlow.emit(UIEvent.ShowSnackBar(response.message ?: "Unknown Error"))
+                }
+            }
+        }.launchIn(this)
+    }
+
+    fun changePersonnelPassword(currentPassword: String, newPassword: String) = viewModelScope.launch {
+        personnelRepository.changePersonnelPassword(currentPassword, newPassword).onEach { response->
+            when(response){
+                is Resource.Success ->{
+                    _changePasswordState.value = changePasswordState.value.copy(
+                        isSuccessful = true,
+                        message = response.data.toNotNull(),
+                        isLoading = false
+                    )
+                }
+                is Resource.Loading ->{
+                    _changePasswordState.value = changePasswordState.value.copy(
+                        isSuccessful = false,
+                        message = response.message.toNotNull(),
+                        isLoading = true
+                    )
+                }
+                is Resource.Error ->{
+                    _changePasswordState.value = changePasswordState.value.copy(
+                        isSuccessful = false,
+                        message = response.message ?: "Unknown Error",
+                        isLoading = false
+                    )
                 }
             }
         }.launchIn(this)
@@ -221,20 +253,11 @@ class PersonnelViewModel @Inject constructor(
     fun updatePersonnelContact(contact: String) {
         updatePersonnel(personnelInfo.copy(contact = contact))
     }
-    fun updatePersonnelPhoto(photo: String) {
-        updatePersonnel(personnelInfo.copy(personnelPhoto = photo))
-    }
     fun updatePersonnelOtherInfo(info: String?) {
         updatePersonnel(personnelInfo.copy(otherInfo = info))
     }
     fun updatePersonnelRole(role: String?) {
         updatePersonnel(personnelInfo.copy(role = role))
-    }
-    fun updatePersonnelAdminRights(rights: Boolean?) {
-        updatePersonnel(personnelInfo.copy(hasAdminRights = rights))
-    }
-    fun updatePersonnelIsActive(isActive: Boolean?) {
-        updatePersonnel(personnelInfo.copy(isActive = isActive))
     }
 
 

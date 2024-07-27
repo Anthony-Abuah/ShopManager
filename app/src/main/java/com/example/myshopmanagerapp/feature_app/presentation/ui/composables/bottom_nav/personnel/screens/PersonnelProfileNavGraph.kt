@@ -11,6 +11,7 @@ import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
 import com.example.myshopmanagerapp.core.UserPreferences
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.change_password.screens.ChangePersonnelPasswordScreen
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.personnel.PersonnelNavScreens
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.start_app.login_personnel.screens.LoginPersonnelScreen
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.start_app.register_personnel.screens.RegisterPersonnelScreen
@@ -20,7 +21,7 @@ import com.example.myshopmanagerapp.feature_app.presentation.view_models.sharedV
 @Composable
 fun PersonnelProfileNavGraph (
     isLoggedIn: Boolean,
-    navController: NavController,
+    navController: NavController
 ){
     val context = LocalContext.current
     val personnel = UserPreferences(context).getPersonnelInfo.collectAsState(initial = emptyString).value ?: emptyString
@@ -33,7 +34,12 @@ fun PersonnelProfileNavGraph (
     {
         composable(route = PersonnelNavScreens.Profile.route){
             val companyViewModel = it.sharedViewModel<CompanyViewModel>(navHostController = mainNavController)
-            PersonnelProfileScreen(companyViewModel = companyViewModel, uniquePersonnelId = uniquePersonnelId) {
+            PersonnelProfileScreen(companyViewModel = companyViewModel,
+                uniquePersonnelId = uniquePersonnelId,
+                navigateToChangePasswordScreen = {
+                    mainNavController.navigate(PersonnelNavScreens.ChangePassword.route)
+                }
+            ) {
                 navController.popBackStack()
             }
         }
@@ -51,6 +57,12 @@ fun PersonnelProfileNavGraph (
             RegisterPersonnelScreen(companyViewModel = companyViewModel,
                 navigateToBottomNav = { navController.popBackStack() }
             ) {
+                navController.popBackStack()
+            }
+        }
+
+        composable(route = PersonnelNavScreens.ChangePassword.route){
+            ChangePersonnelPasswordScreen {
                 navController.popBackStack()
             }
         }

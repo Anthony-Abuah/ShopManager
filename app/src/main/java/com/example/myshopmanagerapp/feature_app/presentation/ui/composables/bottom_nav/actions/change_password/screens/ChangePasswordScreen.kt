@@ -1,5 +1,6 @@
 package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.change_password.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +17,7 @@ import com.example.myshopmanagerapp.core.UserPreferences
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.change_password.ChangePasswordContent
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenTopBar
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.CompanyViewModel
+import com.example.myshopmanagerapp.feature_app.presentation.view_models.PersonnelViewModel
 
 
 @Composable
@@ -49,6 +51,51 @@ fun ChangePasswordScreen(
                 changePasswordIsSuccessful = passwordChangedSuccessful ?: false,
                 changePassword = {currentPassword, newPassword, confirmedPassword->
                     companyViewModel.changePassword(currentPassword, newPassword, confirmedPassword)
+                }
+            ) {
+                navigateToProfileScreen()
+            }
+        }
+    }
+}
+
+
+@Composable
+fun ChangePersonnelPasswordScreen(
+    personnelViewModel: PersonnelViewModel = hiltViewModel(),
+    navigateToProfileScreen: () -> Unit
+) {
+
+    val context = LocalContext.current
+    val userPreferences = UserPreferences(context)
+    LaunchedEffect(Unit){
+        userPreferences.saveRepositoryJobMessage(emptyString)
+        userPreferences.saveRepositoryJobSuccessValue(false)
+    }
+
+    Scaffold(
+        topBar = {
+            BasicScreenTopBar(topBarTitleText = "Change Password") {
+                navigateToProfileScreen()
+            }
+        }
+    ){
+        Column(modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            val passwordChangedSuccessful = userPreferences.getRepositoryJobSuccessState.collectAsState(initial = false).value
+            val changePasswordMessage = userPreferences.getRepositoryJobMessage.collectAsState(initial = emptyString).value
+            ChangePasswordContent(
+                changePasswordMessage = changePasswordMessage,
+                changePasswordIsSuccessful = passwordChangedSuccessful ?: false,
+                changePassword = {currentPassword, newPassword, confirmedPassword->
+                    if (newPassword == confirmedPassword) {
+                        personnelViewModel.changePersonnelPassword(currentPassword, newPassword)
+                    }
+                    else{
+                        Toast.makeText(context, "Passwords do not match", Toast.LENGTH_LONG).show()
+                    }
                 }
             ) {
                 navigateToProfileScreen()

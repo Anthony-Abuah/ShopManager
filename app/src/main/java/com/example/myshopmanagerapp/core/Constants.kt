@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi
 import com.example.myshopmanagerapp.R
 import com.example.myshopmanagerapp.feature_app.domain.model.ListNumberDropDownItem
 import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
+import com.example.myshopmanagerapp.feature_app.domain.model.ProfileDropDownItem
 import com.example.myshopmanagerapp.feature_app.domain.model.QuantityCategorization
 import java.time.LocalDate
 
@@ -126,7 +127,14 @@ object Constants{
 
     val defaultQuantityCategorizations = listOf(QuantityCategorization(Unit, ONE))
 
+    val listOfChangePassword = listOf(
+        ProfileDropDownItem(
+            titleText = "Change password"
+        )
+    )
+
     private val dateNow = LocalDate.now()
+
     val listOfPeriods = listOf(
         PeriodDropDownItem(
             titleText = AllTime,

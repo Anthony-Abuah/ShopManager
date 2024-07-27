@@ -80,7 +80,7 @@ fun BankPersonnelContent(
                     textContent = emptyString,
                     placeholder = "Eg: Cristiano Ronaldo",
                     label = "Add susu collector",
-                    icon = R.drawable.ic_bank,
+                    icon = R.drawable.ic_bank_account,
                     keyboardType = KeyboardType.Text,
                     unconfirmedUpdatedToastText = "Susu collector's route not edited",
                     confirmedUpdatedToastText = "Successfully changed",

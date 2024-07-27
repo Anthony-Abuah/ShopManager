@@ -67,7 +67,7 @@ fun AddBankAccountContent(
                     isError = bankAccountNameIsInvalid,
                     placeholder = BankAccountNamePlaceholder,
                     label = EnterBankAccountName,
-                    icon = R.drawable.ic_bank,
+                    icon = R.drawable.ic_bank_account,
                     keyboardType = KeyboardType.Text
                 )
             }

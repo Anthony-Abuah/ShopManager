@@ -388,20 +388,20 @@ fun RegisterPersonnelContent(
 
         BasicTextFieldAlertDialog(
             openDialog = openRolesDialog,
-            title = "Add PersonnelRole",
+            title = "Add Personnel Role",
             textContent = emptyString,
             placeholder = "Eg: Manager",
             label = "Add personnel role",
             icon = R.drawable.ic_role,
             keyboardType = KeyboardType.Text,
-            unconfirmedUpdatedToastText = "PersonnelRole not added",
+            unconfirmedUpdatedToastText = "Personnel Role not added",
             confirmedUpdatedToastText = null,
             getValue = { _newRole ->
                 val newPersonnelRole = PersonnelRole(_newRole)
                 val roles = personnelRoles.toPersonnelRoles()
                 val mutablePersonnelRoles = mutableListOf<PersonnelRole>()
                 if (roles.map { it.personnelRole.trim().lowercase(Locale.ROOT) }.contains(_newRole.trim().lowercase(Locale.ROOT))) {
-                    Toast.makeText(context, "PersonnelRole: $_newRole already exists", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Personnel Role: $_newRole already exists", Toast.LENGTH_LONG).show()
                     openRolesDialog = false
                 } else {
                     mutablePersonnelRoles.addAll(roles)
@@ -410,7 +410,7 @@ fun RegisterPersonnelContent(
                     coroutineScope.launch {
                         UserPreferences(context).savePersonnelRoles(personnelRoles ?: emptyString)
                     }
-                    Toast.makeText(context, "PersonnelRole: $_newRole successfully added", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Personnel Role: $_newRole successfully added", Toast.LENGTH_LONG).show()
                 }
             }
         ) {

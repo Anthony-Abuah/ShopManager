@@ -62,7 +62,7 @@ fun BankPersonnelScreen(
             textContent = emptyString,
             placeholder = "Eg: Mary Mensah",
             label = "Add bank personnel",
-            icon = R.drawable.ic_bank,
+            icon = R.drawable.ic_bank_account,
             keyboardType = KeyboardType.Text,
             unconfirmedUpdatedToastText = "Bank personnel's name not added",
             confirmedUpdatedToastText = "Successfully added",

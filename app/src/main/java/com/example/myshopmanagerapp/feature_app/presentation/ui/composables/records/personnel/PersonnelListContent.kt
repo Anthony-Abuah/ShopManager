@@ -11,9 +11,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.PersonnelEntities
+import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
+import com.example.myshopmanagerapp.core.UserPreferences
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenColumnWithoutBottomBar
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.ConfirmationInfoDialog
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.DeleteConfirmationDialog
@@ -30,11 +33,22 @@ fun PersonnelListContent(
     onConfirmDelete: (String)-> Unit,
     navigateToViewPersonnelScreen: (String)-> Unit
 ) {
+    val context = LocalContext.current
+    val userPreferences = UserPreferences(context)
+    val thisPersonnelJson = userPreferences.getPersonnelInfo.collectAsState(initial = emptyString).value
+    val thisPersonnel = thisPersonnelJson.toPersonnelEntity()
+    val isPrincipalAdmin = thisPersonnel?.isPrincipalAdmin == true
     var openDeleteConfirmation by remember {
+        mutableStateOf(false)
+    }
+    var openAlertDialog by remember {
         mutableStateOf(false)
     }
     var confirmationInfoDialog by remember {
         mutableStateOf(false)
+    }
+    var alertDialogMessage by remember {
+        mutableStateOf(emptyString)
     }
     var uniquePersonnelId by remember {
         mutableStateOf(emptyString)
@@ -76,9 +90,14 @@ fun PersonnelListContent(
                         secondaryContentColor = secondaryContentColor,
                         number = index.plus(1).toString(),
                         onDelete = {
-                            personnelName = "${personnel.firstName} ${personnel.lastName}"
-                            uniquePersonnelId = personnel.uniquePersonnelId
-                            openDeleteConfirmation = !openDeleteConfirmation
+                            if (isPrincipalAdmin) {
+                                personnelName = "${personnel.firstName} ${personnel.lastName}"
+                                uniquePersonnelId = personnel.uniquePersonnelId
+                                openDeleteConfirmation = !openDeleteConfirmation
+                            }else{
+                                alertDialogMessage = "You do not have the administrative rights to delete this personnel"
+                                openAlertDialog = !openAlertDialog
+                            }
                        },
                     ) {
                         navigateToViewPersonnelScreen(personnel.uniquePersonnelId)
@@ -113,6 +132,18 @@ fun PersonnelListContent(
             }
             confirmationInfoDialog = false
         }
+
+        ConfirmationInfoDialog(
+            openDialog = openAlertDialog,
+            isLoading = false,
+            title = null,
+            textContent = alertDialogMessage,
+            unconfirmedDeletedToastText = null,
+            confirmedDeleteToastText = null
+        ) {
+            openAlertDialog = false
+        }
+
     }
     
     
