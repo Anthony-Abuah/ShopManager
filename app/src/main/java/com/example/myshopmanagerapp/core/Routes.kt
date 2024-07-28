@@ -72,6 +72,18 @@ object Routes {
 
 
 
+    //Receipt Routes
+    const val getAllReceipts = "/getAllReceipts"
+    const val getAllCompanyReceipts = "/getAllCompanyReceipts/{uniqueCompanyId}"
+    const val addReceipt = "/addReceipt"
+    const val addReceipts = "/addReceipts/{uniqueCompanyId}"
+    const val smartAddCompanyReceipts = "/smartAddCompanyReceipts/{uniqueCompanyId}"
+    const val updateReceipt = "/updateReceipt"
+    const val deleteCompanyReceipt = "/deleteCompanyReceipt/{uniqueReceiptId}/{uniqueCompanyId}"
+    const val deleteReceipt = "/deleteReceipt/{uniqueReceiptId}/{uniqueCompanyId}"
+    const val deleteAllCompanyReceipts = "/deleteAllCompanyReceipt/{uniqueCompanyId}"
+
+
     //Debt Routes
     const val getAllDebts = "/getAllDebts"
     const val getAllCompanyDebts = "/getAllCompanyDebts/{uniqueCompanyId}"

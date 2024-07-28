@@ -17,7 +17,6 @@ import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.TypeConverters.toListOfCompanyEntities
 import com.example.myshopmanagerapp.core.TypeConverters.toListOfCompanyEntitiesJson
-import com.example.myshopmanagerapp.core.TypeConverters.toListOfShopLoginInfo
 import com.example.myshopmanagerapp.core.UserPreferences
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
@@ -34,7 +33,6 @@ import retrofit2.HttpException
 import retrofit2.Response
 import java.io.File
 import java.io.IOException
-import kotlin.system.exitProcess
 
 
 class CompanyRepositoryImpl(
@@ -483,7 +481,6 @@ class CompanyRepositoryImpl(
                             Log.d("CompanyRepository", "2nd Shop info json = $thisShop1")
                         }
                     }
-
                 }
             }
         }

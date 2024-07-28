@@ -153,6 +153,7 @@ class BackupRepositoryImpl(
                     val banks = appDatabase.bankAccountDao.getAllBankAccounts()?.map { it.toBankAccountInfoDto(uniqueCompanyId) }
                     val stocks = appDatabase.stockDao.getAllStocks()?.map { it.toStockInfoDto(uniqueCompanyId) }
                     val cashIns = appDatabase.cashInDao.getAllCashIns()?.map { it.toCashInfoDto(uniqueCompanyId) }
+                    val receipts = appDatabase.receiptDao.getAllReceipts()?.map { it.toReceiptInfoDto(uniqueCompanyId) }
 
                     if (!customers.isNullOrEmpty()) {
                         Log.d("BackupRepository", "Customer is not empty is called")
@@ -245,6 +246,39 @@ class BackupRepositoryImpl(
                                     )
                                 }
                                 Log.d("BackupRepository", "Cash in data backup failed")
+                            }
+                        })
+                    }
+
+                    if (!receipts.isNullOrEmpty()) {
+                        Log.d("BackupRepository", "Receipt is not empty is called")
+                        emit(Resource.Loading("Backing up receipts ..."))
+                        val call = shopManagerDatabaseApi.addReceipts(uniqueCompanyId, receipts)
+                        call!!.enqueue(object : Callback<AddEntitiesResponse> {
+                            override fun onResponse(
+                                call: Call<AddEntitiesResponse>,
+                                response: Response<AddEntitiesResponse>
+                            ) {
+                                Log.d("BackupRepository", "Receipt data backup is successful")
+                                coroutineScope.launch {
+                                    emit(Resource.Success(data = response.body()?.data.toNotNull()))
+                                }
+                            }
+
+                            override fun onFailure(call: Call<AddEntitiesResponse>, t: Throwable) {
+                                coroutineScope.launch {
+                                    emit(
+                                        Resource.Error(
+                                            data = t.message,
+                                            message = "Unknown error\nUnable to backup receipts",
+                                        )
+                                    )
+                                    Log.d(
+                                        "BackupRepository",
+                                        "Receipt data backup is emitted with failure"
+                                    )
+                                }
+                                Log.d("BackupRepository", "Receipt data backup failed")
                             }
                         })
                     }
@@ -647,6 +681,10 @@ class BackupRepositoryImpl(
                     val addedCustomerIds = AdditionEntityMarkers(context).getAddedCustomerIds.first().toUniqueIds().map { it.uniqueId }
                     val customers = allCustomers.filter { addedCustomerIds.contains(it.uniqueCustomerId) }.map { it.toCustomerInfoDto(uniqueCompanyId) }
 
+                    val allReceipts = appDatabase.receiptDao.getAllReceipts() ?: emptyList()
+                    val addedReceiptIds = AdditionEntityMarkers(context).getAddedReceiptIds.first().toUniqueIds().map { it.uniqueId }
+                    val receipts = allReceipts.filter { addedReceiptIds.contains(it.uniqueReceiptId) }.map { it.toReceiptInfoDto(uniqueCompanyId) }
+
                     val allDebts = appDatabase.debtDao.getAllDebt() ?: emptyList()
                     val addedDebtIds = AdditionEntityMarkers(context).getAddedDebtIds.first().toUniqueIds().map { it.uniqueId }
                     val debts = allDebts.filter { addedDebtIds.contains(it.uniqueDebtId) }.map { it.toDebtInfoDto(uniqueCompanyId) }
@@ -806,6 +844,42 @@ class BackupRepositoryImpl(
                                     )
                                 }
                                 Log.d("BackupRepository", "Cash in data backup failed")
+                            }
+                        })
+                    }
+
+                    if (receipts.isNotEmpty()) {
+                        val uniqueReceiptIds = ChangesEntityMarkers(context).getChangedReceiptIds.first().toUniqueIds()
+                        Log.d("BackupRepository", "Receipt is not empty is called")
+                        emit(Resource.Loading("Backing up receipts ..."))
+                        val call = shopManagerDatabaseApi.smartBackUpReceipts(uniqueCompanyId, receipts, uniqueReceiptIds)
+                        call!!.enqueue(object : Callback<AddEntitiesResponse> {
+                            override fun onResponse(
+                                call: Call<AddEntitiesResponse>,
+                                response: Response<AddEntitiesResponse>
+                            ) {
+                                Log.d("BackupRepository", "Receipt data backup is successful")
+                                coroutineScope.launch {
+                                    emit(Resource.Success(data = response.body()?.data.toNotNull()))
+                                    AdditionEntityMarkers(context).saveAddedReceiptIds(emptyString)
+                                    ChangesEntityMarkers(context).saveChangedReceiptIds(emptyString)
+                                }
+                            }
+
+                            override fun onFailure(call: Call<AddEntitiesResponse>, t: Throwable) {
+                                coroutineScope.launch {
+                                    emit(
+                                        Resource.Error(
+                                            data = t.message,
+                                            message = "Unknown error\nUnable to backup receipts",
+                                        )
+                                    )
+                                    Log.d(
+                                        "BackupRepository",
+                                        "Receipt data backup is emitted with failure"
+                                    )
+                                }
+                                Log.d("BackupRepository", "Receipt data backup failed")
                             }
                         })
                     }
@@ -1248,6 +1322,11 @@ class BackupRepositoryImpl(
                             ?: emptyList()
                     appDatabase.supplierDao.addSuppliers(remoteSuppliers.map { it.toSupplierEntity() })
 
+                    val remoteReceipts =
+                        shopManagerDatabaseApi.fetchAllCompanyReceipts(uniqueCompanyId)?.data
+                            ?: emptyList()
+                    appDatabase.receiptDao.addReceipts(remoteReceipts.map { it.toReceiptEntity() })
+
                     val remoteDebts =
                         shopManagerDatabaseApi.fetchAllCompanyDebts(uniqueCompanyId)?.data
                             ?: emptyList()
@@ -1354,6 +1433,12 @@ class BackupRepositoryImpl(
                             ?: emptyList()
                     val allSupplierIds = appDatabase.supplierDao.getAllSuppliers()?.map { it.uniqueSupplierId } ?: emptyList()
                     appDatabase.supplierDao.addSuppliers(remoteSuppliers.map { it.toSupplierEntity() }.filter { !allSupplierIds.contains(it.uniqueSupplierId) })
+
+                    val remoteReceipts =
+                        shopManagerDatabaseApi.fetchAllCompanyReceipts(uniqueCompanyId)?.data
+                            ?: emptyList()
+                    val allReceiptIds = appDatabase.receiptDao.getAllReceipts()?.map { it.uniqueReceiptId } ?: emptyList()
+                    appDatabase.receiptDao.addReceipts(remoteReceipts.map { it.toReceiptEntity() }.filter { !allReceiptIds.contains(it.uniqueReceiptId) })
 
                     val remoteDebts =
                         shopManagerDatabaseApi.fetchAllCompanyDebts(uniqueCompanyId)?.data

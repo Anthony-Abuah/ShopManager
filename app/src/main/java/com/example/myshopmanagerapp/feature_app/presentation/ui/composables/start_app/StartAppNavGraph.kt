@@ -24,8 +24,7 @@ fun StartAppNavGraph (navController: NavHostController){
     NavHost(
         navController = startAppNavHostController,
         startDestination = StartAppScreens.LogInCompanyScreen.route
-    )
-    {
+    ) {
         composable(route = StartAppScreens.LogInCompanyScreen.route){
             LoginCompanyScreen {
                 startAppNavHostController.navigate(StartAppScreens.RegisterCompanyNavigation.route)

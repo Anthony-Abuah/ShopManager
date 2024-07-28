@@ -119,7 +119,27 @@ fun SettingsContent(
                 info = null
             )
         }
-        
+
+
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .padding(LocalSpacing.current.smallMedium)
+            .clickable {
+                if (isLoggedIn){
+                    alertDialogMessage = "You're already logged in.\nTo login into a new account, please log out first"
+                    openAlertDialog = !openAlertDialog
+                }else{
+                    navigateToLoginScreen()
+                }
+           },
+        ) {
+            SettingsContentCard(
+                icon = R.drawable.ic_login,
+                title = "Create cloud profile",
+                info = null
+            )
+        }
+
         HorizontalDivider(
             modifier = Modifier.padding(vertical = LocalSpacing.current.default),
             color = MaterialTheme.colorScheme.onBackground,

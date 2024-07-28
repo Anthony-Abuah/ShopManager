@@ -14,6 +14,7 @@ import com.example.myshopmanagerapp.core.Routes.addInventoryItems
 import com.example.myshopmanagerapp.core.Routes.addInventoryStocks
 import com.example.myshopmanagerapp.core.Routes.addListOfPersonnel
 import com.example.myshopmanagerapp.core.Routes.addListOfSavings
+import com.example.myshopmanagerapp.core.Routes.addReceipts
 import com.example.myshopmanagerapp.core.Routes.addRevenues
 import com.example.myshopmanagerapp.core.Routes.addStocks
 import com.example.myshopmanagerapp.core.Routes.addSuppliers
@@ -31,6 +32,7 @@ import com.example.myshopmanagerapp.core.Routes.getAllCompanyInventories
 import com.example.myshopmanagerapp.core.Routes.getAllCompanyInventoryItems
 import com.example.myshopmanagerapp.core.Routes.getAllCompanyInventoryStocks
 import com.example.myshopmanagerapp.core.Routes.getAllCompanyPersonnel
+import com.example.myshopmanagerapp.core.Routes.getAllCompanyReceipts
 import com.example.myshopmanagerapp.core.Routes.getAllCompanyRevenues
 import com.example.myshopmanagerapp.core.Routes.getAllCompanySavings
 import com.example.myshopmanagerapp.core.Routes.getAllCompanyStocks
@@ -48,6 +50,7 @@ import com.example.myshopmanagerapp.core.Routes.smartAddCompanyInventories
 import com.example.myshopmanagerapp.core.Routes.smartAddCompanyInventoryItems
 import com.example.myshopmanagerapp.core.Routes.smartAddCompanyInventoryStocks
 import com.example.myshopmanagerapp.core.Routes.smartAddCompanyPersonnel
+import com.example.myshopmanagerapp.core.Routes.smartAddCompanyReceipts
 import com.example.myshopmanagerapp.core.Routes.smartAddCompanyRevenues
 import com.example.myshopmanagerapp.core.Routes.smartAddCompanySavings
 import com.example.myshopmanagerapp.core.Routes.smartAddCompanyStocks
@@ -76,6 +79,8 @@ import com.example.myshopmanagerapp.feature_app.data.remote.dto.inventoy_item.In
 import com.example.myshopmanagerapp.feature_app.data.remote.dto.inventoy_item.ListOfInventoryItemResponseDto
 import com.example.myshopmanagerapp.feature_app.data.remote.dto.personnel.ListOfPersonnelResponseDto
 import com.example.myshopmanagerapp.feature_app.data.remote.dto.personnel.PersonnelInfoDto
+import com.example.myshopmanagerapp.feature_app.data.remote.dto.receipt.ListOfReceiptResponseDto
+import com.example.myshopmanagerapp.feature_app.data.remote.dto.receipt.ReceiptInfoDto
 import com.example.myshopmanagerapp.feature_app.data.remote.dto.revenue.ListOfRevenueResponseDto
 import com.example.myshopmanagerapp.feature_app.data.remote.dto.revenue.RevenueInfoDto
 import com.example.myshopmanagerapp.feature_app.data.remote.dto.savings.ListOfSavingsResponseDto
@@ -160,6 +165,16 @@ interface ShopManagerDatabaseApi {
 
     @GET(getAllCompanyCashIns)
     suspend fun fetchAllCompanyCashIns(@Path("uniqueCompanyId") uniqueCompanyId: String): ListOfCashInResponseDto?
+
+    // Receipt route
+    @POST(addReceipts)
+    fun addReceipts(@Path("uniqueCompanyId") uniqueCompanyId: String, @Body debts: List<ReceiptInfoDto>): Call<AddEntitiesResponse>?
+    @GET(getAllCompanyReceipts)
+    suspend fun fetchAllCompanyReceipts(@Path("uniqueCompanyId") uniqueCompanyId: String): ListOfReceiptResponseDto?
+
+    @POST(smartAddCompanyReceipts)
+    fun smartBackUpReceipts(@Path("uniqueCompanyId") uniqueCompanyId: String, @Body debts: List<ReceiptInfoDto>, @Body uniqueReceiptIds: List<UniqueId>): Call<AddEntitiesResponse>?
+
 
     // Debt route
     @POST(addDebts)

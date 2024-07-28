@@ -15,6 +15,7 @@ interface CompanyRepository {
 
     suspend fun changePassword(currentPassword: String, newPassword: String, confirmedPassword: String)
 
+    suspend fun onlineShopAccount(company: CompanyEntity, confirmedPassword: String)
     suspend fun registerShopAccount(company: CompanyEntity, confirmedPassword: String)
 
     suspend fun login(email: String, password: String): Flow<Resource<String>>
