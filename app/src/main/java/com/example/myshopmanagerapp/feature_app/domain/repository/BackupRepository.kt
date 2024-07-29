@@ -13,6 +13,7 @@ interface BackupRepository {
     suspend fun restoreDatabase(context: Context, restart: Boolean = true): Flow<Resource<String>>
 
     suspend fun absoluteBackup(coroutineScope: CoroutineScope): Flow<Resource<String>>
+    suspend fun absoluteBackup1(coroutineScope: CoroutineScope)
 
     suspend fun smartBackup(coroutineScope: CoroutineScope): Flow<Resource<String>>
 

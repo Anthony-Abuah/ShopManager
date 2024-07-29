@@ -157,6 +157,10 @@ class CompanyRepositoryImpl(
         }
     }
 
+    override suspend fun onlineShopAccount(company: CompanyEntity, confirmedPassword: String) {
+        TODO("Not yet implemented")
+    }
+
     @OptIn(DelicateCoroutinesApi::class)
     override suspend fun registerShopAccount(
         company: CompanyEntity,
