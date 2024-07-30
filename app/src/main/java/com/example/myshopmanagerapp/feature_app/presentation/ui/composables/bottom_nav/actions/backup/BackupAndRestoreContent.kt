@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import com.example.myshopmanagerapp.R
 import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.FormRelatedString.AbsoluteBackUpDialogMessage
@@ -28,11 +29,13 @@ import com.example.myshopmanagerapp.core.FormRelatedString.SmartBackUpDialogMess
 import com.example.myshopmanagerapp.core.FormRelatedString.SmartRemoteBackUp
 import com.example.myshopmanagerapp.core.FormRelatedString.SmartSync
 import com.example.myshopmanagerapp.core.FormRelatedString.SmartSyncDialogMessage
+import com.example.myshopmanagerapp.core.UserPreferences
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.SettingsContentCard
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenColumnWithoutBottomBar
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.ConfirmationInfoDialog
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.DeleteConfirmationDialog
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -56,6 +59,9 @@ fun BackupAndRestoreContent(
     absoluteSyncData: ()-> Unit,
     smartSyncData: ()-> Unit,
 ) {
+    val context = LocalContext.current
+    val userPreferences = UserPreferences(context)
+    val coroutineScope = rememberCoroutineScope()
     var openLocalConfirmationDialog by remember {
         mutableStateOf(false)
     }
@@ -86,6 +92,8 @@ fun BackupAndRestoreContent(
     var isAbsoluteSync by remember {
         mutableStateOf<Boolean?>(null)
     }
+    val repositoryJobMessage = userPreferences.getRepositoryJobMessage.collectAsState(initial = emptyString).value
+
     BasicScreenColumnWithoutBottomBar {
         Box(modifier = Modifier
             .fillMaxWidth()
@@ -232,11 +240,14 @@ fun BackupAndRestoreContent(
         unconfirmedDeletedToastText = null,
         confirmedDeleteToastText = null,
         confirmDelete = {
+            coroutineScope.launch {
+                userPreferences.saveRepositoryJobMessage(emptyString)
+            }
             when(isAbsoluteBackup){
                 true->{
                     absoluteRemoteBackup()
-                    isLoading = isLoadingAbsoluteBackup
-                    dialogMessage = absoluteBackupMessage
+                    isLoading = repositoryJobMessage.isNullOrBlank()
+                    dialogMessage = repositoryJobMessage ?: "Unknown outcome"
                     confirmationInfoDialog = !confirmationInfoDialog
                 }
                 false->{

@@ -646,13 +646,18 @@ class BackupRepositoryImpl(
 
     @OptIn(DelicateCoroutinesApi::class)
     override suspend fun absoluteBackup1(coroutineScope: CoroutineScope){
-        /*try {
-            val context = MyShopManagerApp.applicationContext()
-            val userPreferences = UserPreferences(context)
+        var errorMessage = emptyString
+        val context = MyShopManagerApp.applicationContext()
+        val userPreferences = UserPreferences(context)
+        try {
             val isLoggedIn = userPreferences.getLoggedInState.first()
             val shopInfoJson = userPreferences.getShopInfo.first()
-            val uniqueCompanyId = shopInfoJson.toCompanyEntity()?.uniqueCompanyId
-
+            val uniqueCompanyId = "Company_Dedeeappliances_86681"
+            //val uniqueCompanyId = shopInfoJson.toCompanyEntity()?.uniqueCompanyId
+            Log.d(
+                "BackupRepository",
+                "uniqueCompanyId: $uniqueCompanyId"
+            )
             when(true) {
                 (isLoggedIn != true) -> {
                     userPreferences.saveRepositoryJobSuccessValue(false)
@@ -675,14 +680,12 @@ class BackupRepositoryImpl(
                     val revenues = appDatabase.revenueDao.getAllRevenues()?.map { it.toRevenueInfoDto(uniqueCompanyId) }
                     val withdrawals = appDatabase.withdrawalDao.getAllWithdrawals()?.map { it.toWithdrawalInfoDto(uniqueCompanyId) }
                     val savings = appDatabase.savingsDao.getAllSavings()?.map { it.toSavingsInfoDto(uniqueCompanyId) }
-                    val banks = appDatabase.bankAccountDao.getAllBankAccounts()?.map { it.toBankAccountInfoDto(uniqueCompanyId) }
+                    val bankAccounts = appDatabase.bankAccountDao.getAllBankAccounts()?.map { it.toBankAccountInfoDto(uniqueCompanyId) }
                     val stocks = appDatabase.stockDao.getAllStocks()?.map { it.toStockInfoDto(uniqueCompanyId) }
                     val cashIns = appDatabase.cashInDao.getAllCashIns()?.map { it.toCashInfoDto(uniqueCompanyId) }
                     val receipts = appDatabase.receiptDao.getAllReceipts()?.map { it.toReceiptInfoDto(uniqueCompanyId) }
 
-                    userPreferences.saveRepositoryJobSuccessValue(false)
                     userPreferences.saveRepositoryJobMessage("All data has been fetched...")
-
 
                     if (!customers.isNullOrEmpty()) {
                         Log.d("BackupRepository", "Customer is not empty is called")
@@ -694,27 +697,33 @@ class BackupRepositoryImpl(
                                 response: Response<AddEntitiesResponse>
                             ) {
                                 val customerIsBackedUpSuccessfully = response.body()?.success == true
-                                Log.d("BackupRepository", "Customer data backup is successful")
+                                Log.d("BackupRepository", "Customer data backup success value: ${response.body()?.success}")
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
                                     if (customerIsBackedUpSuccessfully) {
                                         userPreferences.saveRepositoryJobMessage("${response.body()?.data}")
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Customer data is emitted successfully"
+                                        )
+                                    }else{
+                                        errorMessage = "${response.body()?.data}"
+                                        userPreferences.saveRepositoryJobMessage(errorMessage)
+                                        Log.d(
+                                            "BackupRepository",
+                                            "error Message: $errorMessage\n" +
+                                                    "data: ${response.body()?.data}\n" +
+                                                    "message: ${response.body()?.message}\n" +
+                                                    "success: ${response.body()?.success}"
+                                        )
                                     }
-
-                                    Log.d(
-                                        "BackupRepository",
-                                        "Customer data is emitted successfully"
-                                    )
                                 }
                             }
 
                             override fun onFailure(call: Call<AddEntitiesResponse>, t: Throwable) {
-                                coroutineScope.launch {
-                                    emit(
-                                        Resource.Error(
-                                            data = t.message,
-                                            message = "Unknown error\nUnable to backup customers",
-                                        )
-                                    )
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+
+                                    errorMessage = t.message ?: "Unknown error!"
+                                    userPreferences.saveRepositoryJobMessage(errorMessage)
                                     Log.d(
                                         "BackupRepository",
                                         "Customer data is emitted with failure"
@@ -725,148 +734,214 @@ class BackupRepositoryImpl(
                     }
 
                     if (!suppliers.isNullOrEmpty()) {
-                        emit(Resource.Loading("Backing up suppliers ..."))
+                        Log.d("BackupRepository", "Supplier is not empty is called")
+                        userPreferences.saveRepositoryJobMessage("Is backing up suppliers...")
                         val call = shopManagerDatabaseApi.addSuppliers(uniqueCompanyId, suppliers)
                         call!!.enqueue(object : Callback<AddEntitiesResponse> {
                             override fun onResponse(
                                 call: Call<AddEntitiesResponse>,
                                 response: Response<AddEntitiesResponse>
                             ) {
-                                coroutineScope.launch {
+                                val supplierIsBackedUpSuccessfully = response.body()?.success == true
+                                Log.d("BackupRepository", "Supplier data backup success value: ${response.body()?.success}")
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    if (supplierIsBackedUpSuccessfully) {
+                                        userPreferences.saveRepositoryJobMessage("${response.body()?.data}")
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Supplier data is emitted successfully"
+                                        )
+                                    }else{
+                                        errorMessage = "${response.body()?.data}"
+                                        userPreferences.saveRepositoryJobMessage(errorMessage)
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Supplier data is is not backed up successfully"
+                                        )
+                                    }
                                 }
                             }
 
                             override fun onFailure(call: Call<AddEntitiesResponse>, t: Throwable) {
-                                coroutineScope.launch {
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
 
+                                    errorMessage = t.message ?: "Unknown error!"
+                                    userPreferences.saveRepositoryJobMessage(errorMessage)
+                                    Log.d(
+                                        "BackupRepository",
+                                        "Supplier data is emitted with failure"
+                                    )
                                 }
                             }
                         })
                     }
 
                     if (!cashIns.isNullOrEmpty()) {
-                        Log.d("BackupRepository", "Debt is not empty is called")
-                        emit(Resource.Loading("Backing up debts ..."))
+                        Log.d("BackupRepository", "Cash in is not empty is called")
+                        userPreferences.saveRepositoryJobMessage("Is backing up cash ins...")
                         val call = shopManagerDatabaseApi.addCashIns(uniqueCompanyId, cashIns)
                         call!!.enqueue(object : Callback<AddEntitiesResponse> {
                             override fun onResponse(
                                 call: Call<AddEntitiesResponse>,
                                 response: Response<AddEntitiesResponse>
                             ) {
+                                val cashInIsBackedUpSuccessfully = response.body()?.success == true
                                 Log.d("BackupRepository", "Cash in data backup is successful")
-                                coroutineScope.launch {
-                                    emit(Resource.Success(data = response.body()?.data.toNotNull()))
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    if (cashInIsBackedUpSuccessfully) {
+                                        userPreferences.saveRepositoryJobMessage("${response.body()?.data}")
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Cash in data is emitted successfully"
+                                        )
+                                    }else{
+                                        errorMessage = "${response.body()?.data}"
+                                        userPreferences.saveRepositoryJobMessage(errorMessage)
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Cash in data is is not backed up successfully"
+                                        )
+                                    }
                                 }
                             }
 
                             override fun onFailure(call: Call<AddEntitiesResponse>, t: Throwable) {
-                                coroutineScope.launch {
-                                    emit(
-                                        Resource.Error(
-                                            data = t.message,
-                                            message = "Unknown error\nUnable to backup cash ins",
-                                        )
-                                    )
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+
+                                    errorMessage = t.message ?: "Unknown error!"
+                                    userPreferences.saveRepositoryJobMessage(errorMessage)
                                     Log.d(
                                         "BackupRepository",
-                                        "Cash in data backup is emitted with failure"
+                                        "Cash in data is emitted with failure"
                                     )
                                 }
-                                Log.d("BackupRepository", "Cash in data backup failed")
                             }
                         })
                     }
 
                     if (!receipts.isNullOrEmpty()) {
                         Log.d("BackupRepository", "Receipt is not empty is called")
-                        emit(Resource.Loading("Backing up receipts ..."))
+                        userPreferences.saveRepositoryJobMessage("Is backing up receipts...")
                         val call = shopManagerDatabaseApi.addReceipts(uniqueCompanyId, receipts)
                         call!!.enqueue(object : Callback<AddEntitiesResponse> {
                             override fun onResponse(
                                 call: Call<AddEntitiesResponse>,
                                 response: Response<AddEntitiesResponse>
                             ) {
+                                val receiptIsBackedUpSuccessfully = response.body()?.success == true
                                 Log.d("BackupRepository", "Receipt data backup is successful")
-                                coroutineScope.launch {
-                                    emit(Resource.Success(data = response.body()?.data.toNotNull()))
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    if (receiptIsBackedUpSuccessfully) {
+                                        userPreferences.saveRepositoryJobMessage("${response.body()?.data}")
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Receipt data is emitted successfully"
+                                        )
+                                    }else{
+                                        errorMessage = "${response.body()?.data}"
+                                        userPreferences.saveRepositoryJobMessage(errorMessage)
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Receipt data is is not backed up successfully"
+                                        )
+                                    }
                                 }
                             }
 
                             override fun onFailure(call: Call<AddEntitiesResponse>, t: Throwable) {
-                                coroutineScope.launch {
-                                    emit(
-                                        Resource.Error(
-                                            data = t.message,
-                                            message = "Unknown error\nUnable to backup receipts",
-                                        )
-                                    )
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+
+                                    errorMessage = t.message ?: "Unknown error!"
+                                    userPreferences.saveRepositoryJobMessage(errorMessage)
                                     Log.d(
                                         "BackupRepository",
-                                        "Receipt data backup is emitted with failure"
+                                        "Receipt data is emitted with failure"
                                     )
                                 }
-                                Log.d("BackupRepository", "Receipt data backup failed")
                             }
                         })
                     }
 
                     if (!debts.isNullOrEmpty()) {
                         Log.d("BackupRepository", "Debt is not empty is called")
-                        emit(Resource.Loading("Backing up debts ..."))
+                        userPreferences.saveRepositoryJobMessage("Is backing up debts...")
                         val call = shopManagerDatabaseApi.addDebts(uniqueCompanyId, debts)
                         call!!.enqueue(object : Callback<AddEntitiesResponse> {
                             override fun onResponse(
                                 call: Call<AddEntitiesResponse>,
                                 response: Response<AddEntitiesResponse>
                             ) {
-                                Log.d("BackupRepository", "Debt data backup is successful")
-                                coroutineScope.launch {
-                                    emit(Resource.Success(data = response.body()?.data.toNotNull()))
+                                val debtIsBackedUpSuccessfully = response.body()?.success == true
+                                Log.d("BackupRepository", "Debt data backup success value: ${response.body()?.success}")
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    if (debtIsBackedUpSuccessfully) {
+                                        userPreferences.saveRepositoryJobMessage("${response.body()?.data}")
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Debt data is emitted successfully"
+                                        )
+                                    }else{
+                                        errorMessage = "${response.body()?.data}"
+                                        userPreferences.saveRepositoryJobMessage(errorMessage)
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Debt data is is not backed up successfully"
+                                        )
+                                    }
                                 }
                             }
 
                             override fun onFailure(call: Call<AddEntitiesResponse>, t: Throwable) {
-                                coroutineScope.launch {
-                                    emit(
-                                        Resource.Error(
-                                            data = t.message,
-                                            message = "Unknown error\nUnable to backup debts",
-                                        )
-                                    )
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+
+                                    errorMessage = t.message ?: "Unknown error!"
+                                    userPreferences.saveRepositoryJobMessage(errorMessage)
                                     Log.d(
                                         "BackupRepository",
-                                        "Debt data backup is emitted with failure"
+                                        "Debt data is emitted with failure"
                                     )
                                 }
-                                Log.d("BackupRepository", "Debt data backup failed")
                             }
                         })
                     }
 
                     if (!debtRepayments.isNullOrEmpty()) {
-                        emit(Resource.Loading("Backing up debt repayments ..."))
-                        val call =
-                            shopManagerDatabaseApi.addDebtRepayments(
-                                uniqueCompanyId,
-                                debtRepayments
-                            )
+                        Log.d("BackupRepository", "DebtRepayment is not empty is called")
+                        userPreferences.saveRepositoryJobMessage("Is backing up debtRepayments...")
+                        val call = shopManagerDatabaseApi.addDebtRepayments(uniqueCompanyId, debtRepayments)
                         call!!.enqueue(object : Callback<AddEntitiesResponse> {
                             override fun onResponse(
                                 call: Call<AddEntitiesResponse>,
                                 response: Response<AddEntitiesResponse>
                             ) {
-                                coroutineScope.launch {
-                                    emit(Resource.Success(data = response.body()?.data.toNotNull()))
+                                val debtRepaymentIsBackedUpSuccessfully = response.body()?.success == true
+                                Log.d("BackupRepository", "Debt repayment data backup success value: ${response.body()?.success}")
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    if (debtRepaymentIsBackedUpSuccessfully) {
+                                        userPreferences.saveRepositoryJobMessage("${response.body()?.data}")
+                                        Log.d(
+                                            "BackupRepository",
+                                            "DebtRepayment data is emitted successfully"
+                                        )
+                                    }else{
+                                        errorMessage = "${response.body()?.data}"
+                                        userPreferences.saveRepositoryJobMessage(errorMessage)
+                                        Log.d(
+                                            "BackupRepository",
+                                            "DebtRepayment data is is not backed up successfully"
+                                        )
+                                    }
                                 }
                             }
 
                             override fun onFailure(call: Call<AddEntitiesResponse>, t: Throwable) {
-                                coroutineScope.launch {
-                                    emit(
-                                        Resource.Error(
-                                            data = t.message,
-                                            message = "Unknown error\nUnable to backup debt repayments",
-                                        )
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+
+                                    errorMessage = t.message ?: "Unknown error!"
+                                    userPreferences.saveRepositoryJobMessage(errorMessage)
+                                    Log.d(
+                                        "BackupRepository",
+                                        "DebtRepayment data is emitted with failure"
                                     )
                                 }
                             }
@@ -875,31 +950,41 @@ class BackupRepositoryImpl(
 
                     if (!revenues.isNullOrEmpty()) {
                         Log.d("BackupRepository", "Revenue is not empty is called")
-                        emit(Resource.Loading("Backing up revenues ..."))
+                        userPreferences.saveRepositoryJobMessage("Is backing up revenues...")
                         val call = shopManagerDatabaseApi.addRevenues(uniqueCompanyId, revenues)
                         call!!.enqueue(object : Callback<AddEntitiesResponse> {
                             override fun onResponse(
                                 call: Call<AddEntitiesResponse>,
                                 response: Response<AddEntitiesResponse>
                             ) {
-                                Log.d("BackupRepository", "Revenue data backup is successful")
-                                coroutineScope.launch {
-                                    emit(Resource.Success(data = response.body()?.data.toNotNull()))
-                                    Log.d(
-                                        "BackupRepository",
-                                        "Revenue data is emitted successfully"
-                                    )
+                                val revenueIsBackedUpSuccessfully = response.body()?.success == true
+                                Log.d("BackupRepository", "Revenue data backup success value: ${response.body()?.success}")
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    if (revenueIsBackedUpSuccessfully) {
+                                        userPreferences.saveRepositoryJobMessage("${response.body()?.data}")
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Revenue data is emitted successfully"
+                                        )
+                                    }else{
+                                        errorMessage = "${response.body()?.data}"
+                                        userPreferences.saveRepositoryJobMessage(errorMessage)
+                                        Log.d(
+                                            "BackupRepository",
+                                            "error Message: $errorMessage\n" +
+                                                    "data: ${response.body()?.data}\n" +
+                                                    "message: ${response.body()?.message}\n" +
+                                                    "success: ${response.body()?.success}"
+                                        )
+                                    }
                                 }
                             }
 
                             override fun onFailure(call: Call<AddEntitiesResponse>, t: Throwable) {
-                                coroutineScope.launch {
-                                    emit(
-                                        Resource.Error(
-                                            data = t.message,
-                                            message = "Unknown error\nUnable to backup revenues",
-                                        )
-                                    )
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+
+                                    errorMessage = t.message ?: "Unknown error!"
+                                    userPreferences.saveRepositoryJobMessage(errorMessage)
                                     Log.d(
                                         "BackupRepository",
                                         "Revenue data is emitted with failure"
@@ -911,54 +996,84 @@ class BackupRepositoryImpl(
 
                     if (!expenses.isNullOrEmpty()) {
                         Log.d("BackupRepository", "Expense is not empty is called")
-                        emit(Resource.Loading("Backing up expenses ..."))
+                        userPreferences.saveRepositoryJobMessage("Is backing up expenses...")
                         val call = shopManagerDatabaseApi.addExpenses(uniqueCompanyId, expenses)
                         call!!.enqueue(object : Callback<AddEntitiesResponse> {
                             override fun onResponse(
                                 call: Call<AddEntitiesResponse>,
                                 response: Response<AddEntitiesResponse>
                             ) {
-                                Log.d("BackupRepository", "Expense data back up is successful")
-                                coroutineScope.launch {
-                                    emit(Resource.Success(data = response.body()?.data.toNotNull()))
+                                val expenseIsBackedUpSuccessfully = response.body()?.success == true
+                                Log.d("BackupRepository", "Expense data backup success value: ${response.body()?.success}")
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    if (expenseIsBackedUpSuccessfully) {
+                                        userPreferences.saveRepositoryJobMessage("${response.body()?.data}")
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Expense data is emitted successfully"
+                                        )
+                                    }else{
+                                        errorMessage = "${response.body()?.data}"
+                                        userPreferences.saveRepositoryJobMessage(errorMessage)
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Expense data is is not backed up successfully"
+                                        )
+                                    }
                                 }
                             }
 
                             override fun onFailure(call: Call<AddEntitiesResponse>, t: Throwable) {
-                                coroutineScope.launch {
-                                    emit(
-                                        Resource.Error(
-                                            data = t.message,
-                                            message = "Unknown error\nUnable to backup expenses",
-                                        )
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+
+                                    errorMessage = t.message ?: "Unknown error!"
+                                    userPreferences.saveRepositoryJobMessage(errorMessage)
+                                    Log.d(
+                                        "BackupRepository",
+                                        "Expense data is emitted with failure"
                                     )
-                                    Log.d("BackupRepository", "Expense  data back up failed")
                                 }
                             }
                         })
                     }
 
                     if (!inventories.isNullOrEmpty()) {
-                        emit(Resource.Loading("Backing up inventories ..."))
-                        val call =
-                            shopManagerDatabaseApi.addInventories(uniqueCompanyId, inventories)
+                        Log.d("BackupRepository", "Inventory is not empty is called")
+                        userPreferences.saveRepositoryJobMessage("Is backing up inventories...")
+                        val call = shopManagerDatabaseApi.addInventories(uniqueCompanyId, inventories)
                         call!!.enqueue(object : Callback<AddEntitiesResponse> {
                             override fun onResponse(
                                 call: Call<AddEntitiesResponse>,
                                 response: Response<AddEntitiesResponse>
                             ) {
-                                coroutineScope.launch {
-                                    emit(Resource.Success(data = response.body()?.data.toNotNull()))
+                                val inventoryIsBackedUpSuccessfully = response.body()?.success == true
+                                Log.d("BackupRepository", "Inventory data backup is successful")
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    if (inventoryIsBackedUpSuccessfully) {
+                                        userPreferences.saveRepositoryJobMessage("${response.body()?.data}")
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Inventory data is emitted successfully"
+                                        )
+                                    }else{
+                                        errorMessage = "${response.body()?.data}"
+                                        userPreferences.saveRepositoryJobMessage(errorMessage)
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Inventory data is is not backed up successfully"
+                                        )
+                                    }
                                 }
                             }
 
                             override fun onFailure(call: Call<AddEntitiesResponse>, t: Throwable) {
-                                coroutineScope.launch {
-                                    emit(
-                                        Resource.Error(
-                                            data = t.message,
-                                            message = "Unknown error\nUnable to backup inventories",
-                                        )
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+
+                                    errorMessage = t.message ?: "Unknown error!"
+                                    userPreferences.saveRepositoryJobMessage(errorMessage)
+                                    Log.d(
+                                        "BackupRepository",
+                                        "Inventory data is emitted with failure"
                                     )
                                 }
                             }
@@ -966,29 +1081,42 @@ class BackupRepositoryImpl(
                     }
 
                     if (!inventoryItems.isNullOrEmpty()) {
-                        emit(Resource.Loading("Backing up inventory items ..."))
-                        val call =
-                            shopManagerDatabaseApi.addInventoryItems(
-                                uniqueCompanyId,
-                                inventoryItems
-                            )
+                        Log.d("BackupRepository", "Inventory item is not empty is called")
+                        userPreferences.saveRepositoryJobMessage("Is backing up inventoryItems...")
+                        val call = shopManagerDatabaseApi.addInventoryItems(uniqueCompanyId, inventoryItems)
                         call!!.enqueue(object : Callback<AddEntitiesResponse> {
                             override fun onResponse(
                                 call: Call<AddEntitiesResponse>,
                                 response: Response<AddEntitiesResponse>
                             ) {
-                                coroutineScope.launch {
-                                    emit(Resource.Success(data = response.body()?.data.toNotNull()))
+                                val inventoryItemIsBackedUpSuccessfully = response.body()?.success == true
+                                Log.d("BackupRepository", "Inventory item data backup is successful")
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    if (inventoryItemIsBackedUpSuccessfully) {
+                                        userPreferences.saveRepositoryJobMessage("${response.body()?.data}")
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Inventory item data is emitted successfully"
+                                        )
+                                    }else{
+                                        errorMessage = "${response.body()?.data}"
+                                        userPreferences.saveRepositoryJobMessage(errorMessage)
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Inventory item data is is not backed up successfully"
+                                        )
+                                    }
                                 }
                             }
 
                             override fun onFailure(call: Call<AddEntitiesResponse>, t: Throwable) {
-                                coroutineScope.launch {
-                                    emit(
-                                        Resource.Error(
-                                            data = t.message,
-                                            message = "Unknown error\nUnable to backup inventory items",
-                                        )
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+
+                                    errorMessage = t.message ?: "Unknown error!"
+                                    userPreferences.saveRepositoryJobMessage(errorMessage)
+                                    Log.d(
+                                        "BackupRepository",
+                                        "Inventory item data is emitted with failure"
                                     )
                                 }
                             }
@@ -996,29 +1124,42 @@ class BackupRepositoryImpl(
                     }
 
                     if (!inventoryStocks.isNullOrEmpty()) {
-                        emit(Resource.Loading("Backing up inventory stocks ..."))
-                        val call =
-                            shopManagerDatabaseApi.addInventoryStocks(
-                                uniqueCompanyId,
-                                inventoryStocks
-                            )
+                        Log.d("BackupRepository", "InventoryStock is not empty is called")
+                        userPreferences.saveRepositoryJobMessage("Is backing up inventoryStocks...")
+                        val call = shopManagerDatabaseApi.addInventoryStocks(uniqueCompanyId, inventoryStocks)
                         call!!.enqueue(object : Callback<AddEntitiesResponse> {
                             override fun onResponse(
                                 call: Call<AddEntitiesResponse>,
                                 response: Response<AddEntitiesResponse>
                             ) {
-                                coroutineScope.launch {
-                                    emit(Resource.Success(data = response.body()?.data.toNotNull()))
+                                val inventoryStockIsBackedUpSuccessfully = response.body()?.success == true
+                                Log.d("BackupRepository", "InventoryStock data backup is successful")
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    if (inventoryStockIsBackedUpSuccessfully) {
+                                        userPreferences.saveRepositoryJobMessage("${response.body()?.data}")
+                                        Log.d(
+                                            "BackupRepository",
+                                            "InventoryStock data is emitted successfully"
+                                        )
+                                    }else{
+                                        errorMessage = "${response.body()?.data}"
+                                        userPreferences.saveRepositoryJobMessage(errorMessage)
+                                        Log.d(
+                                            "BackupRepository",
+                                            "InventoryStock data is is not backed up successfully"
+                                        )
+                                    }
                                 }
                             }
 
                             override fun onFailure(call: Call<AddEntitiesResponse>, t: Throwable) {
-                                coroutineScope.launch {
-                                    emit(
-                                        Resource.Error(
-                                            data = t.message,
-                                            message = "Unknown error\nUnable to backup inventory stocks",
-                                        )
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+
+                                    errorMessage = t.message ?: "Unknown error!"
+                                    userPreferences.saveRepositoryJobMessage(errorMessage)
+                                    Log.d(
+                                        "BackupRepository",
+                                        "InventoryStock data is emitted with failure"
                                     )
                                 }
                             }
@@ -1026,25 +1167,42 @@ class BackupRepositoryImpl(
                     }
 
                     if (!stocks.isNullOrEmpty()) {
-                        emit(Resource.Loading("Backing up stocks ..."))
+                        Log.d("BackupRepository", "Stock is not empty is called")
+                        userPreferences.saveRepositoryJobMessage("Is backing up stocks...")
                         val call = shopManagerDatabaseApi.addStocks(uniqueCompanyId, stocks)
                         call!!.enqueue(object : Callback<AddEntitiesResponse> {
                             override fun onResponse(
                                 call: Call<AddEntitiesResponse>,
                                 response: Response<AddEntitiesResponse>
                             ) {
-                                coroutineScope.launch {
-                                    emit(Resource.Success(data = response.body()?.data.toNotNull()))
+                                val stockIsBackedUpSuccessfully = response.body()?.success == true
+                                Log.d("BackupRepository", "Stock data backup success value: ${response.body()?.success}")
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    if (stockIsBackedUpSuccessfully) {
+                                        userPreferences.saveRepositoryJobMessage("${response.body()?.data}")
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Stock data is emitted successfully"
+                                        )
+                                    }else{
+                                        errorMessage = "${response.body()?.data}"
+                                        userPreferences.saveRepositoryJobMessage(errorMessage)
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Stock data is is not backed up successfully"
+                                        )
+                                    }
                                 }
                             }
 
                             override fun onFailure(call: Call<AddEntitiesResponse>, t: Throwable) {
-                                coroutineScope.launch {
-                                    emit(
-                                        Resource.Error(
-                                            data = t.message,
-                                            message = "Unknown error\nUnable to backup stocks",
-                                        )
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+
+                                    errorMessage = t.message ?: "Unknown error!"
+                                    userPreferences.saveRepositoryJobMessage(errorMessage)
+                                    Log.d(
+                                        "BackupRepository",
+                                        "Stock data is emitted with failure"
                                     )
                                 }
                             }
@@ -1053,32 +1211,41 @@ class BackupRepositoryImpl(
 
                     if (!personnel.isNullOrEmpty()) {
                         Log.d("BackupRepository", "Personnel is not empty is called")
-                        emit(Resource.Loading("Backing up personnel ..."))
-                        val call =
-                            shopManagerDatabaseApi.addListOfPersonnel(uniqueCompanyId, personnel)
+                        userPreferences.saveRepositoryJobMessage("Is backing up personnel...")
+                        val call = shopManagerDatabaseApi.addListOfPersonnel(uniqueCompanyId, personnel)
                         call!!.enqueue(object : Callback<AddEntitiesResponse> {
                             override fun onResponse(
                                 call: Call<AddEntitiesResponse>,
                                 response: Response<AddEntitiesResponse>
                             ) {
-                                Log.d("BackupRepository", "Personnel data backup is successful")
-                                coroutineScope.launch {
-                                    emit(Resource.Success(data = response.body()?.data.toNotNull()))
-                                    Log.d(
-                                        "BackupRepository",
-                                        "Personnel data is emitted successfully"
-                                    )
+                                val customerIsBackedUpSuccessfully = response.body()?.success == true
+                                Log.d("BackupRepository", "Personnel data backup success value: ${response.body()?.success}")
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    if (customerIsBackedUpSuccessfully) {
+                                        userPreferences.saveRepositoryJobMessage("${response.body()?.data}")
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Personnel data is emitted successfully"
+                                        )
+                                    }else{
+                                        errorMessage = "${response.body()?.data}"
+                                        userPreferences.saveRepositoryJobMessage(errorMessage)
+                                        Log.d(
+                                            "BackupRepository",
+                                            "error Message: $errorMessage\n" +
+                                                    "data: ${response.body()?.data}\n" +
+                                                    "message: ${response.body()?.message}\n" +
+                                                    "success: ${response.body()?.success}"
+                                        )
+                                    }
                                 }
                             }
 
                             override fun onFailure(call: Call<AddEntitiesResponse>, t: Throwable) {
-                                coroutineScope.launch {
-                                    emit(
-                                        Resource.Error(
-                                            data = t.message,
-                                            message = "Unknown error\nUnable to backup personnel",
-                                        )
-                                    )
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+
+                                    errorMessage = t.message ?: "Unknown error!"
+                                    userPreferences.saveRepositoryJobMessage(errorMessage)
                                     Log.d(
                                         "BackupRepository",
                                         "Personnel data is emitted with failure"
@@ -1090,26 +1257,41 @@ class BackupRepositoryImpl(
 
                     if (!savings.isNullOrEmpty()) {
                         Log.d("BackupRepository", "Savings is not empty is called")
-                        emit(Resource.Loading("Backing up savings ..."))
+                        userPreferences.saveRepositoryJobMessage("Is backing up savings...")
                         val call = shopManagerDatabaseApi.addListOfSavings(uniqueCompanyId, savings)
                         call!!.enqueue(object : Callback<AddEntitiesResponse> {
                             override fun onResponse(
                                 call: Call<AddEntitiesResponse>,
                                 response: Response<AddEntitiesResponse>
                             ) {
+                                val customerIsBackedUpSuccessfully = response.body()?.success == true
                                 Log.d("BackupRepository", "Savings data backup is successful")
-                                coroutineScope.launch {
-                                    emit(Resource.Success(data = response.body()?.data.toNotNull()))
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    if (customerIsBackedUpSuccessfully) {
+                                        userPreferences.saveRepositoryJobMessage("${response.body()?.data}")
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Savings data is emitted successfully"
+                                        )
+                                    }else{
+                                        errorMessage = "${response.body()?.data}"
+                                        userPreferences.saveRepositoryJobMessage(errorMessage)
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Savings data is is not backed up successfully"
+                                        )
+                                    }
                                 }
                             }
 
                             override fun onFailure(call: Call<AddEntitiesResponse>, t: Throwable) {
-                                coroutineScope.launch {
-                                    emit(
-                                        Resource.Error(
-                                            data = t.message,
-                                            message = "Unknown error\nUnable to backup savings",
-                                        )
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+
+                                    errorMessage = t.message ?: "Unknown error!"
+                                    userPreferences.saveRepositoryJobMessage(errorMessage)
+                                    Log.d(
+                                        "BackupRepository",
+                                        "Savings data is emitted with failure"
                                     )
                                 }
                             }
@@ -1118,67 +1300,100 @@ class BackupRepositoryImpl(
 
                     if (!withdrawals.isNullOrEmpty()) {
                         Log.d("BackupRepository", "Withdrawal is not empty is called")
-                        emit(Resource.Loading("Backing up withdrawals ..."))
-                        val call =
-                            shopManagerDatabaseApi.addWithdrawals(uniqueCompanyId, withdrawals)
+                        userPreferences.saveRepositoryJobMessage("Is backing up withdrawals...")
+                        val call = shopManagerDatabaseApi.addWithdrawals(uniqueCompanyId, withdrawals)
                         call!!.enqueue(object : Callback<AddEntitiesResponse> {
                             override fun onResponse(
                                 call: Call<AddEntitiesResponse>,
                                 response: Response<AddEntitiesResponse>
                             ) {
+                                val withdrawalIsBackedUpSuccessfully = response.body()?.success == true
                                 Log.d("BackupRepository", "Withdrawal data backup is successful")
-                                coroutineScope.launch {
-                                    emit(Resource.Success(data = response.body()?.data.toNotNull()))
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    if (withdrawalIsBackedUpSuccessfully) {
+                                        userPreferences.saveRepositoryJobMessage("${response.body()?.data}")
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Withdrawal data is emitted successfully"
+                                        )
+                                    }else{
+                                        errorMessage = "${response.body()?.data}"
+                                        userPreferences.saveRepositoryJobMessage(errorMessage)
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Withdrawal data is is not backed up successfully"
+                                        )
+                                    }
                                 }
                             }
 
                             override fun onFailure(call: Call<AddEntitiesResponse>, t: Throwable) {
-                                coroutineScope.launch {
-                                    emit(
-                                        Resource.Error(
-                                            data = t.message,
-                                            message = "Unknown error\nUnable to backup withdrawals",
-                                        )
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+
+                                    errorMessage = t.message ?: "Unknown error!"
+                                    userPreferences.saveRepositoryJobMessage(errorMessage)
+                                    Log.d(
+                                        "BackupRepository",
+                                        "Withdrawal data is emitted with failure"
                                     )
                                 }
                             }
                         })
                     }
 
-                    if (!banks.isNullOrEmpty()) {
-                        Log.d("BackupRepository", "Bank is not empty is called")
-                        val call = shopManagerDatabaseApi.addBankAccounts(uniqueCompanyId, banks)
+                    if (!bankAccounts.isNullOrEmpty()) {
+                        Log.d("BackupRepository", "Bank Account is not empty is called")
+                        userPreferences.saveRepositoryJobMessage("Is backing up banks...")
+                        val call = shopManagerDatabaseApi.addBankAccounts(uniqueCompanyId, bankAccounts)
                         call!!.enqueue(object : Callback<AddEntitiesResponse> {
                             override fun onResponse(
                                 call: Call<AddEntitiesResponse>,
                                 response: Response<AddEntitiesResponse>
                             ) {
-                                Log.d("BackupRepository", "Bank data backup is successful")
-                                coroutineScope.launch {
-                                    emit(Resource.Success(data = response.body()?.data.toNotNull()))
+                                val bankIsBackedUpSuccessfully = response.body()?.success == true
+                                Log.d("BackupRepository", "Bank Account data backup is successful")
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    if (bankIsBackedUpSuccessfully) {
+                                        userPreferences.saveRepositoryJobMessage("${response.body()?.data}")
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Bank Account data is emitted successfully"
+                                        )
+                                    }else{
+                                        errorMessage = "${response.body()?.data}"
+                                        userPreferences.saveRepositoryJobMessage(errorMessage)
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Bank Account data is is not backed up successfully"
+                                        )
+                                    }
                                 }
                             }
 
                             override fun onFailure(call: Call<AddEntitiesResponse>, t: Throwable) {
-                                coroutineScope.launch {
-                                    emit(
-                                        Resource.Error(
-                                            data = t.message,
-                                            message = "Unknown error\nUnable to backup banks",
-                                        )
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    errorMessage = t.message ?: "Unknown error!"
+                                    userPreferences.saveRepositoryJobMessage(errorMessage)
+                                    Log.d(
+                                        "BackupRepository",
+                                        "Bank Account data is emitted with failure"
                                     )
                                 }
                             }
                         })
                     }
+                    Log.d(
+                        "BackupRepository",
+                        "At the end of successfully backed up"
+                    )
+                    userPreferences.saveRepositoryJobSuccessValue(true)
+                    userPreferences.saveRepositoryJobMessage("All data is successfully backed up")
                 }
             }
         }catch (e: Exception){
-            emit(Resource.Error(
-                message = "Could not back up any/all of the data",
-                data = e.message
-            ))
-        }*/
+            userPreferences.saveRepositoryJobSuccessValue(false)
+            userPreferences.saveRepositoryJobMessage(errorMessage.plus("\n\n${e.message ?: "Unknown error"}"))
+        }
     }
 
     override suspend fun smartBackup(coroutineScope: CoroutineScope): Flow<Resource<String>> = flow{

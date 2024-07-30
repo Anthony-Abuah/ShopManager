@@ -44,6 +44,9 @@ class BackupViewModel @Inject constructor(
     private val _restoreDatabaseState = mutableStateOf(AddCompanyState())
     val restoreDatabaseState: State<AddCompanyState> = _restoreDatabaseState
 
+    fun absoluteRemoteBackup1() = viewModelScope.launch {
+        backupRepository.absoluteBackup1(this)
+    }
     fun absoluteRemoteBackup() = viewModelScope.launch {
         backupRepository.absoluteBackup(this).onEach { response->
             when(response){

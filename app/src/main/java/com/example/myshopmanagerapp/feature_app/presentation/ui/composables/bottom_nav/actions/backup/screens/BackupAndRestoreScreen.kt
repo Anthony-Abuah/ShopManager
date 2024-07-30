@@ -73,7 +73,7 @@ fun BackupAndRestoreScreen(
                 smartSyncMessage = smartSyncData.message.toNotNull(),
                 localBackupData = { backupViewModel.backupDatabase(context) },
                 localRestoreData = { backupViewModel.restoreDatabase(context) },
-                absoluteRemoteBackup = { backupViewModel.absoluteRemoteBackup() },
+                absoluteRemoteBackup = { backupViewModel.absoluteRemoteBackup1() },
                 smartRemoteBackup = { backupViewModel.smartRemoteBackup() },
                 absoluteSyncData = { backupViewModel.absoluteSyncData() },
                 smartSyncData = { backupViewModel.smartSyncData() }

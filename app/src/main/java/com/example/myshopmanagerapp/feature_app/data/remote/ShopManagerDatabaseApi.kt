@@ -116,17 +116,12 @@ interface ShopManagerDatabaseApi {
     @PUT(changePassword)
     fun changePassword(@Path("uniqueCompanyId") uniqueCompanyId: String, @Path("currentPassword") currentPassword: String, @Path("updatedPassword") updatedPassword: String): Call<CompanyResponseDto>?
 
-    @POST(changePassword)
-    suspend fun changePassword1(@Path("uniqueCompanyId") uniqueCompanyId: String, @Path("currentPassword") currentPassword: String, @Path("updatedPassword") updatedPassword: String): Call<CompanyResponseDto>?
-
     @DELETE(deleteCompany)
     suspend fun deleteCompany(@Path("uniqueCompanyId") uniqueCompanyId: String): Call<CompanyResponseDto>?
 
     @POST(addCompany)
     fun addCompany(@Body companyInfo: CompanyInfoDto): Call<AddCompanyResponse>?
 
-    @POST(addCompany)
-    fun addAccount(@Body companyInfo: CompanyInfoDto): AddCompanyResponse?
 
     // Customer route
     @POST(addCustomers)
