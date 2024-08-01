@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.myshopmanagerapp.core.Constants.DebtRepayment_Table
 import com.example.myshopmanagerapp.core.Functions.toLocalDate
+import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.Functions.toTimestamp
 import com.example.myshopmanagerapp.feature_app.data.remote.dto.debt_repayment.DebtRepaymentInfoDto
 import java.util.*
@@ -26,9 +27,9 @@ data class DebtRepaymentEntity(
             uniqueCustomerId,
             uniquePersonnelId,
             date,
-            dayOfWeek,
+            dayOfWeek.toNotNull(),
             debtRepaymentAmount,
-            otherInfo
+            otherInfo.toNotNull()
         )
     }
 }

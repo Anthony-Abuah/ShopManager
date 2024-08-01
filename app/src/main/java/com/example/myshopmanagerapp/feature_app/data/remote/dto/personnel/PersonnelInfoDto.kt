@@ -9,16 +9,16 @@ data class PersonnelInfoDto(
     val uniqueCompanyId: String,
     val firstName: String,
     val lastName: String,
-    val otherNames: String?,
+    val otherNames: String,
     val userName: String = lastName,
     val contact: String,
     val password: String = Password,
-    val personnelPhoto: String?,
-    val otherInfo: String?,
-    val role: String?,
-    val hasAdminRights: Boolean?,
+    val personnelPhoto: String,
+    val otherInfo: String,
+    val role: String,
+    val hasAdminRights: Boolean,
     val isPrincipalAdmin: Boolean = false,
-    val isActive: Boolean? = true
+    val isActive: Boolean = true
 ){
     fun toPersonnelEntity(): PersonnelEntity{
         return PersonnelEntity(

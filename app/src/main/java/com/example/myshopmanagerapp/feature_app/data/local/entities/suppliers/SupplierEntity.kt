@@ -3,6 +3,7 @@ package com.example.myshopmanagerapp.feature_app.data.local.entities.suppliers
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.myshopmanagerapp.core.Constants.Supplier_Table
+import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.feature_app.data.remote.dto.supplier.SupplierInfoDto
 
 @Entity(tableName = Supplier_Table)
@@ -21,9 +22,9 @@ data class SupplierEntity(
             uniqueSupplierId = uniqueSupplierId,
             supplierName = supplierName,
             supplierContact = supplierContact,
-            supplierLocation = supplierLocation,
-            supplierRole = supplierRole,
-            otherInfo = otherInfo
+            supplierLocation = supplierLocation.toNotNull(),
+            supplierRole = supplierRole.toNotNull(),
+            otherInfo = otherInfo.toNotNull()
         )
     }
 }

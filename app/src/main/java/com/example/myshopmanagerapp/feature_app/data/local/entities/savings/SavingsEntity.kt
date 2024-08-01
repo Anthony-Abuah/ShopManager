@@ -3,6 +3,7 @@ package com.example.myshopmanagerapp.feature_app.data.local.entities.savings
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.myshopmanagerapp.core.Constants.Savings_Table
+import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.feature_app.data.remote.dto.savings.SavingsInfoDto
 
 @Entity(tableName = Savings_Table)
@@ -26,8 +27,8 @@ data class SavingsEntity(
             savingsDate = date,
             savingsDayOfWeek = dayOfWeek,
             savingsAmount = savingsAmount,
-            bankPersonnel = bankPersonnel,
-            otherInfo = otherInfo
+            bankPersonnel = bankPersonnel.toNotNull(),
+            otherInfo = otherInfo.toNotNull()
         )
     }
 

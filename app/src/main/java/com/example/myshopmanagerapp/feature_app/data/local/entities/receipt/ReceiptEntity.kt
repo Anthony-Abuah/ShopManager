@@ -3,6 +3,7 @@ package com.example.myshopmanagerapp.feature_app.data.local.entities.receipt
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.myshopmanagerapp.core.Constants.Receipt_Table
+import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.TypeConverters.toItemQuantityInfoListJson
 import com.example.myshopmanagerapp.feature_app.data.remote.dto.receipt.ReceiptInfoDto
 import com.example.myshopmanagerapp.feature_app.domain.model.ItemQuantityInfo
@@ -31,7 +32,19 @@ data class ReceiptEntity(
    }
    fun toReceiptInfoDto(uniqueCompanyId: String): ReceiptInfoDto{
       return ReceiptInfoDto(
-         uniqueReceiptId, shopName, shopLocation, shopContact, date, customerName, customerContact, personnelName, personnelRole, items.toItemQuantityInfoListJson(), totalAmount, uniqueCompanyId)
+         uniqueReceiptId = uniqueReceiptId,
+         shopName = shopName,
+         shopLocation = shopLocation,
+         shopContact = shopContact,
+         date = date,
+         customerName = customerName,
+         customerContact = customerContact.toNotNull(),
+         personnelName = personnelName.toNotNull(),
+         personnelRole = personnelRole.toNotNull(),
+         items = items.toItemQuantityInfoListJson(),
+         totalAmount = totalAmount,
+         uniqueCompanyId = uniqueCompanyId
+      )
    }
 
 }

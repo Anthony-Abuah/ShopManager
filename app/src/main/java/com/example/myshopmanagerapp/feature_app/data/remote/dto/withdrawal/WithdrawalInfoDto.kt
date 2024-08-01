@@ -10,10 +10,10 @@ data class WithdrawalInfoDto(
     val uniqueBankAccountId: String,
     val uniquePersonnelId: String,
     val date: Long,
-    val dayOfWeek: String?,
+    val dayOfWeek: String,
     val withdrawalAmount: Double,
     val transactionId: String,
-    val otherInfo: String?
+    val otherInfo: String
 ){
     fun toWithdrawalEntity(): WithdrawalEntity{
         return WithdrawalEntity(

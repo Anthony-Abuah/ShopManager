@@ -6,12 +6,12 @@ import com.example.myshopmanagerapp.feature_app.data.local.entities.banks.BankAc
 data class BankAccountInfoDto(
     val uniqueBankAccountId: String,
     val uniqueCompanyId: String,
-    val bankAccountName: String?,
-    val bankName: String?,
-    val bankContact: String?,
-    val bankLocation: String?,
-    val accountBalance: Double?,
-    val otherInfo: String?
+    val bankAccountName: String,
+    val bankName: String,
+    val bankContact: String,
+    val bankLocation: String,
+    val accountBalance: Double,
+    val otherInfo: String
 ){
     fun toBankEntity(): BankAccountEntity{
         return BankAccountEntity(

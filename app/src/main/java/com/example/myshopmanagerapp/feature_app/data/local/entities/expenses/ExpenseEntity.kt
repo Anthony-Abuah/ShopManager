@@ -3,6 +3,7 @@ package com.example.myshopmanagerapp.feature_app.data.local.entities.expenses
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.myshopmanagerapp.core.Constants.Expense_Table
+import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.feature_app.data.remote.dto.expense.ExpenseInfoDto
 
 @Entity(tableName = Expense_Table)
@@ -23,11 +24,11 @@ data class ExpenseEntity(
             uniqueExpenseId = uniqueExpenseId,
             uniquePersonnelId = uniquePersonnelId,
             date = date,
-            dayOfWeek = dayOfWeek,
+            dayOfWeek = dayOfWeek.toNotNull(),
             expenseName = expenseName,
             expenseAmount = expenseAmount,
             expenseType = expenseType,
-            otherInfo = otherInfo
+            otherInfo = otherInfo.toNotNull()
         )
     }
 }

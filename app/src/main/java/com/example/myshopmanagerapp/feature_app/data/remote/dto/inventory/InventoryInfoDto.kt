@@ -10,14 +10,14 @@ data class InventoryInfoDto(
     val uniqueCompanyId: String,
     val uniqueInventoryItemId: String,
     val date: Long,
-    val dayOfWeek: String?,
-    val quantityInfo: String?,
-    val totalNumberOfUnits: Int?,
-    val totalCostPrice: Double?,
-    val prices: String?,
-    val unitCostPrice: Double?,
-    val receiptId: String?,
-    val otherInfo: String?,
+    val dayOfWeek: String,
+    val quantityInfo: String,
+    val totalNumberOfUnits: Int,
+    val totalCostPrice: Double,
+    val prices: String,
+    val unitCostPrice: Double,
+    val receiptId: String,
+    val otherInfo: String,
 ){
     fun toInventoryEntity(): InventoryEntity{
         return InventoryEntity(

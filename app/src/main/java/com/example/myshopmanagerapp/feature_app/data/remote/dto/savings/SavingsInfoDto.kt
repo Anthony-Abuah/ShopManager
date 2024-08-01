@@ -9,10 +9,10 @@ data class SavingsInfoDto(
     val uniqueBankAccountId: String,
     val uniquePersonnelId: String,
     val savingsDate: Long,
-    val savingsDayOfWeek: String?,
+    val savingsDayOfWeek: String,
     val savingsAmount: Double,
-    val bankPersonnel: String?,
-    val otherInfo: String?
+    val bankPersonnel: String,
+    val otherInfo: String
 ){
     fun toSavingsEntity(): SavingsEntity{
         return SavingsEntity(

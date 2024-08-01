@@ -6,20 +6,20 @@ data class RevenueInfoDto(
     val uniqueRevenueId: String,
     val uniqueCompanyId: String,
     val uniquePersonnelId: String,
-    val revenueDate: Long,
-    val revenueDayOfWeek: String?,
-    val revenueType: String?,
-    val numberOfHours: Int?,
+    val date: Long,
+    val dayOfWeek: String,
+    val revenueType: String,
+    val numberOfHours: Int,
     val revenueAmount: Double,
-    val otherInfo: String?
+    val otherInfo: String
 ){
     fun toRevenueEntity(): RevenueEntity{
         return RevenueEntity(
             0,
             uniquePersonnelId = uniquePersonnelId,
             uniqueRevenueId = uniqueRevenueId,
-            date = revenueDate,
-            dayOfWeek = revenueDayOfWeek,
+            date = date,
+            dayOfWeek = dayOfWeek,
             revenueType = revenueType,
             numberOfHours = numberOfHours,
             revenueAmount = revenueAmount,

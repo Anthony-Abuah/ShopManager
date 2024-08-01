@@ -8,11 +8,11 @@ data class ExpenseInfoDto(
     val uniqueCompanyId: String,
     val uniquePersonnelId: String,
     val date: Long,
-    val dayOfWeek: String?,
+    val dayOfWeek: String,
     val expenseName: String,
     val expenseAmount: Double,
     val expenseType: String,
-    val otherInfo: String?
+    val otherInfo: String
 ){
     fun toExpenseEntity(): ExpenseEntity{
         return ExpenseEntity(

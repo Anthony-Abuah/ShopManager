@@ -28,7 +28,7 @@ data class WithdrawalEntity(
             dayOfWeek = dayOfWeek,
             transactionId = transactionId.toNotNull(),
             withdrawalAmount = withdrawalAmount,
-            otherInfo = otherInfo
+            otherInfo = otherInfo.toNotNull()
         )
     }
 }

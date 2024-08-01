@@ -5,6 +5,7 @@ import androidx.room.PrimaryKey
 import com.example.myshopmanagerapp.core.Constants.CashIn_Table
 import com.example.myshopmanagerapp.core.Constants.Loan
 import com.example.myshopmanagerapp.core.Constants.NotAvailable
+import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.feature_app.data.remote.dto.cash_in.CashInInfoDto
 
 @Entity(tableName = CashIn_Table)
@@ -27,15 +28,15 @@ data class CashInEntity(
             uniqueCashInId,
             uniqueCompanyId,
             date = date,
-            dayOfWeek = dayOfWeek,
-            cashSource = cashSource,
+            dayOfWeek = dayOfWeek.toNotNull(),
+            cashSource = cashSource.toNotNull(),
             isLoan = isLoan,
             cashInAmount = cashInAmount,
-            period = period,
-            interestAmount = interestAmount,
-            paymentAmount = paymentAmount,
+            period = period.toNotNull(),
+            interestAmount = interestAmount.toNotNull(),
+            paymentAmount = paymentAmount.toNotNull(),
             cashInType = cashInType,
-            otherInfo = otherInfo
+            otherInfo = otherInfo.toNotNull()
         )
     }
 }

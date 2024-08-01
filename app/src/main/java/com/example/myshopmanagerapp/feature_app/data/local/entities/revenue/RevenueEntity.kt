@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.myshopmanagerapp.core.Constants.Revenue_Table
 import com.example.myshopmanagerapp.core.Functions.toLocalDate
+import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.Functions.toTimestamp
 import com.example.myshopmanagerapp.feature_app.data.remote.dto.revenue.RevenueInfoDto
 import java.util.*
@@ -22,15 +23,15 @@ data class RevenueEntity(
 ){
     fun toRevenueInfoDto(uniqueCompanyId: String): RevenueInfoDto{
         return RevenueInfoDto(
-            uniqueRevenueId = uniqueRevenueId,
-            uniqueCompanyId = uniqueCompanyId,
-            uniquePersonnelId = uniquePersonnelId,
-            revenueDate = date,
-            revenueDayOfWeek = dayOfWeek,
-            revenueType = revenueType,
-            numberOfHours = numberOfHours,
-            revenueAmount = revenueAmount,
-            otherInfo = otherInfo
+            uniqueRevenueId = uniqueRevenueId.toNotNull(),
+            uniqueCompanyId = uniqueCompanyId.toNotNull(),
+            uniquePersonnelId = uniquePersonnelId.toNotNull(),
+            date = date.toNotNull(),
+            dayOfWeek = dayOfWeek.toNotNull(),
+            revenueType = revenueType.toNotNull(),
+            numberOfHours = numberOfHours.toNotNull(),
+            revenueAmount = revenueAmount.toNotNull(),
+            otherInfo = otherInfo.toNotNull()
         )
     }
 }

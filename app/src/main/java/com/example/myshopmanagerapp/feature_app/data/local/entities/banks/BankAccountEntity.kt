@@ -3,6 +3,7 @@ package com.example.myshopmanagerapp.feature_app.data.local.entities.banks
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.myshopmanagerapp.core.Constants.BankAccount_Table
+import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.feature_app.data.remote.dto.bank.BankAccountInfoDto
 
 @Entity(tableName = BankAccount_Table)
@@ -23,9 +24,9 @@ data class BankAccountEntity(
             bankAccountName = bankAccountName,
             bankName = bankName,
             bankContact = bankContact,
-            bankLocation = bankLocation,
-            accountBalance = accountBalance,
-            otherInfo = otherInfo
+            bankLocation = bankLocation.toNotNull(),
+            accountBalance = accountBalance.toNotNull(),
+            otherInfo = otherInfo.toNotNull()
         )
     }
 }

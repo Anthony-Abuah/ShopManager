@@ -6,6 +6,7 @@ import com.example.myshopmanagerapp.core.Constants.InventoryItem_Table
 import com.example.myshopmanagerapp.core.Constants.defaultQuantityCategorizations
 import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.Functions.toItemQuantitiesJson
+import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.Functions.toPricesJson
 import com.example.myshopmanagerapp.core.Functions.toStockEntitiesJson
 import com.example.myshopmanagerapp.core.ItemQuantities
@@ -38,19 +39,19 @@ data class InventoryItemEntity(
         return InventoryItemInfoDto(
             uniqueCompanyId = uniqueCompanyId,
             uniqueInventoryItemId = uniqueInventoryItemId,
-            manufacturerName = manufacturerName,
+            manufacturerName = manufacturerName.toNotNull(),
             inventoryItemName = inventoryItemName,
-            inventoryItemPhoto = inventoryItemPhoto,
+            inventoryItemPhoto = inventoryItemPhoto.toNotNull(),
             inventoryItemCategory = itemCategory,
-            currentSellingPrice = currentSellingPrice,
+            currentSellingPrice = currentSellingPrice.toNotNull(),
             sellingPrices = sellingPrices.toPricesJson(),
             costPrices = costPrices.toPricesJson(),
-            currentCostPrice = currentCostPrice,
+            currentCostPrice = currentCostPrice.toNotNull(),
             quantityCategorizations = quantityCategorizations.toQuantityCategorizationJson(),
             stockInfo = stockInfo.toStockEntitiesJson(),
             itemQuantity = itemQuantityInfo.toItemQuantitiesJson(),
-            totalNumberOfUnits = totalNumberOfUnits,
-            otherInfo = otherInfo
+            totalNumberOfUnits = totalNumberOfUnits.toNotNull(),
+            otherInfo = otherInfo.toNotNull()
         )
     }
 }

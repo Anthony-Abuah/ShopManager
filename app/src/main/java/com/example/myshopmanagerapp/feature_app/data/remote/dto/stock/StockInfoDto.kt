@@ -10,15 +10,15 @@ data class StockInfoDto(
     val uniqueItemId: String,
     val uniquePersonnelId: String,
     val stockDate: Long,
-    val stockDayOfWeek: String?,
-    val stockQuantityInfo: String?,
+    val stockDayOfWeek: String,
+    val stockQuantityInfo: String,
     val totalNumberOfUnits: Int,
-    val lastStockDate: Long?,
-    val changeInNumberOfUnits: Int?,
+    val lastStockDate: Long,
+    val changeInNumberOfUnits: Int,
     val isInventoryStock: Boolean,
-    val unitCostPrice: Double? = null,
-    val totalCostPrice: Double? = null,
-    val otherInfo: String?,
+    val unitCostPrice: Double = 0.0,
+    val totalCostPrice: Double = 0.0,
+    val otherInfo: String,
 ){
     fun toStockEntity(): StockEntity{
         return StockEntity(

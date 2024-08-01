@@ -6,15 +6,15 @@ data class CashInInfoDto(
     val uniqueCashInId: String,
     val uniqueCompanyId: String,
     val date: Long,
-    val dayOfWeek: String?,
-    val cashSource: String?,
+    val dayOfWeek: String,
+    val cashSource: String,
     val isLoan: Boolean,
     val cashInAmount: Double,
-    val period: Int?,
-    val interestAmount: Double?,
-    val paymentAmount: Double?,
+    val period: Int,
+    val interestAmount: Double,
+    val paymentAmount: Double,
     val cashInType: String,
-    val otherInfo: String?
+    val otherInfo: String
 ){
     fun toCashInEntity(): CashInEntity {
         return CashInEntity(

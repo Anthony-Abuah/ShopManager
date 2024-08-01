@@ -8,9 +8,9 @@ data class SupplierInfoDto(
     val uniqueCompanyId: String,
     val supplierName: String,
     val supplierContact: String,
-    val supplierLocation: String?,
-    val supplierRole: String?,
-    val otherInfo: String?
+    val supplierLocation: String,
+    val supplierRole: String,
+    val otherInfo: String
 ){
     fun toSupplierEntity(): SupplierEntity{
         return SupplierEntity(

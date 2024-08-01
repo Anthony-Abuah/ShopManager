@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.myshopmanagerapp.core.Constants.Password
 import com.example.myshopmanagerapp.core.Constants.Personnel_Table
+import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.feature_app.data.remote.dto.personnel.PersonnelInfoDto
 
 @Entity(tableName = Personnel_Table)
@@ -29,16 +30,16 @@ data class PersonnelEntity(
             uniqueCompanyId = uniqueCompanyId,
             firstName = firstName,
             lastName = lastName,
-            otherNames = otherNames,
+            otherNames = otherNames.toNotNull(),
             userName = userName,
             contact = contact,
             password = password,
-            personnelPhoto = personnelPhoto,
-            otherInfo = otherInfo,
-            role = role,
-            hasAdminRights = hasAdminRights,
+            personnelPhoto = personnelPhoto.toNotNull(),
+            otherInfo = otherInfo.toNotNull(),
+            role = role.toNotNull(),
+            hasAdminRights = hasAdminRights.toNotNull(),
             isPrincipalAdmin = isPrincipalAdmin,
-            isActive = isActive
+            isActive = isActive.toNotNull()
         )
     }
 }

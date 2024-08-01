@@ -3,6 +3,7 @@ package com.example.myshopmanagerapp.feature_app.data.local.entities.debt
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.myshopmanagerapp.core.Constants.Debt_Table
+import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.feature_app.data.remote.dto.debt.DebtInfoDto
 
 @Entity(tableName = Debt_Table)
@@ -23,9 +24,9 @@ data class DebtEntity(
             uniqueCustomerId = uniqueCustomerId,
             uniquePersonnelId = uniquePersonnelId,
             date = date,
-            dayOfWeek = dayOfWeek,
+            dayOfWeek = dayOfWeek.toNotNull(),
             debtAmount = debtAmount,
-            otherInfo = otherInfo
+            otherInfo = otherInfo.toNotNull()
         )
     }
 }

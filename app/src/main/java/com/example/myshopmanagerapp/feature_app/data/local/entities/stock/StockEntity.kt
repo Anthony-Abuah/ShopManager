@@ -6,6 +6,7 @@ import com.example.myshopmanagerapp.core.Constants.Stock_Table
 import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.Functions.toItemQuantitiesJson
 import com.example.myshopmanagerapp.core.Functions.toLocalDate
+import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.Functions.toTimestamp
 import com.example.myshopmanagerapp.core.ItemQuantities
 import com.example.myshopmanagerapp.feature_app.data.remote.dto.stock.StockInfoDto
@@ -33,16 +34,16 @@ data class StockEntity(
             uniqueItemId = uniqueInventoryItemId,
             uniqueStockId = uniqueStockId,
             stockDate = date.toLocalDate().toTimestamp(),
-            stockDayOfWeek = dayOfWeek,
+            stockDayOfWeek = dayOfWeek.toNotNull(),
             stockQuantityInfo = stockQuantityInfo.toItemQuantitiesJson(),
             totalNumberOfUnits = totalNumberOfUnits,
             lastStockDate = dateOfLastStock?.toLocalDate().toTimestamp(),
-            changeInNumberOfUnits = changeInNumberOfUnits,
+            changeInNumberOfUnits = changeInNumberOfUnits.toNotNull(),
             isInventoryStock = isInventoryStock,
-            otherInfo = otherInfo,
+            otherInfo = otherInfo.toNotNull(),
             uniquePersonnelId = uniquePersonnelId,
-            unitCostPrice = unitCostPrice,
-            totalCostPrice = totalCostPrice
+            unitCostPrice = unitCostPrice.toNotNull(),
+            totalCostPrice = totalCostPrice.toNotNull()
         )
     }
 }

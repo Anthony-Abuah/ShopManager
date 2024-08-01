@@ -3,6 +3,7 @@ package com.example.myshopmanagerapp.feature_app.data.local.entities.customers
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.myshopmanagerapp.core.Constants.Customer_Table
+import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.feature_app.data.remote.dto.customer.CustomerInfoDto
 
 @Entity(tableName = Customer_Table)
@@ -18,14 +19,14 @@ data class CustomerEntity(
 ){
     fun toCustomerInfoDto(uniqueCompanyId: String): CustomerInfoDto{
         return CustomerInfoDto(
-            uniqueCustomerId = uniqueCustomerId,
-            customerName = customerName,
-            customerContact = customerContact,
-            customerLocation = customerLocation,
-            customerPhoto = customerPhoto,
+            uniqueCustomerId = uniqueCustomerId.toNotNull(),
+            customerName = customerName.toNotNull(),
+            customerContact = customerContact.toNotNull(),
+            customerLocation = customerLocation.toNotNull(),
+            customerPhoto = customerPhoto.toNotNull(),
             debtAmount = debtAmount,
             uniqueCompanyId = uniqueCompanyId,
-            otherInfo = otherInfo
+            otherInfo = otherInfo ?: "I figured it out"
         )
     }
 }

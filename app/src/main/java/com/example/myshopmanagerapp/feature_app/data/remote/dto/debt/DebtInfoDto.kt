@@ -8,9 +8,9 @@ data class DebtInfoDto(
     val uniqueCustomerId: String,
     val uniquePersonnelId: String,
     val date: Long,
-    val dayOfWeek: String?,
+    val dayOfWeek: String,
     val debtAmount: Double,
-    val otherInfo: String?
+    val otherInfo: String
 ){
     fun toDebtEntity(): DebtEntity{
         return DebtEntity(
