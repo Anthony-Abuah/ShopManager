@@ -16,6 +16,7 @@ import com.example.myshopmanagerapp.core.TypeConverters.toUniqueIds
 import com.example.myshopmanagerapp.core.UserPreferences
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
+import com.example.myshopmanagerapp.feature_app.data.local.entities.expenses.ExpenseEntity
 import com.example.myshopmanagerapp.feature_app.data.remote.ShopManagerDatabaseApi
 import com.example.myshopmanagerapp.feature_app.data.remote.dto.company.CompanyResponseDto
 import com.example.myshopmanagerapp.feature_app.domain.model.AddEntitiesResponse
@@ -645,10 +646,11 @@ class BackupRepositoryImpl(
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    override suspend fun absoluteBackup1(coroutineScope: CoroutineScope){
+    override suspend fun absoluteBackup1(coroutineScope: CoroutineScope) {
         var errorMessage = emptyString
         val context = MyShopManagerApp.applicationContext()
         val userPreferences = UserPreferences(context)
+
         try {
             val isLoggedIn = userPreferences.getLoggedInState.first()
             val shopInfoJson = userPreferences.getShopInfo.first()
@@ -658,7 +660,7 @@ class BackupRepositoryImpl(
                 "BackupRepository",
                 "uniqueCompanyId: $uniqueCompanyId"
             )
-            when(true) {
+            when(true){
                 (isLoggedIn != true) -> {
                     userPreferences.saveRepositoryJobSuccessValue(false)
                     userPreferences.saveRepositoryJobMessage("You're not logged in into any account.\nPlease register an online account and subscribe in order to continue")
@@ -685,7 +687,59 @@ class BackupRepositoryImpl(
                     val cashIns = appDatabase.cashInDao.getAllCashIns()?.map { it.toCashInfoDto(uniqueCompanyId) }
                     val receipts = appDatabase.receiptDao.getAllReceipts()?.map { it.toReceiptInfoDto(uniqueCompanyId) }
 
+                    var returnNow = false
                     userPreferences.saveRepositoryJobMessage("All data has been fetched...")
+
+                    if (!customers.isNullOrEmpty()) {
+                        Log.d("BackupRepository", "Customer is not empty is called")
+                        userPreferences.saveRepositoryJobMessage("Is backing up customers...")
+                        val call = shopManagerDatabaseApi.addCustomers(uniqueCompanyId, customers)
+                        call!!.enqueue(object : Callback<AddEntitiesResponse> {
+                            override fun onResponse(
+                                call: Call<AddEntitiesResponse>,
+                                response: Response<AddEntitiesResponse>
+                            ) {
+                                val customerIsBackedUpSuccessfully = response.body()?.success == true
+                                Log.d(
+                                    "BackupRepository",
+                                    "customer is backed up value = ${response.body()?.success}"
+                                )
+                                if (!customerIsBackedUpSuccessfully) { returnNow = true }
+                                Log.d("BackupRepository", "Customer data backup success value: ${response.body()?.success}")
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    if (customerIsBackedUpSuccessfully) {
+                                        userPreferences.saveRepositoryJobMessage("${response.body()?.data}")
+                                        Log.d(
+                                            "BackupRepository",
+                                            "Customer data is emitted successfully"
+                                        )
+                                    }else{
+                                        errorMessage = "${response.body()?.data}"
+                                        userPreferences.saveRepositoryJobMessage(errorMessage)
+                                        Log.d(
+                                            "BackupRepository",
+                                            "error Message: $errorMessage\n" +
+                                                    "customer data: ${response.body()?.data}\n" +
+                                                    "customer message: ${response.body()?.message}\n" +
+                                                    "customer success: ${response.body()?.success}"
+                                        )
+                                    }
+                                }
+                            }
+
+                            override fun onFailure(call: Call<AddEntitiesResponse>, t: Throwable) {
+                                GlobalScope.launch(Dispatchers.IO + Job()) {
+
+                                    errorMessage = t.message ?: "Unknown error!"
+                                    userPreferences.saveRepositoryJobMessage(errorMessage)
+                                    Log.d(
+                                        "BackupRepository",
+                                        "Customer data is emitted with failure"
+                                    )
+                                }
+                            }
+                        })
+                    }
 
                     if (!suppliers.isNullOrEmpty()) {
                         Log.d("BackupRepository", "Supplier is not empty is called")
@@ -948,6 +1002,7 @@ class BackupRepositoryImpl(
                         })
                     }
 
+
                     if (!expenses.isNullOrEmpty()) {
                         Log.d("BackupRepository", "Expense is not empty is called")
                         userPreferences.saveRepositoryJobMessage("Is backing up expenses...")
@@ -971,7 +1026,11 @@ class BackupRepositoryImpl(
                                         userPreferences.saveRepositoryJobMessage(errorMessage)
                                         Log.d(
                                             "BackupRepository",
-                                            "Expense data is is not backed up successfully"
+                                            "Expense data is is not backed up successfully" +
+                                            "error Message: $errorMessage\n" +
+                                                    "expense data: ${response.body()?.data}\n" +
+                                                    "expense message: ${response.body()?.message}\n" +
+                                                    "expense success: ${response.body()?.success}"
                                         )
                                     }
                                 }
@@ -1209,52 +1268,6 @@ class BackupRepositoryImpl(
                         })
                     }
 
-                    if (!customers.isNullOrEmpty()) {
-                        Log.d("BackupRepository", "Customer is not empty is called")
-                        userPreferences.saveRepositoryJobMessage("Is backing up customers...")
-                        val call = shopManagerDatabaseApi.addCustomers(uniqueCompanyId, customers)
-                        call!!.enqueue(object : Callback<AddEntitiesResponse> {
-                            override fun onResponse(
-                                call: Call<AddEntitiesResponse>,
-                                response: Response<AddEntitiesResponse>
-                            ) {
-                                val customerIsBackedUpSuccessfully = response.body()?.success == true
-                                Log.d("BackupRepository", "Customer data backup success value: ${response.body()?.success}")
-                                GlobalScope.launch(Dispatchers.IO + Job()) {
-                                    if (customerIsBackedUpSuccessfully) {
-                                        userPreferences.saveRepositoryJobMessage("${response.body()?.data}")
-                                        Log.d(
-                                            "BackupRepository",
-                                            "Customer data is emitted successfully"
-                                        )
-                                    }else{
-                                        errorMessage = "${response.body()?.data}"
-                                        userPreferences.saveRepositoryJobMessage(errorMessage)
-                                        Log.d(
-                                            "BackupRepository",
-                                            "error Message: $errorMessage\n" +
-                                                    "customer data: ${response.body()?.data}\n" +
-                                                    "customer message: ${response.body()?.message}\n" +
-                                                    "customer success: ${response.body()?.success}"
-                                        )
-                                    }
-                                }
-                            }
-
-                            override fun onFailure(call: Call<AddEntitiesResponse>, t: Throwable) {
-                                GlobalScope.launch(Dispatchers.IO + Job()) {
-
-                                    errorMessage = t.message ?: "Unknown error!"
-                                    userPreferences.saveRepositoryJobMessage(errorMessage)
-                                    Log.d(
-                                        "BackupRepository",
-                                        "Customer data is emitted with failure"
-                                    )
-                                }
-                            }
-                        })
-                    }
-
                     if (!savings.isNullOrEmpty()) {
                         Log.d("BackupRepository", "Savings is not empty is called")
                         userPreferences.saveRepositoryJobMessage("Is backing up savings...")
@@ -1394,6 +1407,7 @@ class BackupRepositoryImpl(
             userPreferences.saveRepositoryJobSuccessValue(false)
             userPreferences.saveRepositoryJobMessage(errorMessage.plus("\n\n${e.message ?: "Unknown error"}"))
         }
+        Log.d("BackupRepository", "Return code is called here")
     }
 
     override suspend fun smartBackup(coroutineScope: CoroutineScope): Flow<Resource<String>> = flow{

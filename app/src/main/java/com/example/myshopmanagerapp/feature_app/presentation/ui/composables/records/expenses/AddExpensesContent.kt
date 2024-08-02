@@ -250,7 +250,7 @@ fun AddExpenseContent(
                 }
             }
         ) {
-            openExpenseTypes = false
+            openExpenseNames = false
         }
 
 

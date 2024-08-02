@@ -20,8 +20,8 @@ data class CustomerInfoDto(
             customerName = customerName.toNotNull(),
             customerContact = customerContact.toNotNull(),
             customerLocation = customerLocation,
-            customerPhoto = customerPhoto.toNotNull(),
-            otherInfo = otherInfo.toNotNull(),
+            customerPhoto = customerPhoto,
+            otherInfo = otherInfo,
             debtAmount = debtAmount.toNotNull()
         )
     }
