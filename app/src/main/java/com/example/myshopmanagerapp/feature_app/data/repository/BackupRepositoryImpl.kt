@@ -709,20 +709,9 @@ class BackupRepositoryImpl(
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
                                     if (customerIsBackedUpSuccessfully) {
                                         userPreferences.saveRepositoryJobMessage("${response.body()?.data}")
-                                        Log.d(
-                                            "BackupRepository",
-                                            "Customer data is emitted successfully"
-                                        )
                                     }else{
                                         errorMessage = "${response.body()?.data}"
                                         userPreferences.saveRepositoryJobMessage(errorMessage)
-                                        Log.d(
-                                            "BackupRepository",
-                                            "error Message: $errorMessage\n" +
-                                                    "customer data: ${response.body()?.data}\n" +
-                                                    "customer message: ${response.body()?.message}\n" +
-                                                    "customer success: ${response.body()?.success}"
-                                        )
                                     }
                                 }
                             }
