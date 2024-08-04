@@ -687,7 +687,6 @@ class BackupRepositoryImpl(
                     val cashIns = appDatabase.cashInDao.getAllCashIns()?.map { it.toCashInfoDto(uniqueCompanyId) }
                     val receipts = appDatabase.receiptDao.getAllReceipts()?.map { it.toReceiptInfoDto(uniqueCompanyId) }
 
-                    var returnNow = false
                     userPreferences.saveRepositoryJobMessage("All data has been fetched...")
 
                     if (!customers.isNullOrEmpty()) {
@@ -704,7 +703,6 @@ class BackupRepositoryImpl(
                                     "BackupRepository",
                                     "customer is backed up value = ${response.body()?.success}"
                                 )
-                                if (!customerIsBackedUpSuccessfully) { returnNow = true }
                                 Log.d("BackupRepository", "Customer data backup success value: ${response.body()?.success}")
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
                                     if (customerIsBackedUpSuccessfully) {
@@ -718,7 +716,6 @@ class BackupRepositoryImpl(
 
                             override fun onFailure(call: Call<AddEntitiesResponse>, t: Throwable) {
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
-
                                     errorMessage = t.message ?: "Unknown error!"
                                     userPreferences.saveRepositoryJobMessage(errorMessage)
                                     Log.d(

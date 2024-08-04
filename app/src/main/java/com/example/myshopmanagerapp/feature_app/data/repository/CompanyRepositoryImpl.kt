@@ -181,6 +181,7 @@ class CompanyRepositoryImpl(
             }
             else {
                 val invalidParameters = company.companyName.isBlank() || company.email.isBlank() || company.password.isBlank()
+                val passwordIsNotValid = !passwordIsValid(company.password, company.companyName, company.email)
                 when(true){
                     (company.password != confirmedPassword)->{
                         Log.d("CompanyRepository", "Unmatched password is called")
@@ -193,6 +194,10 @@ class CompanyRepositoryImpl(
                         Log.d("CompanyRepository", "flow of invalid parameters is called")
                         userPreferences.saveRepositoryJobSuccessValue(false)
                         userPreferences.saveRepositoryJobMessage("Please make sure that all required fields are filled appropriately")
+                    }
+                    passwordIsNotValid ->{
+                        userPreferences.saveRepositoryJobSuccessValue(false)
+                        userPreferences.saveRepositoryJobMessage("Password is not valid.\nPlease make sure that the password does not contain email or company name and password length is more than 7 characters")
                     }
                     else->{
                         Log.d("CompanyRepository", "Api call enqueue is called")
@@ -831,6 +836,15 @@ class CompanyRepositoryImpl(
         db.query("PRAGMA wal_checkpoint(FULL);", emptyArray())
         db.query("PRAGMA wal_checkpoint(TRUNCATE);", emptyArray())
     }
+
+    private fun passwordIsValid(password: String, companyName: String, email: String): Boolean {
+        val containsCompanyName = password.contains(companyName.take(6), true)
+        val containsEmail = password.contains(email.take(6), true)
+        val shortPassword = password.length < 7
+        return (containsCompanyName.not() && containsEmail.not() && shortPassword.not())
+    }
+
+
     override fun restartApp() {
         val context = MyShopManagerApp.applicationContext()
         val packageManager: PackageManager = context.packageManager
