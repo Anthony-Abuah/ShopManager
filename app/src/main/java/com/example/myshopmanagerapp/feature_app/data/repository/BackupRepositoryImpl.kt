@@ -374,7 +374,6 @@ class BackupRepositoryImpl(
                     }
 
                     if (!expenses.isNullOrEmpty()) {
-                        Log.d("BackupRepository", "Expense is not empty is called")
                         emit(Resource.Loading("Backing up expenses ..."))
                         val call = shopManagerDatabaseApi.addExpenses(uniqueCompanyId, expenses)
                         call!!.enqueue(object : Callback<AddEntitiesResponse> {
@@ -382,7 +381,6 @@ class BackupRepositoryImpl(
                                 call: Call<AddEntitiesResponse>,
                                 response: Response<AddEntitiesResponse>
                             ) {
-                                Log.d("BackupRepository", "Expense data back up is successful")
                                 coroutineScope.launch {
                                     emit(Resource.Success(data = response.body()?.data.toNotNull()))
                                 }
@@ -396,7 +394,6 @@ class BackupRepositoryImpl(
                                             message = "Unknown error\nUnable to backup expenses",
                                         )
                                     )
-                                    Log.d("BackupRepository", "Expense  data back up failed")
                                 }
                             }
                         })
