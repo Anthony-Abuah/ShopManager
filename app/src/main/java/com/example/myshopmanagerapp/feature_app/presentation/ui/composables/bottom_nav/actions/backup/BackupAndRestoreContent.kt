@@ -44,10 +44,6 @@ fun BackupAndRestoreContent(
     dataBackupConfirmationMessage: String,
     isRestoringDatabase: Boolean,
     dataRestoreConfirmationMessage: String,
-    isLoadingAbsoluteBackup: Boolean,
-    isLoadingSmartBackup: Boolean,
-    absoluteBackupMessage: String,
-    smartBackupMessage: String,
     isLoadingAbsoluteSync: Boolean,
     isLoadingSmartSync: Boolean,
     absoluteSyncMessage: String,
@@ -252,8 +248,8 @@ fun BackupAndRestoreContent(
                 }
                 false->{
                     smartRemoteBackup()
-                    isLoading = isLoadingSmartBackup
-                    dialogMessage = smartBackupMessage
+                    isLoading = repositoryJobMessage.isNullOrBlank()
+                    dialogMessage = repositoryJobMessage ?: "Unknown outcome"
                     confirmationInfoDialog = !confirmationInfoDialog
                 }
                 null->{ openRemoteBackupConfirmationDialog = false }

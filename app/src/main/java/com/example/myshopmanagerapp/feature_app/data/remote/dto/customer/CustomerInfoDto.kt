@@ -5,13 +5,13 @@ import com.example.myshopmanagerapp.feature_app.data.local.entities.customers.Cu
 
 data class CustomerInfoDto(
     val uniqueCustomerId: String,
-    val customerName: String?,
-    val customerContact: String?,
-    val customerLocation: String?,
-    val customerPhoto: String?,
-    val debtAmount: Double?,
+    val customerName: String,
+    val customerContact: String,
+    val customerLocation: String,
+    val customerPhoto: String,
+    val debtAmount: Double,
     val uniqueCompanyId: String,
-    val otherInfo: String?
+    val otherInfo: String
 ){
     fun toCustomerEntity(): CustomerEntity{
         return CustomerEntity(

@@ -47,6 +47,11 @@ class BackupViewModel @Inject constructor(
     fun absoluteRemoteBackup1() = viewModelScope.launch {
         backupRepository.absoluteBackup1(this)
     }
+
+    fun smartBackup1() = viewModelScope.launch {
+        backupRepository.smartBackup1()
+    }
+
     fun absoluteRemoteBackup() = viewModelScope.launch {
         backupRepository.absoluteBackup(this).onEach { response->
             when(response){

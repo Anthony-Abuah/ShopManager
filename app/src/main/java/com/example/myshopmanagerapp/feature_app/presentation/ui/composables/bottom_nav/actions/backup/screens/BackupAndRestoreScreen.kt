@@ -54,8 +54,6 @@ fun BackupAndRestoreScreen(
         ) {
             val localDataRestore = backupViewModel.restoreDatabaseState.value
             val localDataBackup = backupViewModel.backupDatabaseState.value
-            val absoluteRemoteBackup = backupViewModel.absoluteRemoteBackupState.value
-            val smartRemoteBackup = backupViewModel.smartRemoteBackupState.value
             val absoluteSyncData = backupViewModel.absoluteSyncDataState.value
             val smartSyncData = backupViewModel.smartSyncDataState.value
             BackupAndRestoreContent(
@@ -63,10 +61,6 @@ fun BackupAndRestoreScreen(
                 dataBackupConfirmationMessage = localDataBackup.message.toNotNull(),
                 isRestoringDatabase = localDataRestore.isLoading,
                 dataRestoreConfirmationMessage = localDataRestore.message.toNotNull(),
-                isLoadingAbsoluteBackup = absoluteRemoteBackup.isLoading,
-                isLoadingSmartBackup = smartRemoteBackup.isLoading,
-                absoluteBackupMessage = absoluteRemoteBackup.message.toNotNull(),
-                smartBackupMessage = smartRemoteBackup.message.toNotNull(),
                 isLoadingAbsoluteSync = absoluteSyncData.isLoading,
                 isLoadingSmartSync = smartSyncData.isLoading,
                 absoluteSyncMessage = absoluteSyncData.message.toNotNull(),
@@ -74,7 +68,7 @@ fun BackupAndRestoreScreen(
                 localBackupData = { backupViewModel.backupDatabase(context) },
                 localRestoreData = { backupViewModel.restoreDatabase(context) },
                 absoluteRemoteBackup = { backupViewModel.absoluteRemoteBackup1() },
-                smartRemoteBackup = { backupViewModel.smartRemoteBackup() },
+                smartRemoteBackup = { backupViewModel.smartBackup1() },
                 absoluteSyncData = { backupViewModel.absoluteSyncData() },
                 smartSyncData = { backupViewModel.smartSyncData() }
             )

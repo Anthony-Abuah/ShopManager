@@ -23,10 +23,10 @@ data class CustomerEntity(
             customerName = customerName.toNotNull(),
             customerContact = customerContact.toNotNull(),
             customerLocation = customerLocation.toNotNull(),
-            customerPhoto = customerPhoto,
-            debtAmount = debtAmount,
+            customerPhoto = customerPhoto.toNotNull(),
+            debtAmount = debtAmount.toNotNull(),
             uniqueCompanyId = uniqueCompanyId,
-            otherInfo = otherInfo
+            otherInfo = otherInfo.toNotNull()
         )
     }
 }
