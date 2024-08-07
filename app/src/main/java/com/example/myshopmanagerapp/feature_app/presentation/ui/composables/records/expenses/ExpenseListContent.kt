@@ -10,7 +10,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.ExpenseEntities
+import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenColumnWithoutBottomBar
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.ConfirmationInfoDialog
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.DeleteConfirmationDialog
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
 
@@ -18,11 +20,18 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpaci
 @Composable
 fun ExpenseListContent(
     allExpenses: ExpenseEntities?,
+    expenseDeletionIsSuccessful: Boolean,
+    isDeletingExpense: Boolean,
+    expenseDeletingMessage: String?,
+    reloadAllExpenses: () -> Unit,
     navigateToViewExpenseScreen: (String) -> Unit,
     onConfirmDelete: (String) -> Unit,
 ) {
 
     var openDeleteConfirmation by remember {
+        mutableStateOf(false)
+    }
+    var confirmationInfoDialog by remember {
         mutableStateOf(false)
     }
     var uniqueExpenseId by remember {
@@ -77,6 +86,19 @@ fun ExpenseListContent(
             }
         ) {
             openDeleteConfirmation = false
+        }
+        ConfirmationInfoDialog(
+            openDialog = confirmationInfoDialog,
+            isLoading = isDeletingExpense,
+            title = null,
+            textContent = expenseDeletingMessage.toNotNull(),
+            unconfirmedDeletedToastText = null,
+            confirmedDeleteToastText = null
+        ) {
+            if (expenseDeletionIsSuccessful){
+                reloadAllExpenses()
+            }
+            confirmationInfoDialog = false
         }
     }
 

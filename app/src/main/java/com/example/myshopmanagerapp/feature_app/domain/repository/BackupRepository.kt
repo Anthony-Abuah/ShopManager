@@ -19,7 +19,7 @@ interface BackupRepository {
 
     suspend fun smartBackup1()
 
-    suspend fun absoluteSyncCompanyInfo(coroutineScope: CoroutineScope): Flow<Resource<String>>
+    suspend fun absoluteSyncCompanyInfo()
 
     suspend fun smartSyncCompanyInfo(coroutineScope: CoroutineScope): Flow<Resource<String>>
 

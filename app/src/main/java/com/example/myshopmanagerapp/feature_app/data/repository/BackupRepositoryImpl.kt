@@ -1930,6 +1930,9 @@ class BackupRepositoryImpl(
                     val uniqueReceiptIds = changesEntityMarkers.getChangedReceiptIds.first().toUniqueIds()
                     val uniqueCashInIds = changesEntityMarkers.getChangedCashInIds.first().toUniqueIds()
 
+                    userPreferences.saveRepositoryJobSuccessValue(false)
+                    userPreferences.saveRepositoryJobMessage("All data to be backed up is loaded.\n" +
+                            "Is backing up data...")
 
                     if (expenses.isNotEmpty() || uniqueExpenseIds.isNotEmpty()) {
                         Log.d("BackupRepository", "Expense is not empty is called")
@@ -1944,14 +1947,15 @@ class BackupRepositoryImpl(
                             ) {
                                 Log.d("BackupRepository", "Expense data back up is successful")
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
-                                    userPreferences.saveRepositoryJobMessage( response.body()?.data.toNotNull())
+                                    val data = response.body()?.data.toNotNull()
+                                    val message = response.body()?.message.toNotNull()
+                                    userPreferences.saveRepositoryJobMessage("$data\n$message")
                                     additionEntityMarkers.saveAddedExpenseIds(emptyString)
                                     changesEntityMarkers.saveChangedExpenseIds(emptyString)
                                 }
                             }
 
                             override fun onFailure(call: Call<AddEntitiesResponse>, t: Throwable) {
-                                Log.d("BackupRepository", "Expense  data back up failed")
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
                                     userPreferences.saveRepositoryJobMessage("${t.message} \nUnknown error\n" +
                                             "Unable to backup expenses")
@@ -1971,9 +1975,10 @@ class BackupRepositoryImpl(
                                 call: Call<AddEntitiesResponse>,
                                 response: Response<AddEntitiesResponse>
                             ) {
-                                Log.d("BackupRepository", "Customer data backup is successful")
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
-                                    userPreferences.saveRepositoryJobMessage( response.body()?.data.toNotNull())
+                                    val data = response.body()?.data.toNotNull()
+                                    val message = response.body()?.message.toNotNull()
+                                    userPreferences.saveRepositoryJobMessage("$data\n$message")
                                     Log.d(
                                         "BackupRepository",
                                         "Revenue data is emitted successfully"
@@ -2005,7 +2010,9 @@ class BackupRepositoryImpl(
                                 response: Response<AddEntitiesResponse>
                             ) {
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
-                                    userPreferences.saveRepositoryJobMessage( response.body()?.data.toNotNull())
+                                    val data = response.body()?.data.toNotNull()
+                                    val message = response.body()?.message.toNotNull()
+                                    userPreferences.saveRepositoryJobMessage("$data\n$message")
                                     additionEntityMarkers.saveAddedSupplierIds(emptyString)
                                     changesEntityMarkers.saveChangedSupplierIds(emptyString)
                                 }
@@ -2031,7 +2038,9 @@ class BackupRepositoryImpl(
                             ) {
                                 Log.d("BackupRepository", "Cash in data backup is successful")
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
-                                    userPreferences.saveRepositoryJobMessage( response.body()?.data.toNotNull())
+                                    val data = response.body()?.data.toNotNull()
+                                    val message = response.body()?.message.toNotNull()
+                                    userPreferences.saveRepositoryJobMessage("$data\n$message")
                                     additionEntityMarkers.saveAddedCashInIds(emptyString)
                                     changesEntityMarkers.saveChangedCashInIds(emptyString)
                                 }
@@ -2062,7 +2071,9 @@ class BackupRepositoryImpl(
                             ) {
                                 Log.d("BackupRepository", "Receipt data backup is successful")
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
-                                    userPreferences.saveRepositoryJobMessage( response.body()?.data.toNotNull())
+                                    val data = response.body()?.data.toNotNull()
+                                    val message = response.body()?.message.toNotNull()
+                                    userPreferences.saveRepositoryJobMessage("$data\n$message")
                                     additionEntityMarkers.saveAddedReceiptIds(emptyString)
                                     changesEntityMarkers.saveChangedReceiptIds(emptyString)
                                 }
@@ -2093,7 +2104,9 @@ class BackupRepositoryImpl(
                             ) {
                                 Log.d("BackupRepository", "Debt data backup is successful")
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
-                                    userPreferences.saveRepositoryJobMessage( response.body()?.data.toNotNull())
+                                    val data = response.body()?.data.toNotNull()
+                                    val message = response.body()?.message.toNotNull()
+                                    userPreferences.saveRepositoryJobMessage("$data\n$message")
                                     additionEntityMarkers.saveAddedDebtIds(emptyString)
                                     changesEntityMarkers.saveChangedDebtIds(emptyString)
                                 }
@@ -2128,7 +2141,9 @@ class BackupRepositoryImpl(
                                 response: Response<AddEntitiesResponse>
                             ) {
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
-                                    userPreferences.saveRepositoryJobMessage( response.body()?.data.toNotNull())
+                                    val data = response.body()?.data.toNotNull()
+                                    val message = response.body()?.message.toNotNull()
+                                    userPreferences.saveRepositoryJobMessage("$data\n$message")
                                     additionEntityMarkers.saveAddedDebtRepaymentIds(emptyString)
                                     changesEntityMarkers.saveChangedDebtRepaymentIds(emptyString)
                                 }
@@ -2154,7 +2169,9 @@ class BackupRepositoryImpl(
                             ) {
                                 Log.d("BackupRepository", "Revenue data backup is successful")
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
-                                    userPreferences.saveRepositoryJobMessage( response.body()?.data.toNotNull())
+                                    val data = response.body()?.data.toNotNull()
+                                    val message = response.body()?.message.toNotNull()
+                                    userPreferences.saveRepositoryJobMessage("$data\n$message")
                                     Log.d(
                                         "BackupRepository",
                                         "Revenue data is emitted successfully"
@@ -2187,7 +2204,9 @@ class BackupRepositoryImpl(
                                 response: Response<AddEntitiesResponse>
                             ) {
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
-                                    userPreferences.saveRepositoryJobMessage( response.body()?.data.toNotNull())
+                                    val data = response.body()?.data.toNotNull()
+                                    val message = response.body()?.message.toNotNull()
+                                    userPreferences.saveRepositoryJobMessage("$data\n$message")
                                     additionEntityMarkers.saveAddedInventoryIds(emptyString)
                                     changesEntityMarkers.saveChangedInventoryIds(emptyString)
                                 }
@@ -2218,7 +2237,9 @@ class BackupRepositoryImpl(
                                 response: Response<AddEntitiesResponse>
                             ) {
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
-                                    userPreferences.saveRepositoryJobMessage( response.body()?.data.toNotNull())
+                                    val data = response.body()?.data.toNotNull()
+                                    val message = response.body()?.message.toNotNull()
+                                    userPreferences.saveRepositoryJobMessage("$data\n$message")
                                     additionEntityMarkers.saveAddedInventoryItemIds(emptyString)
                                     changesEntityMarkers.saveChangedInventoryItemIds(emptyString)
                                 }
@@ -2248,7 +2269,9 @@ class BackupRepositoryImpl(
                                 response: Response<AddEntitiesResponse>
                             ) {
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
-                                    userPreferences.saveRepositoryJobMessage( response.body()?.data.toNotNull())
+                                    val data = response.body()?.data.toNotNull()
+                                    val message = response.body()?.message.toNotNull()
+                                    userPreferences.saveRepositoryJobMessage("$data\n$message")
                                     additionEntityMarkers.saveAddedInventoryStockIds(emptyString)
                                     changesEntityMarkers.saveChangedInventoryStockIds(emptyString)
                                 }
@@ -2272,7 +2295,9 @@ class BackupRepositoryImpl(
                                 response: Response<AddEntitiesResponse>
                             ) {
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
-                                    userPreferences.saveRepositoryJobMessage( response.body()?.data.toNotNull())
+                                    val data = response.body()?.data.toNotNull()
+                                    val message = response.body()?.message.toNotNull()
+                                    userPreferences.saveRepositoryJobMessage("$data\n$message")
                                     additionEntityMarkers.saveAddedStockIds(emptyString)
                                     changesEntityMarkers.saveChangedStockIds(emptyString)
                                 }
@@ -2299,7 +2324,9 @@ class BackupRepositoryImpl(
                             ) {
                                 Log.d("BackupRepository", "Personnel data backup is successful")
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
-                                    userPreferences.saveRepositoryJobMessage( response.body()?.data.toNotNull())
+                                    val data = response.body()?.data.toNotNull()
+                                    val message = response.body()?.message.toNotNull()
+                                    userPreferences.saveRepositoryJobMessage("$data\n$message")
                                     Log.d(
                                         "BackupRepository",
                                         "Personnel data is emitted successfully"
@@ -2333,7 +2360,9 @@ class BackupRepositoryImpl(
                             ) {
                                 Log.d("BackupRepository", "Savings data backup is successful")
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
-                                    userPreferences.saveRepositoryJobMessage( response.body()?.data.toNotNull())
+                                    val data = response.body()?.data.toNotNull()
+                                    val message = response.body()?.message.toNotNull()
+                                    userPreferences.saveRepositoryJobMessage("$data\n$message")
                                     additionEntityMarkers.saveAddedSavingsIds(emptyString)
                                     changesEntityMarkers.saveChangedSavingsIds(emptyString)
                                 }
@@ -2361,7 +2390,9 @@ class BackupRepositoryImpl(
                             ) {
                                 Log.d("BackupRepository", "Withdrawal data backup is successful")
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
-                                    userPreferences.saveRepositoryJobMessage( response.body()?.data.toNotNull())
+                                    val data = response.body()?.data.toNotNull()
+                                    val message = response.body()?.message.toNotNull()
+                                    userPreferences.saveRepositoryJobMessage("$data\n$message")
                                     additionEntityMarkers.saveAddedWithdrawalIds(emptyString)
                                     changesEntityMarkers.saveChangedWithdrawalIds(emptyString)
                                 }
@@ -2386,7 +2417,9 @@ class BackupRepositoryImpl(
                             ) {
                                 Log.d("BackupRepository", "Bank data backup is successful")
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
-                                    userPreferences.saveRepositoryJobMessage( response.body()?.data.toNotNull())
+                                    val data = response.body()?.data.toNotNull()
+                                    val message = response.body()?.message.toNotNull()
+                                    userPreferences.saveRepositoryJobMessage("$data\n$message")
                                     additionEntityMarkers.saveAddedBankAccountIds(emptyString)
                                     changesEntityMarkers.saveChangedBankAccountIds(emptyString)
                                 }
@@ -2400,9 +2433,7 @@ class BackupRepositoryImpl(
                             }
                         })
                     }
-
-                    //emit(Resource.Success("All data successfully backed up"))
-
+                    userPreferences.saveRepositoryJobMessage("Smart back up complete")
                 }
             }
 
@@ -2413,116 +2444,195 @@ class BackupRepositoryImpl(
         }
     }
 
-    override suspend fun absoluteSyncCompanyInfo(coroutineScope: CoroutineScope): Flow<Resource<String>> = flow{
-        emit(Resource.Loading())
+    override suspend fun absoluteSyncCompanyInfo(){
+        val context = MyShopManagerApp.applicationContext()
+        val userPreferences = UserPreferences(context)
         try {
-            val context = MyShopManagerApp.applicationContext()
-            val userPreferences = UserPreferences(context)
+            userPreferences.saveRepositoryJobMessage(emptyString)
             val isLoggedIn = userPreferences.getLoggedInState.first()
             val shopInfoJson = userPreferences.getShopInfo.first()
             val uniqueCompanyId = shopInfoJson.toCompanyEntity()?.uniqueCompanyId
             if (isLoggedIn == true) {
                 if (uniqueCompanyId == null){
-                    emit(Resource.Error(
-                        data = "Could not sync data",
-                        message = "Could not get the shop account details\nPlease ensure that you are logged in"
-                    ))
+                    userPreferences.saveRepositoryJobMessage("Could not sync data\nCould not get the shop account details\n" +
+                            "Please ensure that you are logged in")
                 }else {
+
+                    val remoteCustomerDto = shopManagerDatabaseApi.fetchAllCompanyCustomers(uniqueCompanyId)
                     val remoteCustomers =
                         shopManagerDatabaseApi.fetchAllCompanyCustomers(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.customerDao.addCustomers(remoteCustomers.map { it.toCustomerEntity() })
 
+                    val remoteSupplierDto = shopManagerDatabaseApi.fetchAllCompanySuppliers(uniqueCompanyId)
                     val remoteSuppliers =
                         shopManagerDatabaseApi.fetchAllCompanySuppliers(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.supplierDao.addSuppliers(remoteSuppliers.map { it.toSupplierEntity() })
 
+                    val remoteReceiptDto = shopManagerDatabaseApi.fetchAllCompanyReceipts(uniqueCompanyId)
                     val remoteReceipts =
                         shopManagerDatabaseApi.fetchAllCompanyReceipts(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.receiptDao.addReceipts(remoteReceipts.map { it.toReceiptEntity() })
 
+                    val remoteDebtDto = shopManagerDatabaseApi.fetchAllCompanyDebts(uniqueCompanyId)
                     val remoteDebts =
                         shopManagerDatabaseApi.fetchAllCompanyDebts(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.debtDao.addDebts(remoteDebts.map { it.toDebtEntity() })
 
+                    val remoteCashInDto = shopManagerDatabaseApi.fetchAllCompanyCashIns(uniqueCompanyId)
                     val remoteCashIns =
                         shopManagerDatabaseApi.fetchAllCompanyCashIns(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.cashInDao.addCashIns(remoteCashIns.map { it.toCashInEntity() })
 
+                    val remoteDebtRepaymentDto = shopManagerDatabaseApi.fetchAllCompanyCustomers(uniqueCompanyId)
                     val remoteDebtRepayments =
                         shopManagerDatabaseApi.fetchAllCompanyDebtRepayments(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.debtRepaymentDao.addDebtRepayments(remoteDebtRepayments.map { it.toDebtRepaymentEntity() })
 
+                    val remoteInventoryDto = shopManagerDatabaseApi.fetchAllCompanyInventories(uniqueCompanyId)
                     val remoteInventories =
                         shopManagerDatabaseApi.fetchAllCompanyInventories(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.inventoryDao.addInventories(remoteInventories.map { it.toInventoryEntity() })
 
+                    val remoteInventoryItemDto = shopManagerDatabaseApi.fetchAllCompanyInventoryItems(uniqueCompanyId)
                     val remoteInventoryItems =
                         shopManagerDatabaseApi.fetchAllCompanyInventoryItems(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.inventoryItemDao.addInventoryItems(remoteInventoryItems.map { it.toInventoryItemEntity() })
 
+                    val remoteRevenuesDto = shopManagerDatabaseApi.fetchAllCompanyRevenues(uniqueCompanyId)
                     val remoteRevenues =
                         shopManagerDatabaseApi.fetchAllCompanyRevenues(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.revenueDao.addRevenues(remoteRevenues.map { it.toRevenueEntity() })
 
+                    val remoteExpenseDto = shopManagerDatabaseApi.fetchAllCompanyExpenses(uniqueCompanyId)
                     val remoteExpenses =
                         shopManagerDatabaseApi.fetchAllCompanyExpenses(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.expenseDao.addExpenses(remoteExpenses.map { it.toExpenseEntity() })
 
+                    val remoteStockDto = shopManagerDatabaseApi.fetchAllCompanyStocks(uniqueCompanyId)
                     val remoteStocks =
                         shopManagerDatabaseApi.fetchAllCompanyStocks(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.stockDao.addStocks(remoteStocks.map { it.toStockEntity() })
 
+                    val remotePersonnelDto = shopManagerDatabaseApi.fetchAllCompanyPersonnel(uniqueCompanyId)
                     val remotePersonnel =
                         shopManagerDatabaseApi.fetchAllCompanyPersonnel(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.personnelDao.addPersonnel(remotePersonnel.map { it.toPersonnelEntity() })
 
+                    val remoteSavingsDto = shopManagerDatabaseApi.fetchAllCompanySavings(uniqueCompanyId)
                     val remoteSavings =
                         shopManagerDatabaseApi.fetchAllCompanySavings(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.savingsDao.addSavings(remoteSavings.map { it.toSavingsEntity() })
 
+                    val remoteWithdrawalDto = shopManagerDatabaseApi.fetchAllCompanyWithdrawals(uniqueCompanyId)
                     val remoteWithdrawals =
                         shopManagerDatabaseApi.fetchAllCompanyWithdrawals(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.withdrawalDao.addWithdrawals(remoteWithdrawals.map { it.toWithdrawalEntity() })
 
+                    val remoteInventoryStockDto = shopManagerDatabaseApi.fetchAllCompanyInventoryStocks(uniqueCompanyId)
                     val remoteInventoryStocks =
                         shopManagerDatabaseApi.fetchAllCompanyInventoryStocks(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.inventoryStockDao.addInventoryStock(remoteInventoryStocks.map { it.toInventoryStock() })
 
+                    val remoteBankDto = shopManagerDatabaseApi.fetchAllCompanyBanks(uniqueCompanyId)
                     val remoteBanks =
                         shopManagerDatabaseApi.fetchAllCompanyBanks(uniqueCompanyId)?.data
                             ?: emptyList()
-                    appDatabase.bankAccountDao.addBankAccounts(remoteBanks.map { it.toBankEntity() })
+
+
+                    userPreferences.saveRepositoryJobMessage("Fetching data from cloud complete...\n" +
+                            "Saving data to database...")
+
+                    if (remoteCustomerDto?.success.toNotNull()) {
+                        appDatabase.customerDao.deleteAllCustomers()
+                        appDatabase.customerDao.addCustomers(remoteCustomers.map { it.toCustomerEntity() })
+                    }
+
+                    if (remoteSupplierDto?.success.toNotNull()) {
+                        appDatabase.supplierDao.deleteAllSuppliers()
+                        appDatabase.supplierDao.addSuppliers(remoteSuppliers.map { it.toSupplierEntity() })
+                    }
+
+                    if (remoteReceiptDto?.success.toNotNull()) {
+                        appDatabase.receiptDao.deleteAllReceipts()
+                        appDatabase.receiptDao.addReceipts(remoteReceipts.map { it.toReceiptEntity() })
+                    }
+
+                    if (remoteDebtDto?.success.toNotNull()) {
+                        appDatabase.debtDao.deleteAllDebts()
+                        appDatabase.debtDao.addDebts(remoteDebts.map { it.toDebtEntity() })
+                    }
+
+                    if (remoteCashInDto?.success.toNotNull()) {
+                        appDatabase.cashInDao.deleteAllCashIns()
+                        appDatabase.cashInDao.addCashIns(remoteCashIns.map { it.toCashInEntity() })
+                    }
+
+                    if (remoteDebtRepaymentDto?.success.toNotNull()) {
+                        appDatabase.debtRepaymentDao.deleteAllDebtRepayments()
+                        appDatabase.debtRepaymentDao.addDebtRepayments(remoteDebtRepayments.map { it.toDebtRepaymentEntity() })
+                    }
+
+                    if (remoteInventoryDto?.success.toNotNull()) {
+                        appDatabase.inventoryDao.deleteAllInventories()
+                        appDatabase.inventoryDao.addInventories(remoteInventories.map { it.toInventoryEntity() })
+                    }
+
+                    if (remoteInventoryItemDto?.success.toNotNull()) {
+                        appDatabase.inventoryItemDao.deleteAllInventoryItems()
+                        appDatabase.inventoryItemDao.addInventoryItems(remoteInventoryItems.map { it.toInventoryItemEntity() })
+                    }
+
+                    if (remoteRevenuesDto?.success.toNotNull()) {
+                        appDatabase.revenueDao.deleteAllRevenues()
+                        appDatabase.revenueDao.addRevenues(remoteRevenues.map { it.toRevenueEntity() })
+                    }
+
+                    if (remoteExpenseDto?.success.toNotNull()) {
+                        appDatabase.expenseDao.deleteAllExpenses()
+                        appDatabase.expenseDao.addExpenses(remoteExpenses.map { it.toExpenseEntity() })
+                    }
+
+                    if (remoteStockDto?.success.toNotNull()) {
+                        appDatabase.stockDao.deleteAllStocks()
+                        appDatabase.stockDao.addStocks(remoteStocks.map { it.toStockEntity() })
+                    }
+
+                    if (remotePersonnelDto?.success.toNotNull()) {
+                        appDatabase.personnelDao.deleteAllPersonnel()
+                        appDatabase.personnelDao.addPersonnel(remotePersonnel.map { it.toPersonnelEntity() })
+                    }
+
+                    if (remoteSavingsDto?.success.toNotNull()) {
+                        appDatabase.savingsDao.deleteAllSavings()
+                        appDatabase.savingsDao.addSavings(remoteSavings.map { it.toSavingsEntity() })
+                    }
+
+                    if (remoteWithdrawalDto?.success.toNotNull()) {
+                        appDatabase.withdrawalDao.deleteAllWithdrawals()
+                        appDatabase.withdrawalDao.addWithdrawals(remoteWithdrawals.map { it.toWithdrawalEntity() })
+                    }
+
+                    if (remoteInventoryStockDto?.success.toNotNull()) {
+                        appDatabase.inventoryStockDao.deleteAllInventoryStock()
+                        appDatabase.inventoryStockDao.addInventoryStock(remoteInventoryStocks.map { it.toInventoryStock() })
+                    }
+
+                    if (remoteBankDto?.success.toNotNull()) {
+                        appDatabase.bankAccountDao.deleteAllBanks()
+                        appDatabase.bankAccountDao.addBankAccounts(remoteBanks.map { it.toBankEntity() })
+                    }
+                    userPreferences.saveRepositoryJobMessage("Data sync complete")
                 }
             }
             else{
                 Log.d("BackupRepository", "It is not logged in")
-                emit(Resource.Error(
-                    data = "Could not sync data",
-                    message = "You are not logged in into any account"
-                ))
+                userPreferences.saveRepositoryJobMessage("Could not sync data\nYou are not logged in into any account")
+
             }
 
         }catch (e: Exception){
             Log.d("BackupRepository", "Exception is called")
-            emit(Resource.Error(
-                data = "Could not sync data",
-                message = e.message
-            ))
+            userPreferences.saveRepositoryJobMessage("Could not sync data\n${e.message}")
         }
     }
 

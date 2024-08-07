@@ -29,6 +29,7 @@ import com.example.myshopmanagerapp.core.FormRelatedString.SmartBackUpDialogMess
 import com.example.myshopmanagerapp.core.FormRelatedString.SmartRemoteBackUp
 import com.example.myshopmanagerapp.core.FormRelatedString.SmartSync
 import com.example.myshopmanagerapp.core.FormRelatedString.SmartSyncDialogMessage
+import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.UserPreferences
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.SettingsContentCard
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenColumnWithoutBottomBar
@@ -44,10 +45,6 @@ fun BackupAndRestoreContent(
     dataBackupConfirmationMessage: String,
     isRestoringDatabase: Boolean,
     dataRestoreConfirmationMessage: String,
-    isLoadingAbsoluteSync: Boolean,
-    isLoadingSmartSync: Boolean,
-    absoluteSyncMessage: String,
-    smartSyncMessage: String,
     localBackupData: ()-> Unit,
     localRestoreData: ()-> Unit,
     absoluteRemoteBackup: ()-> Unit,
@@ -58,6 +55,7 @@ fun BackupAndRestoreContent(
     val context = LocalContext.current
     val userPreferences = UserPreferences(context)
     val coroutineScope = rememberCoroutineScope()
+
     var openLocalConfirmationDialog by remember {
         mutableStateOf(false)
     }
@@ -269,14 +267,14 @@ fun BackupAndRestoreContent(
             when(isAbsoluteSync){
                 true->{
                     absoluteSyncData()
-                    isLoading = isLoadingAbsoluteSync
-                    dialogMessage = absoluteSyncMessage
+                    isLoading = repositoryJobMessage.isNullOrBlank()
+                    dialogMessage = repositoryJobMessage ?: "Unknown outcome"
                     confirmationInfoDialog = !confirmationInfoDialog
                 }
                 false->{
                     smartSyncData()
-                    isLoading = isLoadingSmartSync
-                    dialogMessage = smartSyncMessage
+                    isLoading = repositoryJobMessage.isNullOrBlank()
+                    dialogMessage = repositoryJobMessage ?: "Unknown outcome"
                     confirmationInfoDialog = !confirmationInfoDialog
                 }
                 null->{ openSyncDataConfirmationDialog = false }

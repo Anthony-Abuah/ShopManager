@@ -98,12 +98,15 @@ fun ExpenseListScreen(
         ) {
             ExpenseListContent(
                 allExpenses = allExpenses,
+                isDeletingExpense = expenseViewModel.deleteExpenseState.value.isLoading,
+                expenseDeletingMessage = expenseViewModel.deleteExpenseState.value.message,
+                expenseDeletionIsSuccessful = expenseViewModel.deleteExpenseState.value.isSuccessful,
+                reloadAllExpenses = { expenseViewModel.getAllExpenses() },
                 navigateToViewExpenseScreen = {_uniqueExpenseId->
                     navigateToViewExpenseScreen(_uniqueExpenseId)
                 },
                 onConfirmDelete = {_uniqueExpenseId->
                     expenseViewModel.deleteExpense(_uniqueExpenseId)
-                    expenseViewModel.getAllExpenses()
                 }
             )
         }

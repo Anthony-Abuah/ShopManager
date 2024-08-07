@@ -54,17 +54,11 @@ fun BackupAndRestoreScreen(
         ) {
             val localDataRestore = backupViewModel.restoreDatabaseState.value
             val localDataBackup = backupViewModel.backupDatabaseState.value
-            val absoluteSyncData = backupViewModel.absoluteSyncDataState.value
-            val smartSyncData = backupViewModel.smartSyncDataState.value
             BackupAndRestoreContent(
                 isBackingUpDatabase = localDataBackup.isLoading,
                 dataBackupConfirmationMessage = localDataBackup.message.toNotNull(),
                 isRestoringDatabase = localDataRestore.isLoading,
                 dataRestoreConfirmationMessage = localDataRestore.message.toNotNull(),
-                isLoadingAbsoluteSync = absoluteSyncData.isLoading,
-                isLoadingSmartSync = smartSyncData.isLoading,
-                absoluteSyncMessage = absoluteSyncData.message.toNotNull(),
-                smartSyncMessage = smartSyncData.message.toNotNull(),
                 localBackupData = { backupViewModel.backupDatabase(context) },
                 localRestoreData = { backupViewModel.restoreDatabase(context) },
                 absoluteRemoteBackup = { backupViewModel.absoluteRemoteBackup1() },

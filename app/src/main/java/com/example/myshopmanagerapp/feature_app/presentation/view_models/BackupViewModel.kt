@@ -5,6 +5,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.UIEvent
 import com.example.myshopmanagerapp.feature_app.domain.repository.BackupRepository
@@ -120,37 +121,7 @@ class BackupViewModel @Inject constructor(
     }
 
     fun absoluteSyncData() = viewModelScope.launch {
-        backupRepository.absoluteSyncCompanyInfo(this).onEach { response->
-            when(response){
-                is Resource.Success ->{
-                    _absoluteSyncDataState.value = absoluteSyncDataState.value.copy(
-                        data = response.data ,
-                        isSuccessful = true,
-                        message = response.message,
-                        isLoading = false
-                    )
-                    _eventFlow.emit(UIEvent.ShowSnackBar(response.data ?: "Success"))
-                }
-                is Resource.Loading ->{
-                    _absoluteSyncDataState.value = absoluteSyncDataState.value.copy(
-                        data = response.data,
-                        isSuccessful = false,
-                        message = response.message,
-                        isLoading = true
-                    )
-                    _eventFlow.emit(UIEvent.ShowSnackBar(response.data ?: "Backing up data"))
-                }
-                is Resource.Error ->{
-                    _absoluteSyncDataState.value = absoluteSyncDataState.value.copy(
-                        data = response.data,
-                        isSuccessful = false,
-                        message = response.message ?: "Unknown Error",
-                        isLoading = false
-                    )
-                    _eventFlow.emit(UIEvent.ShowSnackBar(response.message ?: "Unknown Error"))
-                }
-            }
-        }.launchIn(this)
+        backupRepository.absoluteSyncCompanyInfo()
     }
 
     fun smartSyncData() = viewModelScope.launch {
