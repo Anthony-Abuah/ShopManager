@@ -234,10 +234,11 @@ fun ViewExpenseContent(
                         UserPreferences(context).saveExpenseNames(expenseNamesJson.toNotNull())
                     }
                     Toast.makeText(context, "Expense Name: $_expenseName successfully added", Toast.LENGTH_LONG).show()
+                    openExpenseNames = false
                 }
             }
         ) {
-            openExpenseTypes = false
+            openExpenseNames = false
         }
 
 
@@ -270,6 +271,7 @@ fun ViewExpenseContent(
                         UserPreferences(context).saveExpenseTypes(expenseTypesJson.toNotNull())
                     }
                     Toast.makeText(context, "Expense Type: $_expenseType successfully added", Toast.LENGTH_LONG).show()
+                    openExpenseTypes = false
                 }
             }
         ) {

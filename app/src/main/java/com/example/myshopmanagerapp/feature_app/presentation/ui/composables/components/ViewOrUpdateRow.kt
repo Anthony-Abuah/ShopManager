@@ -33,6 +33,7 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpaci
 fun ViewOrUpdateTextValueRow(
     viewTitle: String,
     viewValue: String,
+    insideValue: String = emptyString,
     placeholder: String,
     label: String,
     icon: Int,
@@ -119,7 +120,7 @@ fun ViewOrUpdateTextValueRow(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                var updatedValue by remember { mutableStateOf(viewValue) }
+                var updatedValue by remember { mutableStateOf(insideValue) }
                 Box(modifier = Modifier.weight(1f),
                     contentAlignment = Alignment.Center
                 ) {
@@ -161,6 +162,7 @@ fun ViewOrUpdateTextValueRow(
 fun ViewOrUpdateAutoCompleteValueRow(
     viewTitle: String,
     viewValue: String,
+    insideValue: String = emptyString,
     placeholder: String,
     label: String,
     expandedIcon: Int,
@@ -248,7 +250,7 @@ fun ViewOrUpdateAutoCompleteValueRow(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                var updatedValue by remember { mutableStateOf(viewValue) }
+                var updatedValue by remember { mutableStateOf(insideValue) }
                 Box(modifier = Modifier.weight(1f),
                     contentAlignment = Alignment.Center
                 ) {

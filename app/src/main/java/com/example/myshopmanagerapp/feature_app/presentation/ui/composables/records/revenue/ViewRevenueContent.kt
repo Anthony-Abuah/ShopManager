@@ -107,6 +107,7 @@ fun ViewRevenueContent(
             viewTitle = RevenueType,
             viewValue = revenue.revenueType.toNotNull(),
             placeholder = RevenueTypePlaceholder,
+            insideValue = revenue.revenueType.toNotNull(),
             label = SelectRevenueType,
             expandedIcon = R.drawable.ic_money_filled,
             unexpandedIcon = R.drawable.ic_money_outline,
@@ -121,6 +122,7 @@ fun ViewRevenueContent(
         ViewOrUpdateAutoCompleteValueRow(
             viewTitle = NumberOfHours,
             viewValue = revenue.numberOfHours.toNotNull().toString(),
+            insideValue = revenue.numberOfHours.toNotNull().toString(),
             placeholder = RevenueHoursPlaceholder,
             label = NumberOfHours,
             expandedIcon = R.drawable.ic_money_filled,
@@ -138,6 +140,7 @@ fun ViewRevenueContent(
             viewValue = "$currency ${revenue.revenueAmount}",
             placeholder = RevenueAmountPlaceholder,
             label = EnterRevenueAmount,
+            insideValue = revenue.revenueAmount.toString(),
             icon = R.drawable.ic_money_filled,
             getUpdatedValue = { getUpdatedRevenueAmount(it) }
         )
@@ -155,6 +158,7 @@ fun ViewRevenueContent(
             viewTitle = RevenueShortNotes,
             viewValue = revenue.otherInfo ?: NotAvailable,
             placeholder = ShortNotesPlaceholder,
+            insideValue = revenue.otherInfo.toNotNull(),
             label = EnterShortDescription,
             icon = R.drawable.ic_short_notes,
             getUpdatedValue = { getUpdatedRevenueOtherInfo(it) }
@@ -206,6 +210,7 @@ fun ViewRevenueContent(
                         UserPreferences(context).saveRevenueTypes(revenueTypesJson.toNotNull())
                     }
                     Toast.makeText(context, "Revenue Type: $_revenueType successfully added", Toast.LENGTH_LONG).show()
+                    openRevenueTypes = false
                 }
             }
         ) {

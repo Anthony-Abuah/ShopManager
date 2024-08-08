@@ -2,7 +2,6 @@ package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bot
 
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,26 +14,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.myshopmanagerapp.R
 import com.example.myshopmanagerapp.core.Constants.Currency
-import com.example.myshopmanagerapp.core.Constants.emptyString
-import com.example.myshopmanagerapp.core.FormRelatedString.CurrencyPlaceholder
 import com.example.myshopmanagerapp.core.FormRelatedString.GHS
-import com.example.myshopmanagerapp.core.FormRelatedString.SelectCurrency
 import com.example.myshopmanagerapp.core.FormRelatedString.listOfCurrencies
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.UserPreferences
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenColumnWithoutBottomBar
-import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.SelectOnlyAutoCompleteTextFieldAlertDialog
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.VerticalDisplayAndEditTextValues
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.*
 import kotlinx.coroutines.launch
+import java.util.*
 
 
 @Composable
 fun PreferencesContent() {
 
-    var openCurrencyDialog by remember {
-        mutableStateOf(false)
-    }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val userPreferences = UserPreferences(context)
@@ -50,8 +43,7 @@ fun PreferencesContent() {
             modifier = Modifier
                 .background(Color.Transparent)
                 .padding(LocalSpacing.current.default)
-                .fillMaxWidth()
-                .clickable { openCurrencyDialog = !openCurrencyDialog },
+                .fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
             VerticalDisplayAndEditTextValues(
@@ -60,38 +52,29 @@ fun PreferencesContent() {
                 secondText = currency.ifBlank { GHS },
                 secondTextColor = descriptionColor,
                 value = currency.toNotNull(),
-                readOnly = true,
+                readOnly = false,
                 leadingIcon = R.drawable.ic_money_outline,
                 leadingIconWidth = 32.dp,
                 onBackgroundColor = titleColor,
+                isAutoCompleteTextField = true,
+                listItems = listOfCurrencies,
+                expandedIcon = R.drawable.ic_money_outline,
+                unexpandedIcon = R.drawable.ic_money_filled,
+                getUpdatedValue = {_currency->
+                    if (_currency.isNotBlank()) {
+                        coroutineScope.launch {
+                            userPreferences.saveCurrency(_currency.uppercase(Locale.ROOT).take(3))
+                        }
+                        Toast.makeText(context, "${_currency.uppercase().take(3)} selected", Toast.LENGTH_LONG).show()
+                    }else{
+                        coroutineScope.launch {
+                            userPreferences.saveCurrency(GHS)
+                        }
+                        Toast.makeText(context, "$GHS selected", Toast.LENGTH_LONG).show()
+                    }
+                }
             )
         }
     }
-    SelectOnlyAutoCompleteTextFieldAlertDialog(
-        openDialog = openCurrencyDialog,
-        title = SelectCurrency,
-        textContent = emptyString,
-        placeholder = CurrencyPlaceholder,
-        label = SelectCurrency,
-        expandedIcon = R.drawable.ic_money_filled,
-        unexpandedIcon = R.drawable.ic_money_outline,
-        unconfirmedUpdatedToastText = emptyString,
-        confirmedUpdatedToastText = null,
-        listItems = listOfCurrencies,
-        getSelectedItem = {_currency->
-            if (_currency.isNotBlank()) {
-                coroutineScope.launch {
-                    userPreferences.saveCurrency(_currency.take(3))
-                }
-                Toast.makeText(context, "${_currency.take(3)} selected", Toast.LENGTH_LONG).show()
-            }else{
-                coroutineScope.launch {
-                    userPreferences.saveCurrency(GHS)
-                }
-                Toast.makeText(context, "$GHS selected", Toast.LENGTH_LONG).show()
-            }
-        }
-    ) {
-        openCurrencyDialog = false
-    }
+
 }

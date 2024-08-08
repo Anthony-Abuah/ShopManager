@@ -83,6 +83,7 @@ fun ExpenseListContent(
             confirmedDeleteToastText = "Expense has been successfully removed",
             confirmDelete = {
                 onConfirmDelete(uniqueExpenseId)
+                confirmationInfoDialog = !confirmationInfoDialog
             }
         ) {
             openDeleteConfirmation = false
@@ -101,5 +102,4 @@ fun ExpenseListContent(
             confirmationInfoDialog = false
         }
     }
-
 }
