@@ -27,7 +27,6 @@ import java.util.*
 
 @Composable
 fun PreferencesContent() {
-
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val userPreferences = UserPreferences(context)
