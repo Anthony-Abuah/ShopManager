@@ -1,20 +1,25 @@
 package com.example.myshopmanagerapp.feature_app.presentation.view_models
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myshopmanagerapp.core.Constants
+import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.UIEvent
+import com.example.myshopmanagerapp.core.UserPreferences
+import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
+import com.example.myshopmanagerapp.feature_app.data.local.entities.customers.CustomerEntity
 import com.example.myshopmanagerapp.feature_app.domain.repository.BackupRepository
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.company.AddCompanyState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,9 +28,17 @@ class BackupViewModel @Inject constructor(
     private val backupRepository: BackupRepository
 ): ViewModel(){
 
+    val userPreferences = UserPreferences(MyShopManagerApp.applicationContext())
 
     private val _eventFlow = MutableSharedFlow<UIEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
+
+
+    var floatValue by mutableStateOf(0f)
+        private set
+
+    var repositoryMessage by mutableStateOf(emptyString)
+        private set
 
     private val _absoluteRemoteBackupState = mutableStateOf(AddCompanyState())
     val absoluteRemoteBackupState: State<AddCompanyState> = _absoluteRemoteBackupState
@@ -47,6 +60,19 @@ class BackupViewModel @Inject constructor(
 
     fun absoluteRemoteBackup1() = viewModelScope.launch {
         backupRepository.absoluteBackup1(this)
+    }
+
+    fun getFloatValue() = viewModelScope.launch {
+        userPreferences.getDoubleValue.collectLatest { value->
+            floatValue = value.toNotNull().toFloat()
+            Log.d("BackupRepository", "viewModel- getFloatValue() - floatValue = $floatValue")
+        }
+    }
+    fun getRepositoryMessage() = viewModelScope.launch {
+        userPreferences.getRepositoryJobMessage.collectLatest { value->
+            repositoryMessage = value.toNotNull().ifBlank { "Unknown response" }
+            Log.d("BackupRepository", "viewModel- getRepositoryMessage() - floatValue = $repositoryMessage")
+        }
     }
 
     fun smartBackup1() = viewModelScope.launch {

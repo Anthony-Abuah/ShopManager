@@ -1832,16 +1832,22 @@ class BackupRepositoryImpl(
 
             userPreferences.saveRepositoryJobSuccessValue(false)
             userPreferences.saveRepositoryJobMessage(emptyString)
+            userPreferences.saveDoubleValue(0.0)
+            Log.d("BackupRepository", "repository - smartBackup1() - double value = ${userPreferences.getDoubleValue.first().toNotNull()}")
 
             when(true){
                 (isLoggedIn != true)->{
                     userPreferences.saveRepositoryJobSuccessValue(false)
                     userPreferences.saveRepositoryJobMessage("Could not back up data. \nYou are not logged in into any account")
+                    userPreferences.saveDoubleValue(1.0)
+                    Log.d("BackupRepository", "repository - smartBackup1() - double value = ${userPreferences.getDoubleValue.first().toNotNull()}")
                 }
                 (uniqueCompanyId == null)->{
                     userPreferences.saveRepositoryJobSuccessValue(false)
                     userPreferences.saveRepositoryJobMessage("Could not back up data. \nCould not get the shop account details\n" +
                             "Please ensure that you are logged in")
+                    userPreferences.saveDoubleValue(1.0)
+                    Log.d("BackupRepository", "repository - smartBackup1() - double value = ${userPreferences.getDoubleValue.first().toNotNull()}")
                 }
                 else -> {
                     val additionEntityMarkers  = AdditionEntityMarkers(context)
@@ -1933,6 +1939,8 @@ class BackupRepositoryImpl(
                     userPreferences.saveRepositoryJobSuccessValue(false)
                     userPreferences.saveRepositoryJobMessage("All data to be backed up is loaded.\n" +
                             "Is backing up data...")
+                    userPreferences.saveDoubleValue(0.5)
+                    Log.d("BackupRepository", "repository - smartBackup1() - double value = ${userPreferences.getDoubleValue.first().toNotNull()}")
 
                     if (expenses.isNotEmpty() || uniqueExpenseIds.isNotEmpty()) {
                         Log.d("BackupRepository", "Expense is not empty is called")
@@ -2434,13 +2442,15 @@ class BackupRepositoryImpl(
                         })
                     }
                     userPreferences.saveRepositoryJobMessage("Smart back up complete")
+                    userPreferences.saveDoubleValue(1.0)
+                    Log.d("BackupRepository", "repository - smartBackup1() - double value = ${userPreferences.getDoubleValue.first().toNotNull()}")
                 }
             }
-
         }catch (e: Exception){
             Log.d("BackupRepository", "${e.message}")
             userPreferences.saveRepositoryJobMessage("${e.message}Unknown error\n" +
                     "Could not back up any/all of the data")
+            userPreferences.saveDoubleValue(1.0)
         }
     }
 
@@ -2449,6 +2459,7 @@ class BackupRepositoryImpl(
         val userPreferences = UserPreferences(context)
         try {
             userPreferences.saveRepositoryJobMessage(emptyString)
+            userPreferences.saveDoubleValue(0.0)
             val isLoggedIn = userPreferences.getLoggedInState.first()
             val shopInfoJson = userPreferences.getShopInfo.first()
             val uniqueCompanyId = shopInfoJson.toCompanyEntity()?.uniqueCompanyId
@@ -2456,6 +2467,7 @@ class BackupRepositoryImpl(
                 if (uniqueCompanyId == null){
                     userPreferences.saveRepositoryJobMessage("Could not sync data\nCould not get the shop account details\n" +
                             "Please ensure that you are logged in")
+                    userPreferences.saveDoubleValue(1.0)
                 }else {
 
                     val remoteCustomerDto = shopManagerDatabaseApi.fetchAllCompanyCustomers(uniqueCompanyId)
@@ -2537,6 +2549,7 @@ class BackupRepositoryImpl(
                     val remoteBanks =
                         shopManagerDatabaseApi.fetchAllCompanyBanks(uniqueCompanyId)?.data
                             ?: emptyList()
+                    userPreferences.saveDoubleValue(0.50)
 
 
                     userPreferences.saveRepositoryJobMessage("Fetching data from cloud complete...\n" +
@@ -2621,17 +2634,19 @@ class BackupRepositoryImpl(
                         appDatabase.bankAccountDao.deleteAllBanks()
                         appDatabase.bankAccountDao.addBankAccounts(remoteBanks.map { it.toBankEntity() })
                     }
+                    userPreferences.saveDoubleValue(1.0)
                     userPreferences.saveRepositoryJobMessage("Data sync complete")
                 }
             }
             else{
                 Log.d("BackupRepository", "It is not logged in")
+                userPreferences.saveDoubleValue(1.0)
                 userPreferences.saveRepositoryJobMessage("Could not sync data\nYou are not logged in into any account")
-
             }
 
         }catch (e: Exception){
             Log.d("BackupRepository", "Exception is called")
+            userPreferences.saveDoubleValue(1.0)
             userPreferences.saveRepositoryJobMessage("Could not sync data\n${e.message}")
         }
     }

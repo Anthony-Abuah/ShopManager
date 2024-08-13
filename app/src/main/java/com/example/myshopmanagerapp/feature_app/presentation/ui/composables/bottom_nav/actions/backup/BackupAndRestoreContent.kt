@@ -1,5 +1,6 @@
 package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.backup
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,12 +30,12 @@ import com.example.myshopmanagerapp.core.FormRelatedString.SmartBackUpDialogMess
 import com.example.myshopmanagerapp.core.FormRelatedString.SmartRemoteBackUp
 import com.example.myshopmanagerapp.core.FormRelatedString.SmartSync
 import com.example.myshopmanagerapp.core.FormRelatedString.SmartSyncDialogMessage
-import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.UserPreferences
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.SettingsContentCard
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenColumnWithoutBottomBar
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.ConfirmationInfoDialog
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.DeleteConfirmationDialog
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.ProgressBar
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
 import kotlinx.coroutines.launch
 
@@ -45,6 +46,10 @@ fun BackupAndRestoreContent(
     dataBackupConfirmationMessage: String,
     isRestoringDatabase: Boolean,
     dataRestoreConfirmationMessage: String,
+    floatValue: Float,
+    floatFunction: ()-> Unit,
+    repositoryJobMessage: String,
+    repositoryJobFunction: ()-> Unit,
     localBackupData: ()-> Unit,
     localRestoreData: ()-> Unit,
     absoluteRemoteBackup: ()-> Unit,
@@ -68,6 +73,9 @@ fun BackupAndRestoreContent(
     var confirmationInfoDialog by remember {
         mutableStateOf(false)
     }
+    var openProgressBar by remember {
+        mutableStateOf(false)
+    }
     var openRemoteBackupConfirmationDialog by remember {
         mutableStateOf(false)
     }
@@ -86,8 +94,6 @@ fun BackupAndRestoreContent(
     var isAbsoluteSync by remember {
         mutableStateOf<Boolean?>(null)
     }
-    val repositoryJobMessage = userPreferences.getRepositoryJobMessage.collectAsState(initial = emptyString).value
-
     BasicScreenColumnWithoutBottomBar {
         Box(modifier = Modifier
             .fillMaxWidth()
@@ -246,9 +252,10 @@ fun BackupAndRestoreContent(
                 }
                 false->{
                     smartRemoteBackup()
-                    isLoading = repositoryJobMessage.isNullOrBlank()
+                    repositoryJobFunction()
+                    isLoading = false //repositoryJobMessage.isNullOrBlank()
                     dialogMessage = repositoryJobMessage ?: "Unknown outcome"
-                    confirmationInfoDialog = !confirmationInfoDialog
+                    openProgressBar = !openProgressBar
                 }
                 null->{ openRemoteBackupConfirmationDialog = false }
             }
@@ -274,7 +281,7 @@ fun BackupAndRestoreContent(
                 false->{
                     smartSyncData()
                     isLoading = repositoryJobMessage.isNullOrBlank()
-                    dialogMessage = repositoryJobMessage ?: "Unknown outcome"
+                    dialogMessage = repositoryJobMessage.ifBlank { "Unknown outcome" }
                     confirmationInfoDialog = !confirmationInfoDialog
                 }
                 null->{ openSyncDataConfirmationDialog = false }
@@ -294,7 +301,20 @@ fun BackupAndRestoreContent(
     ) {
         confirmationInfoDialog = false
     }
-
+    ProgressBar(
+        openDialog = openProgressBar,
+        title = "Backing up",
+        toastText = null,
+        getProgress = {
+            floatFunction()
+            Log.d("BackupRepository", "BackupAndRestoreContent - float value = $floatValue")
+            openProgressBar = (floatValue != 1f)
+            if (!openProgressBar) confirmationInfoDialog = true
+            return@ProgressBar floatValue
+        }) {
+        openProgressBar = !openProgressBar
+        confirmationInfoDialog = true
+    }
 }
 
 

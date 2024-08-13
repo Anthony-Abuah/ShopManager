@@ -64,7 +64,11 @@ fun BackupAndRestoreScreen(
                 absoluteRemoteBackup = { backupViewModel.absoluteRemoteBackup1() },
                 smartRemoteBackup = { backupViewModel.smartBackup1() },
                 absoluteSyncData = { backupViewModel.absoluteSyncData() },
-                smartSyncData = { backupViewModel.smartSyncData() }
+                smartSyncData = { backupViewModel.smartSyncData() },
+                floatValue = backupViewModel.floatValue,
+                floatFunction = { backupViewModel.getFloatValue() },
+                repositoryJobMessage = backupViewModel.repositoryMessage,
+                repositoryJobFunction = { backupViewModel.getRepositoryMessage() }
             )
         }
     }
