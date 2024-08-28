@@ -41,8 +41,7 @@ fun CreateAndAddReceipt(
     getItemDisplayDialogMessage: (String)-> Unit,
     openOrCloseItemDisplayDialog: ()-> Unit,
     getReceiptItems: (List<ItemQuantityInfo>)-> Unit,
-    closeReceiptView: ()-> Unit,
-
+    closeReceiptView: ()-> Unit
     ) {
     val context = LocalContext.current
 

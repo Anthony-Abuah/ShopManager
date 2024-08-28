@@ -173,7 +173,7 @@ fun AddRevenueContent(
             BasicButton(buttonName = SaveRevenue) {
                 val uniqueRevenueId = generateUniqueRevenueId("${revenue.date.toDateString()}-Amt${revenue.revenueAmount}")
                 when(true){
-                    (revenue.revenueAmount < 1.0)->{
+                    (revenue.revenueAmount < 0.0)->{
                         Toast.makeText(context, "Please enter a valid revenue amount", Toast.LENGTH_LONG).show()
                     }
                     (revenueAmountIsNotValid)->{

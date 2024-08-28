@@ -4,10 +4,7 @@ import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.feature_app.data.local.entities.personnel.PersonnelEntity
 import com.example.myshopmanagerapp.feature_app.data.util.GsonParser
 import com.example.myshopmanagerapp.feature_app.data.util.JsonParser
-import com.example.myshopmanagerapp.feature_app.domain.model.ItemQuantityInfo
-import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
-import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItemWithDate
-import com.example.myshopmanagerapp.feature_app.domain.model.ShopLoginInfo
+import com.example.myshopmanagerapp.feature_app.domain.model.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.time.LocalDate
@@ -70,6 +67,20 @@ object TypeConverters {
         return jsonParser.toJson(
             this,
             object : TypeToken<ShopLoginInfo>(){}.type
+        ) ?: "[]"
+    }
+
+    fun String?.toCompanyOwners(): CompanyOwners {
+        return this?.let {
+            jsonParser.fromJson<CompanyOwners>(
+                it, object : TypeToken<CompanyOwners>(){}.type)
+        }?: emptyList()
+    }
+
+    fun CompanyOwners?.toCompanyOwnersJson(): String{
+        return jsonParser.toJson(
+            this,
+            object : TypeToken<CompanyOwners>(){}.type
         ) ?: "[]"
     }
 

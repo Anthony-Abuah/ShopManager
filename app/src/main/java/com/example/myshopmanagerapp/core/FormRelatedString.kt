@@ -116,7 +116,8 @@ object FormRelatedString{
             "\nNB: This process is irreversible" +
             "\n\nAre you sure want to back up database locally?"
 
-
+    const val UnknownError = "Unknown Error!"
+    const val UniqueCompanyId = "Company_Dedeeappliances_86681"
 
     // Add Debt Questions
     const val SelectDebtDate = "Select the date"
@@ -247,6 +248,8 @@ object FormRelatedString{
     const val UniqueRevenueId = "Unique Revenue Id"
     const val RevenueAmount = "Revenue Amount"
     const val RevenueShortNotes = "Enter short notes"
+
+    const val AddCompanyOwner = "Add company owner"
 
     val ListOfHours = listOf(
         "1 hour",

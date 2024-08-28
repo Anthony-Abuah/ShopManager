@@ -2,7 +2,9 @@ package com.example.myshopmanagerapp.feature_app.data.local.entities.receipt
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.myshopmanagerapp.core.Constants.Cash
 import com.example.myshopmanagerapp.core.Constants.Receipt_Table
+import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.TypeConverters.toItemQuantityInfoListJson
 import com.example.myshopmanagerapp.feature_app.data.remote.dto.receipt.ReceiptInfoDto
@@ -23,7 +25,9 @@ data class ReceiptEntity(
    val personnelName: String?,
    val personnelRole: String?,
    val items: List<ItemQuantityInfo>,
-   val totalAmount: Double = items.sumOf { it.amount }
+   val totalAmount: Double = items.sumOf { it.amount },
+   val paymentMethod: String? = Cash,
+   val transactionId: String? = emptyString
 ){
    fun toReceiptInfo(): ReceiptInfo{
       return ReceiptInfo(
@@ -43,7 +47,9 @@ data class ReceiptEntity(
          personnelRole = personnelRole.toNotNull(),
          items = items.toItemQuantityInfoListJson(),
          totalAmount = totalAmount,
-         uniqueCompanyId = uniqueCompanyId
+         uniqueCompanyId = uniqueCompanyId,
+         paymentMethod.toNotNull(),
+         transactionId.toNotNull()
       )
    }
 

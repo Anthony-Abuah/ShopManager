@@ -21,10 +21,7 @@ import com.example.myshopmanagerapp.core.FormRelatedString.EnterCompanyOwner
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterCompanyProducts
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.feature_app.data.local.entities.company.CompanyEntity
-import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicButton
-import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenColumnWithoutBottomBar
-import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicTextFieldWithTrailingIconError
-import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.DescriptionTextFieldWithTrailingIcon
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.*
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
 
 
@@ -67,6 +64,22 @@ fun RegisterCompanyMoreInfoContent(
             var companyOwners by remember {
                 mutableStateOf(company.companyOwners.toNotNull())
             }
+            CompanyOwnersBox(
+                ownersNames = companyOwners,
+                getCompanyOwners = {
+                companyOwners = it
+            })
+        }
+
+        /*
+        // Company Owners
+        Box(
+            modifier = Modifier.padding(LocalSpacing.current.smallMedium),
+            contentAlignment = Alignment.Center
+        ) {
+            var companyOwners by remember {
+                mutableStateOf(company.companyOwners.toNotNull())
+            }
             BasicTextFieldWithTrailingIconError(
                 value = companyOwners,
                 onValueChange = {
@@ -81,6 +94,8 @@ fun RegisterCompanyMoreInfoContent(
                 keyboardType = KeyboardType.Text
             )
         }
+
+        */
 
         // Company products or services
         Box(

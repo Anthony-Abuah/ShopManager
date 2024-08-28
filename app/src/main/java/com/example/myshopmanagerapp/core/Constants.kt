@@ -70,7 +70,9 @@ object Constants{
     const val Unit = "Unit"
     const val ZERO = 0
     const val ONE = 1
+    const val Cash = "Cash"
     const val emptyString = ""
+    const val UnknownError = "Unknown Error!"
     const val Zero = "0"
     const val zero = "0.0"
 
@@ -90,7 +92,7 @@ object Constants{
 
     const val RegisterMessage = "registerMessage"
     const val IOException_HttpException = "IOExceptionOrHttpException"
-    const val IOException_HttpExceptionMessage = "IOExceptionOrHttpExceptionMessage"
+    const val ExceptionOrErrorMessage = "ExceptionOrErrorMessage"
     const val ShopInfo = "shopInfo"
     const val IsRegistered = "isRegistered"
     const val ListOfShopLoginInfo = "listOfShopLoginInfo"

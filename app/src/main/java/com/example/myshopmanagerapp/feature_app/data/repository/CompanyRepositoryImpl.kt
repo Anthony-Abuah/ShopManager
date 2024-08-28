@@ -172,7 +172,7 @@ class CompanyRepositoryImpl(
             val isLoggedIn = userPreferences.getLoggedInState.first()
 
             userPreferences.saveIOExceptionOrHttpExceptionState(false)
-            userPreferences.saveIO_ExceptionOrHttpExceptionMessage(emptyString)
+            userPreferences.saveExceptionOrErrorMessage(emptyString)
             userPreferences.saveRepositoryJobMessage(emptyString)
             userPreferences.saveRepositoryJobSuccessValue(false)
             if (isLoggedIn == true){
@@ -253,7 +253,7 @@ class CompanyRepositoryImpl(
                                     Log.d("CompanyRepository", "PostResponseMessage in on failure = ${t.message}")
                                     try {
                                         userPreferences.saveIOExceptionOrHttpExceptionState(true)
-                                        userPreferences.saveIO_ExceptionOrHttpExceptionMessage(t.message ?: "IO Exception")
+                                        userPreferences.saveExceptionOrErrorMessage(t.message ?: "IO Exception")
                                         userPreferences.saveRepositoryJobMessage(emptyString)
                                         userPreferences.saveRepositoryJobSuccessValue(false)
 

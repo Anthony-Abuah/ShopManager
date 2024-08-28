@@ -19,7 +19,7 @@ import com.example.myshopmanagerapp.core.Constants.StringValue
 import com.example.myshopmanagerapp.core.Constants.BankPersonnel
 import com.example.myshopmanagerapp.core.Constants.Currency
 import com.example.myshopmanagerapp.core.Constants.IOException_HttpException
-import com.example.myshopmanagerapp.core.Constants.IOException_HttpExceptionMessage
+import com.example.myshopmanagerapp.core.Constants.ExceptionOrErrorMessage
 import com.example.myshopmanagerapp.core.Constants.PersonnelEntityInfo
 import com.example.myshopmanagerapp.core.Constants.Personnel_IsLoggedIn
 import com.example.myshopmanagerapp.core.Constants.RevenueTypes
@@ -41,7 +41,7 @@ class UserPreferences(private val context: Context) {
         val PERSONNEL_IS_LOGGED_IN = booleanPreferencesKey(Personnel_IsLoggedIn)
         val IS_REGISTERED = booleanPreferencesKey(IsRegistered)
         val THERE_IS_IO_EXCEPTION_HTTP_EXCEPTION = booleanPreferencesKey(IOException_HttpException)
-        val IO_EXCEPTION_HTTP_EXCEPTION_MESSAGE = stringPreferencesKey(IOException_HttpExceptionMessage)
+        val EXCEPTION_OR_ERROR_MESSAGE = stringPreferencesKey(ExceptionOrErrorMessage)
         val LIST_OF_SHOP_LOGIN_INFO = stringPreferencesKey(ListOfShopLoginInfo)
         val PERSONNEL_ENTITY_INFO = stringPreferencesKey(PersonnelEntityInfo)
         val API_RESPONSE_MESSAGE = stringPreferencesKey(RegisterMessage)
@@ -160,12 +160,12 @@ class UserPreferences(private val context: Context) {
     }
 
     //get the API response
-    val getIO_ExceptionOrHttpExceptionMessage: Flow<String?> = context.dataStore.data
-        .map { preferences -> preferences[IO_EXCEPTION_HTTP_EXCEPTION_MESSAGE].toNotNull() }
+    val getExceptionOrErrorMessage: Flow<String?> = context.dataStore.data
+        .map { preferences -> preferences[EXCEPTION_OR_ERROR_MESSAGE].toNotNull() }
 
     //save the API response
-    suspend fun saveIO_ExceptionOrHttpExceptionMessage(value: String) {
-        context.dataStore.edit { preferences -> preferences[IO_EXCEPTION_HTTP_EXCEPTION_MESSAGE] = value }
+    suspend fun saveExceptionOrErrorMessage(value: String) {
+        context.dataStore.edit { preferences -> preferences[EXCEPTION_OR_ERROR_MESSAGE] = value }
     }
 
     //get the Bank Personnel

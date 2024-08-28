@@ -8,7 +8,9 @@ import com.example.myshopmanagerapp.core.Constants.SQLITE_SHMFILE_SUFFIX
 import com.example.myshopmanagerapp.core.Constants.SQLITE_WALFILE_SUFFIX
 import com.example.myshopmanagerapp.core.Constants.ShopAppDatabase
 import com.example.myshopmanagerapp.core.Constants.THEDATABASE_DATABASE_BACKUP_SUFFIX
+import com.example.myshopmanagerapp.core.Constants.UnknownError
 import com.example.myshopmanagerapp.core.Constants.emptyString
+import com.example.myshopmanagerapp.core.FormRelatedString.UniqueCompanyId
 import com.example.myshopmanagerapp.core.Functions.toCompanyEntity
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.Resource
@@ -1824,34 +1826,37 @@ class BackupRepositoryImpl(
     override suspend fun smartBackup1(){
         val context = MyShopManagerApp.applicationContext()
         val userPreferences = UserPreferences(context)
+        var loadingValue = 0.0
         try {
             val isLoggedIn = userPreferences.getLoggedInState.first()
-            val shopInfoJson = userPreferences.getShopInfo.first()
-            //val uniqueCompanyId = shopInfoJson.toCompanyEntity()?.uniqueCompanyId
-            val uniqueCompanyId = "Company_Dedeeappliances_86681"
+            /*val shopInfoJson = userPreferences.getShopInfo.first()
+            val uniqueCompanyId = shopInfoJson.toCompanyEntity()?.uniqueCompanyId*/
+            var uniqueCompanyId: String? = UniqueCompanyId
 
             userPreferences.saveRepositoryJobSuccessValue(false)
             userPreferences.saveRepositoryJobMessage(emptyString)
-            userPreferences.saveDoubleValue(0.0)
+            userPreferences.saveDoubleValue(loadingValue)
             Log.d("BackupRepository", "repository - smartBackup1() - double value = ${userPreferences.getDoubleValue.first().toNotNull()}")
 
             when(true){
                 (isLoggedIn != true)->{
                     userPreferences.saveRepositoryJobSuccessValue(false)
                     userPreferences.saveRepositoryJobMessage("Could not back up data. \nYou are not logged in into any account")
-                    userPreferences.saveDoubleValue(1.0)
-                    Log.d("BackupRepository", "repository - smartBackup1() - double value = ${userPreferences.getDoubleValue.first().toNotNull()}")
+                    loadingValue = 1.0
+                    userPreferences.saveDoubleValue(loadingValue)
                 }
-                (uniqueCompanyId == null)->{
+                (uniqueCompanyId.isNullOrBlank())->{
                     userPreferences.saveRepositoryJobSuccessValue(false)
-                    userPreferences.saveRepositoryJobMessage("Could not back up data. \nCould not get the shop account details\n" +
-                            "Please ensure that you are logged in")
-                    userPreferences.saveDoubleValue(1.0)
-                    Log.d("BackupRepository", "repository - smartBackup1() - double value = ${userPreferences.getDoubleValue.first().toNotNull()}")
+                    userPreferences.saveRepositoryJobMessage("Could not back up data." +
+                            "\nCould not get the shop account details" +
+                            "\nPlease ensure that you are logged in")
+                    loadingValue = 1.0
+                    userPreferences.saveDoubleValue(loadingValue)
                 }
                 else -> {
                     val additionEntityMarkers  = AdditionEntityMarkers(context)
                     val changesEntityMarkers  = ChangesEntityMarkers(context)
+
                     val allCustomers = appDatabase.customerDao.getAllCustomers()?: emptyList()
                     val addedCustomerIds = additionEntityMarkers.getAddedCustomerIds.first().toUniqueIds().map { it.uniqueId }
                     val customers = allCustomers.filter { addedCustomerIds.contains(it.uniqueCustomerId) }.map { it.toCustomerInfoDto(uniqueCompanyId) }
@@ -1936,25 +1941,21 @@ class BackupRepositoryImpl(
                     val uniqueReceiptIds = changesEntityMarkers.getChangedReceiptIds.first().toUniqueIds()
                     val uniqueCashInIds = changesEntityMarkers.getChangedCashInIds.first().toUniqueIds()
 
-                    userPreferences.saveRepositoryJobSuccessValue(false)
-                    userPreferences.saveRepositoryJobMessage("All data to be backed up is loaded.\n" +
-                            "Is backing up data...")
-                    userPreferences.saveDoubleValue(0.5)
-                    Log.d("BackupRepository", "repository - smartBackup1() - double value = ${userPreferences.getDoubleValue.first().toNotNull()}")
+                    userPreferences.saveRepositoryJobMessage("All data to be backed up is loaded.\n" + "Is backing up data...")
+                    loadingValue = loadingValue.plus(0.52)
+                    userPreferences.saveDoubleValue(loadingValue)
 
                     if (expenses.isNotEmpty() || uniqueExpenseIds.isNotEmpty()) {
-                        Log.d("BackupRepository", "Expense is not empty is called")
                         userPreferences.saveRepositoryJobMessage("Is backing up expenses...")
-
                         val call = shopManagerDatabaseApi.smartBackUpExpenses(uniqueCompanyId, SmartExpenses( expenses, uniqueExpenseIds))
-                        Log.d("BackupRepository", "smart backup expense api is called")
                         call!!.enqueue(object : Callback<AddEntitiesResponse> {
                             override fun onResponse(
                                 call: Call<AddEntitiesResponse>,
                                 response: Response<AddEntitiesResponse>
                             ) {
-                                Log.d("BackupRepository", "Expense data back up is successful")
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    loadingValue = loadingValue.plus(0.03)
+                                    userPreferences.saveDoubleValue(loadingValue)
                                     val data = response.body()?.data.toNotNull()
                                     val message = response.body()?.message.toNotNull()
                                     userPreferences.saveRepositoryJobMessage("$data\n$message")
@@ -1964,18 +1965,21 @@ class BackupRepositoryImpl(
                             }
 
                             override fun onFailure(call: Call<AddEntitiesResponse>, t: Throwable) {
+
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
-                                    userPreferences.saveRepositoryJobMessage("${t.message} \nUnknown error\n" +
+                                    userPreferences.saveRepositoryJobSuccessValue(false)
+                                    userPreferences.saveRepositoryJobMessage("${ if(t.message.isNullOrBlank()) UnknownError else t.message} \n" +
                                             "Unable to backup expenses")
-                                    Log.d("BackupRepository", "Expense  data back up failed G.S" +
-                                            "\n${t.message}")
                                 }
                             }
                         })
                     }
+                    else{
+                        loadingValue = loadingValue.plus(0.03)
+                        userPreferences.saveDoubleValue(loadingValue)
+                    }
 
                     if (customers.isNotEmpty() || uniqueCustomerIds.isNotEmpty()) {
-                        Log.d("BackupRepository", "Customer is not empty is called")
                         userPreferences.saveRepositoryJobMessage("Is backing up customers...")
                         val call = shopManagerDatabaseApi.smartBackUpCustomers(uniqueCompanyId, SmartCustomers( customers, uniqueCustomerIds))
                         call!!.enqueue(object : Callback<AddEntitiesResponse> {
@@ -1984,13 +1988,13 @@ class BackupRepositoryImpl(
                                 response: Response<AddEntitiesResponse>
                             ) {
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    loadingValue = loadingValue.plus(0.03)
+                                    userPreferences.saveDoubleValue(loadingValue)
+                                                                        loadingValue = loadingValue.plus(0.03)
+                                    userPreferences.saveDoubleValue(loadingValue)
                                     val data = response.body()?.data.toNotNull()
                                     val message = response.body()?.message.toNotNull()
                                     userPreferences.saveRepositoryJobMessage("$data\n$message")
-                                    Log.d(
-                                        "BackupRepository",
-                                        "Revenue data is emitted successfully"
-                                    )
                                     additionEntityMarkers.saveAddedCustomerIds(emptyString)
                                     changesEntityMarkers.saveChangedCustomerIds(emptyString)
                                 }
@@ -2000,14 +2004,13 @@ class BackupRepositoryImpl(
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
                                     userPreferences.saveRepositoryJobMessage("${t.message} \nUnknown error\n" +
                                             "Unable to backup customers")
-                                    Log.d(
-                                        "BackupRepository",
-                                        "Customer data is emitted with failure"
-                                                +
-                                                "\n${t.message}")
                                 }
                             }
                         })
+                    }
+                    else{
+                        loadingValue = loadingValue.plus(0.03)
+                        userPreferences.saveDoubleValue(loadingValue)
                     }
 
                     if (suppliers.isNotEmpty() || uniqueSupplierIds.isNotEmpty()) {
@@ -2018,6 +2021,8 @@ class BackupRepositoryImpl(
                                 response: Response<AddEntitiesResponse>
                             ) {
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    loadingValue = loadingValue.plus(0.03)
+                                    userPreferences.saveDoubleValue(loadingValue)
                                     val data = response.body()?.data.toNotNull()
                                     val message = response.body()?.message.toNotNull()
                                     userPreferences.saveRepositoryJobMessage("$data\n$message")
@@ -2034,6 +2039,10 @@ class BackupRepositoryImpl(
                             }
                         })
                     }
+                    else{
+                        loadingValue = loadingValue.plus(0.03)
+                        userPreferences.saveDoubleValue(loadingValue)
+                    }
 
                     if (cashIns.isNotEmpty() || uniqueCashInIds.isNotEmpty()) {
                         Log.d("BackupRepository", "Debt is not empty is called")
@@ -2046,6 +2055,8 @@ class BackupRepositoryImpl(
                             ) {
                                 Log.d("BackupRepository", "Cash in data backup is successful")
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
+                                                                        loadingValue = loadingValue.plus(0.03)
+                                    userPreferences.saveDoubleValue(loadingValue)
                                     val data = response.body()?.data.toNotNull()
                                     val message = response.body()?.message.toNotNull()
                                     userPreferences.saveRepositoryJobMessage("$data\n$message")
@@ -2067,6 +2078,10 @@ class BackupRepositoryImpl(
                             }
                         })
                     }
+                    else{
+                        loadingValue = loadingValue.plus(0.03)
+                        userPreferences.saveDoubleValue(loadingValue)
+                    }
 
                     if (receipts.isNotEmpty() || uniqueReceiptIds.isNotEmpty()) {
                         Log.d("BackupRepository", "Receipt is not empty is called")
@@ -2079,6 +2094,8 @@ class BackupRepositoryImpl(
                             ) {
                                 Log.d("BackupRepository", "Receipt data backup is successful")
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
+                                                                        loadingValue = loadingValue.plus(0.03)
+                                    userPreferences.saveDoubleValue(loadingValue)
                                     val data = response.body()?.data.toNotNull()
                                     val message = response.body()?.message.toNotNull()
                                     userPreferences.saveRepositoryJobMessage("$data\n$message")
@@ -2100,9 +2117,12 @@ class BackupRepositoryImpl(
                             }
                         })
                     }
+                    else{
+                        loadingValue = loadingValue.plus(0.03)
+                        userPreferences.saveDoubleValue(loadingValue)
+                    }
 
                     if (debts.isNotEmpty() || uniqueDebtIds.isNotEmpty()) {
-                        Log.d("BackupRepository", "Debt is not empty is called")
                         userPreferences.saveRepositoryJobMessage("Is backing up debts...")
                         val call = shopManagerDatabaseApi.smartBackUpDebts(uniqueCompanyId, SmartDebts(debts, uniqueDebtIds))
                         call!!.enqueue(object : Callback<AddEntitiesResponse> {
@@ -2110,8 +2130,9 @@ class BackupRepositoryImpl(
                                 call: Call<AddEntitiesResponse>,
                                 response: Response<AddEntitiesResponse>
                             ) {
-                                Log.d("BackupRepository", "Debt data backup is successful")
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    loadingValue = loadingValue.plus(0.03)
+                                    userPreferences.saveDoubleValue(loadingValue)
                                     val data = response.body()?.data.toNotNull()
                                     val message = response.body()?.message.toNotNull()
                                     userPreferences.saveRepositoryJobMessage("$data\n$message")
@@ -2124,14 +2145,13 @@ class BackupRepositoryImpl(
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
                                     userPreferences.saveRepositoryJobMessage("${t.message} \nUnknown error\n" +
                                             "Unable to backup debts")
-                                    Log.d(
-                                        "BackupRepository",
-                                        "Debt data backup is emitted with failure"
-                                    )
                                 }
-                                Log.d("BackupRepository", "Debt data backup failed")
                             }
                         })
+                    }
+                    else{
+                        loadingValue = loadingValue.plus(0.03)
+                        userPreferences.saveDoubleValue(loadingValue)
                     }
 
                     if (debtRepayments.isNotEmpty() || uniqueDebtRepaymentIds.isNotEmpty()) {
@@ -2149,6 +2169,8 @@ class BackupRepositoryImpl(
                                 response: Response<AddEntitiesResponse>
                             ) {
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    loadingValue = loadingValue.plus(0.03)
+                                    userPreferences.saveDoubleValue(loadingValue)
                                     val data = response.body()?.data.toNotNull()
                                     val message = response.body()?.message.toNotNull()
                                     userPreferences.saveRepositoryJobMessage("$data\n$message")
@@ -2165,9 +2187,12 @@ class BackupRepositoryImpl(
                             }
                         })
                     }
+                    else{
+                        loadingValue = loadingValue.plus(0.03)
+                        userPreferences.saveDoubleValue(loadingValue)
+                    }
 
                     if (revenues.isNotEmpty() || uniqueRevenueIds.isNotEmpty()) {
-                        Log.d("BackupRepository", "Revenue is not empty is called")
                         userPreferences.saveRepositoryJobMessage("Is backing up revenues...")
                         val call = shopManagerDatabaseApi.smartBackUpRevenues(uniqueCompanyId, SmartRevenues(revenues, uniqueRevenueIds))
                         call!!.enqueue(object : Callback<AddEntitiesResponse> {
@@ -2175,15 +2200,12 @@ class BackupRepositoryImpl(
                                 call: Call<AddEntitiesResponse>,
                                 response: Response<AddEntitiesResponse>
                             ) {
-                                Log.d("BackupRepository", "Revenue data backup is successful")
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    loadingValue = loadingValue.plus(0.03)
+                                    userPreferences.saveDoubleValue(loadingValue)
                                     val data = response.body()?.data.toNotNull()
                                     val message = response.body()?.message.toNotNull()
                                     userPreferences.saveRepositoryJobMessage("$data\n$message")
-                                    Log.d(
-                                        "BackupRepository",
-                                        "Revenue data is emitted successfully"
-                                    )
                                     additionEntityMarkers.saveAddedRevenueIds(emptyString)
                                     changesEntityMarkers.saveChangedRevenueIds(emptyString)
                                 }
@@ -2193,14 +2215,13 @@ class BackupRepositoryImpl(
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
                                     userPreferences.saveRepositoryJobMessage("${t.message} \nUnknown error\n" +
                                             "Unable to backup revenues")
-                                    Log.d(
-                                        "BackupRepository",
-                                        "Revenue data is emitted with failure"
-                                                +
-                                                "\n${t.message}")
                                 }
                             }
                         })
+                    }
+                    else{
+                        loadingValue = loadingValue.plus(0.03)
+                        userPreferences.saveDoubleValue(loadingValue)
                     }
 
                     if (inventories.isNotEmpty() || uniqueInventoryIds.isNotEmpty()) {
@@ -2212,6 +2233,8 @@ class BackupRepositoryImpl(
                                 response: Response<AddEntitiesResponse>
                             ) {
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
+                                                                        loadingValue = loadingValue.plus(0.03)
+                                    userPreferences.saveDoubleValue(loadingValue)
                                     val data = response.body()?.data.toNotNull()
                                     val message = response.body()?.message.toNotNull()
                                     userPreferences.saveRepositoryJobMessage("$data\n$message")
@@ -2227,6 +2250,10 @@ class BackupRepositoryImpl(
                                 }
                             }
                         })
+                    }
+                    else{
+                        loadingValue = loadingValue.plus(0.03)
+                        userPreferences.saveDoubleValue(loadingValue)
                     }
 
                     if (inventoryItems.isNotEmpty() || uniqueInventoryItemIds.isNotEmpty()) {
@@ -2245,6 +2272,8 @@ class BackupRepositoryImpl(
                                 response: Response<AddEntitiesResponse>
                             ) {
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
+                                                                        loadingValue = loadingValue.plus(0.03)
+                                    userPreferences.saveDoubleValue(loadingValue)
                                     val data = response.body()?.data.toNotNull()
                                     val message = response.body()?.message.toNotNull()
                                     userPreferences.saveRepositoryJobMessage("$data\n$message")
@@ -2260,6 +2289,10 @@ class BackupRepositoryImpl(
                                 }
                             }
                         })
+                    }
+                    else{
+                        loadingValue = loadingValue.plus(0.03)
+                        userPreferences.saveDoubleValue(loadingValue)
                     }
 
                     if (inventoryStocks.isNotEmpty() || uniqueInventoryStockIds.isNotEmpty()) {
@@ -2277,6 +2310,8 @@ class BackupRepositoryImpl(
                                 response: Response<AddEntitiesResponse>
                             ) {
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
+                                                                        loadingValue = loadingValue.plus(0.03)
+                                    userPreferences.saveDoubleValue(loadingValue)
                                     val data = response.body()?.data.toNotNull()
                                     val message = response.body()?.message.toNotNull()
                                     userPreferences.saveRepositoryJobMessage("$data\n$message")
@@ -2293,6 +2328,10 @@ class BackupRepositoryImpl(
                             }
                         })
                     }
+                    else{
+                        loadingValue = loadingValue.plus(0.03)
+                        userPreferences.saveDoubleValue(loadingValue)
+                    }
 
                     if (stocks.isNotEmpty() || uniqueStockIds.isNotEmpty()) {
                         userPreferences.saveRepositoryJobMessage("Is backing up stocks...")
@@ -2303,6 +2342,8 @@ class BackupRepositoryImpl(
                                 response: Response<AddEntitiesResponse>
                             ) {
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
+                                                                        loadingValue = loadingValue.plus(0.03)
+                                    userPreferences.saveDoubleValue(loadingValue)
                                     val data = response.body()?.data.toNotNull()
                                     val message = response.body()?.message.toNotNull()
                                     userPreferences.saveRepositoryJobMessage("$data\n$message")
@@ -2319,6 +2360,10 @@ class BackupRepositoryImpl(
                             }
                         })
                     }
+                    else{
+                        loadingValue = loadingValue.plus(0.03)
+                        userPreferences.saveDoubleValue(loadingValue)
+                    }
 
                     if (personnel.isNotEmpty() || uniquePersonnelIds.isNotEmpty()) {
                         Log.d("BackupRepository", "Personnel is not empty is called")
@@ -2332,6 +2377,8 @@ class BackupRepositoryImpl(
                             ) {
                                 Log.d("BackupRepository", "Personnel data backup is successful")
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
+                                                                        loadingValue = loadingValue.plus(0.03)
+                                    userPreferences.saveDoubleValue(loadingValue)
                                     val data = response.body()?.data.toNotNull()
                                     val message = response.body()?.message.toNotNull()
                                     userPreferences.saveRepositoryJobMessage("$data\n$message")
@@ -2356,6 +2403,10 @@ class BackupRepositoryImpl(
                             }
                         })
                     }
+                    else{
+                        loadingValue = loadingValue.plus(0.03)
+                        userPreferences.saveDoubleValue(loadingValue)
+                    }
 
                     if (savings.isNotEmpty() || uniqueSavingsIds.isNotEmpty()) {
                         Log.d("BackupRepository", "Savings is not empty is called")
@@ -2366,8 +2417,9 @@ class BackupRepositoryImpl(
                                 call: Call<AddEntitiesResponse>,
                                 response: Response<AddEntitiesResponse>
                             ) {
-                                Log.d("BackupRepository", "Savings data backup is successful")
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
+                                                                        loadingValue = loadingValue.plus(0.03)
+                                    userPreferences.saveDoubleValue(loadingValue)
                                     val data = response.body()?.data.toNotNull()
                                     val message = response.body()?.message.toNotNull()
                                     userPreferences.saveRepositoryJobMessage("$data\n$message")
@@ -2385,6 +2437,10 @@ class BackupRepositoryImpl(
                             }
                         })
                     }
+                    else{
+                        loadingValue = loadingValue.plus(0.03)
+                        userPreferences.saveDoubleValue(loadingValue)
+                    }
 
                     if (withdrawals.isNotEmpty() || uniqueWithdrawalIds.isNotEmpty()) {
                         Log.d("BackupRepository", "Withdrawal is not empty is called")
@@ -2396,8 +2452,9 @@ class BackupRepositoryImpl(
                                 call: Call<AddEntitiesResponse>,
                                 response: Response<AddEntitiesResponse>
                             ) {
-                                Log.d("BackupRepository", "Withdrawal data backup is successful")
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
+                                                                        loadingValue = loadingValue.plus(0.03)
+                                    userPreferences.saveDoubleValue(loadingValue)
                                     val data = response.body()?.data.toNotNull()
                                     val message = response.body()?.message.toNotNull()
                                     userPreferences.saveRepositoryJobMessage("$data\n$message")
@@ -2414,6 +2471,10 @@ class BackupRepositoryImpl(
                             }
                         })
                     }
+                    else{
+                        loadingValue = loadingValue.plus(0.03)
+                        userPreferences.saveDoubleValue(loadingValue)
+                    }
 
                     if (bankAccounts.isNotEmpty() || uniqueBankAccountIds.isNotEmpty()) {
                         Log.d("BackupRepository", "Bank is not empty is called")
@@ -2423,8 +2484,9 @@ class BackupRepositoryImpl(
                                 call: Call<AddEntitiesResponse>,
                                 response: Response<AddEntitiesResponse>
                             ) {
-                                Log.d("BackupRepository", "Bank data backup is successful")
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
+                                    loadingValue = loadingValue.plus(0.03)
+                                    userPreferences.saveDoubleValue(loadingValue)
                                     val data = response.body()?.data.toNotNull()
                                     val message = response.body()?.message.toNotNull()
                                     userPreferences.saveRepositoryJobMessage("$data\n$message")
@@ -2441,8 +2503,12 @@ class BackupRepositoryImpl(
                             }
                         })
                     }
+                    else{
+                        loadingValue = loadingValue.plus(0.03)
+                        userPreferences.saveDoubleValue(loadingValue)
+                    }
+
                     userPreferences.saveRepositoryJobMessage("Smart back up complete")
-                    userPreferences.saveDoubleValue(1.0)
                     Log.d("BackupRepository", "repository - smartBackup1() - double value = ${userPreferences.getDoubleValue.first().toNotNull()}")
                 }
             }
