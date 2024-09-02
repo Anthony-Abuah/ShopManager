@@ -1,5 +1,6 @@
 package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.start_app.register_company.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -44,10 +45,15 @@ fun RegisterCompanyPasswordScreen(
                 addCompanyEmail = {email-> companyViewModel.addEmail(email)},
                 addCompanyPassword = {password-> companyViewModel.addPassword(password)},
                 addPasswordConfirmation = {password-> companyViewModel.addPasswordConfirmation(password)},
-                addCompany = {company-> companyViewModel.registerShopAccount(company, companyViewModel.passwordConfirmation)},
+                addCompany = {company->
+                    companyViewModel.registerShopAccount(company, companyViewModel.passwordConfirmation)
+                    Log.d("RegisterCompanyPasswordScreen", "(RegisterCompanyPasswordScreen) Company Owners(inside) = ${company.companyOwners}")
+                },
             ) {
                 navigateToRegisterPersonnelScreen()
             }
+            Log.d("RegisterCompanyPasswordScreen", "(RegisterCompanyPasswordScreen) Company Owners(outside) = ${companyViewModel.addCompanyInfo.companyOwners}")
+
         }
     }
 }

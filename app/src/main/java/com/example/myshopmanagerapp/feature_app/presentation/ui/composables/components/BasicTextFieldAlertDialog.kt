@@ -48,7 +48,9 @@ fun BasicTextFieldAlertDialog(
                     .padding(LocalSpacing.current.noPadding)
                     .fillMaxWidth(),
                 onDismissRequest = {
-                    Toast.makeText(context, unconfirmedUpdatedToastText, Toast.LENGTH_LONG).show()
+                    if (unconfirmedUpdatedToastText != null) {
+                        Toast.makeText(context, unconfirmedUpdatedToastText, Toast.LENGTH_LONG).show()
+                    }
                     closeDialog()
                 },
                 title = {

@@ -1,5 +1,6 @@
 package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.profile.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -64,6 +65,7 @@ fun ProfileScreen(
                 openRegisterPage = { openSignUpPage() },
                 openLoginPage = { openLoginPage() },
             )
+            Log.d("ProfileScreen", "company info Json = ${shopInfo.toCompanyEntity()}")
         }
     }
 }

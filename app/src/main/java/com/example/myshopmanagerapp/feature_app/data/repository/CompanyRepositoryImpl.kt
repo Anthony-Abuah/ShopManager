@@ -184,14 +184,10 @@ class CompanyRepositoryImpl(
                 val passwordIsNotValid = !passwordIsValid(company.password, company.companyName, company.email)
                 when(true){
                     (company.password != confirmedPassword)->{
-                        Log.d("CompanyRepository", "Unmatched password is called")
-                        Log.d("CompanyRepository", "flow of unmatched password is called")
                         userPreferences.saveRepositoryJobSuccessValue(false)
                         userPreferences.saveRepositoryJobMessage("Passwords do not match")
                     }
                     (invalidParameters)->{
-                        Log.d("CompanyRepository", "Invalid parameter is called")
-                        Log.d("CompanyRepository", "flow of invalid parameters is called")
                         userPreferences.saveRepositoryJobSuccessValue(false)
                         userPreferences.saveRepositoryJobMessage("Please make sure that all required fields are filled appropriately")
                     }
@@ -200,23 +196,15 @@ class CompanyRepositoryImpl(
                         userPreferences.saveRepositoryJobMessage("Password is not valid.\nPlease make sure that the password does not contain email or company name and password length is more than 7 characters")
                     }
                     else->{
-                        Log.d("CompanyRepository", "Api call enqueue is called")
                         val call = shopManagerDatabaseApi.addCompany(company.toCompanyDto())
                         call!!.enqueue(object : Callback<AddCompanyResponse> {
                             override fun onResponse(
                                 call: Call<AddCompanyResponse>,
                                 response: Response<AddCompanyResponse>
                             ) {
-                                Log.d("CompanyRepository", "Is successfully registered shop is called")
                                 val isRegisteredSuccessfully = response.body()?.data != null
-                                Log.d("CompanyRepository", "the api registered value: $isRegisteredSuccessfully")
-                                Log.d("CompanyRepository", "Emits on response success")
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
                                     if (isRegisteredSuccessfully) {
-                                        Log.d(
-                                            "CompanyRepository",
-                                            "This global scope success coroutine block gets called"
-                                        )
                                         val responseInfo = response.body()?.data?.toCompanyInfoDto()
                                         val registeredAccountInfo = responseInfo?.toCompanyEntity()?.toCompanyEntityJson()
                                         registeredAccountInfo?.let {
@@ -227,18 +215,11 @@ class CompanyRepositoryImpl(
                                             userPreferences.saveRepositoryJobSuccessValue(true)
                                             userPreferences.saveRepositoryJobMessage("Account created successfully")
                                         }
-                                    } else {
+                                    }
+                                    else {
                                         userPreferences.saveRepositoryJobSuccessValue(false)
                                         userPreferences.saveRepositoryJobMessage(response.body()?.message.toNotNull())
 
-                                        Log.d(
-                                            "CompanyRepository",
-                                            "Emits server failure in global scope"
-                                        )
-                                        Log.d(
-                                            "CompanyRepository",
-                                            "Unable to register message is : ${response.body()?.message.toNotNull()}"
-                                        )
                                     }
                                 }
                             }
@@ -249,8 +230,6 @@ class CompanyRepositoryImpl(
                                 GlobalScope.launch(Dispatchers.IO + Job()) {
                                     userPreferences.saveRepositoryJobSuccessValue(false)
                                     userPreferences.saveRepositoryJobMessage(t.message.toNotNull())
-                                    Log.d("CompanyRepository", "Emits on failure in post enqueue method")
-                                    Log.d("CompanyRepository", "PostResponseMessage in on failure = ${t.message}")
                                     try {
                                         userPreferences.saveIOExceptionOrHttpExceptionState(true)
                                         userPreferences.saveExceptionOrErrorMessage(t.message ?: "IO Exception")
@@ -260,17 +239,14 @@ class CompanyRepositoryImpl(
                                         if (isLoggedIn == true) {
                                             userPreferences.saveRepositoryJobSuccessValue(false)
                                             userPreferences.saveRepositoryJobMessage("You are already logged in")
-                                        } else {
+                                        }
+                                        else {
                                             when (true) {
                                                 (company.password != confirmedPassword) -> {
-                                                    Log.d("CompanyRepository", "Unmatched password is called")
-                                                    Log.d("CompanyRepository", "flow of unmatched password is called")
                                                     userPreferences.saveRepositoryJobSuccessValue(false)
                                                     userPreferences.saveRepositoryJobMessage("Passwords do not match")
                                                 }
                                                 (invalidParameters) -> {
-                                                    Log.d("CompanyRepository", "Invalid parameter is called")
-                                                    Log.d("CompanyRepository", "flow of invalid parameters is called")
                                                     userPreferences.saveRepositoryJobSuccessValue(false)
                                                     userPreferences.saveRepositoryJobMessage("Please make sure that all required fields are filled appropriately")
                                                 }
@@ -287,10 +263,6 @@ class CompanyRepositoryImpl(
                                         }
                                     }
                                     catch (e: Exception){
-                                        Log.d(
-                                            "CompanyRepository",
-                                            "General exception is called under IO Exception"
-                                        )
                                         userPreferences.saveRepositoryJobSuccessValue(false)
                                         userPreferences.saveRepositoryJobMessage(e.message ?: "Unknown error")
                                     }
@@ -302,10 +274,6 @@ class CompanyRepositoryImpl(
             }
         }
         catch (e:Exception){
-            Log.d(
-                "CompanyRepository",
-                "General exception is called"
-            )
             userPreferences.saveRepositoryJobSuccessValue(false)
             userPreferences.saveRepositoryJobMessage(e.message ?: "Unknown error")
         }

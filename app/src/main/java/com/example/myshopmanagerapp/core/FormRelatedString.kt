@@ -53,6 +53,7 @@ object FormRelatedString{
     const val ClickToSyncData = "Click to sync remote data with local data"
     const val ProductsSold = "Products sold"
     const val ShopOwners = "Shop Owner(s)"
+    const val ShopPersonnel = "Shop Personnel"
 
     const val ShopName = "Shop Name"
     const val InventoryItemValue = "Total value of all inventory items"

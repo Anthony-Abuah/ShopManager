@@ -13,11 +13,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.myshopmanagerapp.R
 import com.example.myshopmanagerapp.core.Constants.emptyString
-import com.example.myshopmanagerapp.core.FormRelatedString.CompanyOwnerPlaceholder
 import com.example.myshopmanagerapp.core.FormRelatedString.CompanyProductPlaceholder
 import com.example.myshopmanagerapp.core.FormRelatedString.CompanyShortNotes
 import com.example.myshopmanagerapp.core.FormRelatedString.CompanyShortNotesPlaceholder
-import com.example.myshopmanagerapp.core.FormRelatedString.EnterCompanyOwner
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterCompanyProducts
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.feature_app.data.local.entities.company.CompanyEntity
@@ -33,7 +31,6 @@ fun RegisterCompanyMoreInfoContent(
     addCompanyOtherInfo: (String) -> Unit,
     navigateToNextScreen: () -> Unit,
 ) {
-
 
     BasicScreenColumnWithoutBottomBar {
         Spacer(modifier = Modifier.height(LocalSpacing.current.large))
@@ -67,35 +64,11 @@ fun RegisterCompanyMoreInfoContent(
             CompanyOwnersBox(
                 ownersNames = companyOwners,
                 getCompanyOwners = {
-                companyOwners = it
+                    companyOwners = it
+                    addCompanyOwners(companyOwners)
             })
         }
 
-        /*
-        // Company Owners
-        Box(
-            modifier = Modifier.padding(LocalSpacing.current.smallMedium),
-            contentAlignment = Alignment.Center
-        ) {
-            var companyOwners by remember {
-                mutableStateOf(company.companyOwners.toNotNull())
-            }
-            BasicTextFieldWithTrailingIconError(
-                value = companyOwners,
-                onValueChange = {
-                    companyOwners = it
-                    addCompanyOwners(companyOwners)
-                },
-                isError = false,
-                readOnly = false,
-                placeholder = CompanyOwnerPlaceholder,
-                label = EnterCompanyOwner,
-                icon = R.drawable.ic_person_filled,
-                keyboardType = KeyboardType.Text
-            )
-        }
-
-        */
 
         // Company products or services
         Box(

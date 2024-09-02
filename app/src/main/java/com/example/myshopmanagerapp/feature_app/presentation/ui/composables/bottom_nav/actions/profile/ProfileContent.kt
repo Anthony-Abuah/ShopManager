@@ -38,11 +38,14 @@ import com.example.myshopmanagerapp.core.FormRelatedString.Location
 import com.example.myshopmanagerapp.core.FormRelatedString.ProductsSold
 import com.example.myshopmanagerapp.core.FormRelatedString.ShopName
 import com.example.myshopmanagerapp.core.FormRelatedString.ShopOwners
+import com.example.myshopmanagerapp.core.FormRelatedString.ShopPersonnel
 import com.example.myshopmanagerapp.core.Functions.toDateString
 import com.example.myshopmanagerapp.core.Functions.toEllipses
 import com.example.myshopmanagerapp.core.Functions.toLocalDate
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.Functions.toTimestamp
+import com.example.myshopmanagerapp.core.TypeConverters.toCompanyOwners
+import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntities
 import com.example.myshopmanagerapp.feature_app.data.local.entities.company.CompanyEntity
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.*
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.*
@@ -59,6 +62,7 @@ fun ProfileContent(
     openLoginPage: ()-> Unit,
     openRegisterPage: ()-> Unit,
 ) {
+    val backgroundColor = if (isSystemInDarkTheme()) Grey5 else Color.White
     val mainBackgroundColor = if (isSystemInDarkTheme()) Grey10 else Grey99
     val alternateBackgroundColor = if (isSystemInDarkTheme()) Grey15 else Grey95
     val cardBackgroundColor = if (isSystemInDarkTheme()) Grey15 else BlueGrey90
@@ -80,6 +84,7 @@ fun ProfileContent(
     var confirmLogout by remember {
         mutableStateOf(false)
     }
+
     if (isLoggedIn.not()) {
         Column(
             modifier = Modifier
@@ -171,10 +176,15 @@ fun ProfileContent(
     }
 
     else {
-        BasicScreenColumnWithoutBottomBar {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(backgroundColor)
+        ) {
             val shopName = shopInfo?.companyName?.toNotNull().toEllipses(30)
             val contact = "Contact: ${shopInfo?.companyContact?.toNotNull().toEllipses(25)}"
             val location = "Location: ${shopInfo?.companyLocation?.toNotNull().toEllipses(25)}"
+
             Box(modifier = Modifier
                 .background(Color.Transparent)
                 .fillMaxWidth()
@@ -197,296 +207,301 @@ fun ProfileContent(
                 )
             }
 
-            Box(modifier = Modifier
-                .padding(vertical = LocalSpacing.current.default)
-                .height(120.dp)
-                .background(Color.Transparent)
-                .fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ){
-                val registeredDate = shopInfo?.dateCreated?.toLocalDate()
-                val registeredDay = registeredDate?.dayOfWeek?.toString()?.lowercase()
-                    ?.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-                val registeredDateString = registeredDate?.toDateString()
-                InfoDisplayCard(
-                    image = R.drawable.days,
-                    imageWidth = 45.dp,
-                    bigText = "$registeredDay, $registeredDateString",
-                    bigTextSize = 18.sp,
-                    smallTextFontWeight = FontWeight.SemiBold,
-                    smallText = "Date Registered",
-                    smallTextSize = 14.sp,
-                    smallTextColor = descriptionColor,
-                    backgroundColor = cardBackgroundColor,
-                    elevation = LocalSpacing.current.small,
-                    isAmount = false
-                )
+            Box(modifier = Modifier.weight(1f)) {
+                BasicScreenColumnWithoutBottomBar {
+                    Box(
+                        modifier = Modifier
+                            .padding(vertical = LocalSpacing.current.default)
+                            .height(120.dp)
+                            .background(Color.Transparent)
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        val registeredDate = shopInfo?.dateCreated?.toLocalDate()
+                        val registeredDay = registeredDate?.dayOfWeek?.toString()?.lowercase()
+                            ?.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+                        val registeredDateString = registeredDate?.toDateString()
+                        InfoDisplayCard(
+                            image = R.drawable.days,
+                            imageWidth = 45.dp,
+                            bigText = "$registeredDay, $registeredDateString",
+                            bigTextSize = 18.sp,
+                            smallTextFontWeight = FontWeight.SemiBold,
+                            smallText = "Date Registered",
+                            smallTextSize = 14.sp,
+                            smallTextColor = descriptionColor,
+                            backgroundColor = cardBackgroundColor,
+                            elevation = LocalSpacing.current.small,
+                            isAmount = false
+                        )
+                    }
+
+                    Column(
+                        modifier = Modifier
+                            .padding(vertical = LocalSpacing.current.default)
+                            .background(alternateBackgroundColor),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Top,
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .background(Color.Transparent)
+                                .padding(LocalSpacing.current.default)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            VerticalDisplayAndEditTextValues(
+                                firstText = ShopName,
+                                firstTextColor = titleColor,
+                                secondText = shopInfo?.companyName.toNotNull()
+                                    .ifBlank { NotAvailable },
+                                secondTextColor = descriptionColor,
+                                value = shopInfo?.companyName.toNotNull().ifBlank { NotAvailable },
+                                leadingIcon = R.drawable.ic_shop_name,
+                                leadingIconWidth = 32.dp,
+                                onBackgroundColor = titleColor,
+                                keyboardType = KeyboardType.Text,
+                                label = EnterCompanyName,
+                                placeholder = CompanyNamePlaceholder,
+                                textFieldIcon = R.drawable.ic_edit,
+                                getUpdatedValue = {}
+                            )
+                        }
+
+
+                        Box(
+                            modifier = Modifier
+                                .background(Color.Transparent)
+                                .padding(LocalSpacing.current.default)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            VerticalDisplayAndEditTextValues(
+                                firstText = Contact,
+                                firstTextColor = titleColor,
+                                secondText = shopInfo?.companyContact.toNotNull()
+                                    .ifBlank { NotAvailable },
+                                secondTextColor = descriptionColor,
+                                value = shopInfo?.companyContact.toNotNull()
+                                    .ifBlank { NotAvailable },
+                                leadingIcon = R.drawable.ic_contact,
+                                leadingIconWidth = 32.dp,
+                                onBackgroundColor = titleColor,
+                                keyboardType = KeyboardType.Phone,
+                                label = EnterCompanyContact,
+                                placeholder = CompanyContactPlaceholder,
+                                textFieldIcon = R.drawable.ic_edit,
+                                getUpdatedValue = {}
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .background(Color.Transparent)
+                                .padding(LocalSpacing.current.default)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            VerticalDisplayAndEditTextValues(
+                                firstText = Location,
+                                firstTextColor = titleColor,
+                                secondText = shopInfo?.companyLocation.toNotNull()
+                                    .ifBlank { NotAvailable },
+                                secondTextColor = descriptionColor,
+                                value = shopInfo?.companyLocation.toNotNull()
+                                    .ifBlank { NotAvailable },
+                                leadingIcon = R.drawable.ic_location,
+                                leadingIconWidth = 32.dp,
+                                onBackgroundColor = titleColor,
+                                keyboardType = KeyboardType.Text,
+                                label = EnterCustomerLocation,
+                                placeholder = CompanyLocationPlaceholder,
+                                textFieldIcon = R.drawable.ic_edit,
+                                getUpdatedValue = {}
+                            )
+                        }
+
+
+                        Box(
+                            modifier = Modifier
+                                .background(Color.Transparent)
+                                .padding(LocalSpacing.current.default)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            VerticalDisplayAndEditTextValues(
+                                firstText = Email,
+                                firstTextColor = titleColor,
+                                secondText = shopInfo?.email.toNotNull().ifBlank { NotAvailable },
+                                secondTextColor = descriptionColor,
+                                value = shopInfo?.email.toNotNull().ifBlank { NotAvailable },
+                                leadingIcon = R.drawable.ic_email,
+                                leadingIconWidth = 32.dp,
+                                onBackgroundColor = titleColor,
+                                label = EnterCompanyEmail,
+                                placeholder = CompanyEmailPlaceholder,
+                                keyboardType = KeyboardType.Email,
+                                textFieldIcon = R.drawable.ic_edit,
+                                getUpdatedValue = {}
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .background(Color.Transparent)
+                                .padding(LocalSpacing.current.default)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            VerticalDisplayAndEditTextValues(
+                                firstText = ProductsSold,
+                                firstTextColor = titleColor,
+                                secondText = shopInfo?.companyProductsAndServices.toNotNull()
+                                    .ifBlank { NotAvailable },
+                                secondTextColor = descriptionColor,
+                                value = emptyString,
+                                leadingIcon = R.drawable.ic_product,
+                                leadingIconWidth = 32.dp,
+                                onBackgroundColor = titleColor,
+                                keyboardType = KeyboardType.Text,
+                                label = EnterCompanyProducts,
+                                placeholder = CompanyProductPlaceholder,
+                                textFieldIcon = R.drawable.ic_edit,
+                                getUpdatedValue = {}
+                            )
+                        }
+
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .padding(vertical = LocalSpacing.current.default)
+                            .height(120.dp)
+                            .background(Color.Transparent)
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        val endDate = shopInfo?.subscriptionEndDate?.toLocalDate()
+                        val endDateDay =
+                            endDate?.dayOfWeek?.toString()?.take(3).toNotNull().lowercase()
+                                .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
+                        val endDateString = endDate?.toDateString().toNotNull()
+                        InfoDisplayCard(
+                            image = R.drawable.days,
+                            imageWidth = 32.dp,
+                            bigText = if (shopInfo?.subscriptionEndDate.toNotNull() > Date().time ) "$endDateDay, $endDateString" else "Not Subscribed",
+                            bigTextSize = 16.sp,
+                            bigTextColor = greenContent,
+                            smallTextFontWeight = FontWeight.SemiBold,
+                            smallText =  if (shopInfo?.subscriptionEndDate.toNotNull() > Date().time ) "Subscription End date" else "Subscribe to access premium features",
+                            smallTextSize = 14.sp,
+                            smallTextColor = descriptionColor,
+                            backgroundColor = cardBackgroundColor,
+                            elevation = LocalSpacing.current.small,
+                            isAmount = false
+                        )
+                    }
+
+
+                    Column(
+                        modifier = Modifier
+                            .padding(vertical = LocalSpacing.current.default)
+                            .background(alternateBackgroundColor),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Top,
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .background(Color.Transparent)
+                                .padding(LocalSpacing.current.noPadding)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            HorizontalDisplayAndEditTextValues(
+                                modifier = Modifier.padding(
+                                    horizontal = LocalSpacing.current.smallMedium,
+                                    vertical = LocalSpacing.current.default,
+                                ),
+                                leadingIcon = null,
+                                firstText = "Other Information",
+                                firstTextSize = 14.sp,
+                                secondText = emptyString,
+                                readOnly = true
+                            )
+                        }
+
+
+                        Box(
+                            modifier = Modifier
+                                .background(mainBackgroundColor)
+                                .padding(LocalSpacing.current.default)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            val owners = shopInfo?.companyOwners.toNotNull().toCompanyOwners().map { it.name }
+                            val ownersString  = owners.joinToString(separator = ",\n")
+                            VerticalDisplayAndEditTextValues(
+                                readOnly = true,
+                                modifier = Modifier.fillMaxWidth(),
+                                firstText = ShopOwners,
+                                firstTextColor = titleColor,
+                                secondText = ownersString,
+                                secondTextColor = descriptionColor,
+                                value = emptyString,
+                                leadingIcon = R.drawable.ic_person_filled,
+                                leadingIconWidth = 32.dp,
+                                onBackgroundColor = titleColor,
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .background(mainBackgroundColor)
+                                .padding(LocalSpacing.current.default)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            val personnel = shopInfo?.companyPersonnel.toNotNull().toPersonnelEntities().map { "${it.firstName} ${it.lastName}${if (!it.otherNames.isNullOrBlank()) ", ".plus(it.otherNames) else emptyString }" }
+                            val personnelString  = if(personnel.isEmpty()) NotAvailable else personnel.joinToString(separator = ",\n")
+                            VerticalDisplayAndEditTextValues(
+                                readOnly = true,
+                                modifier = Modifier.fillMaxWidth(),
+                                firstText = ShopPersonnel,
+                                firstTextColor = titleColor,
+                                secondText = personnelString,
+                                secondTextColor = descriptionColor,
+                                value = emptyString,
+                                leadingIcon = R.drawable.ic_person_filled,
+                                leadingIconWidth = 32.dp,
+                                onBackgroundColor = titleColor,
+                            )
+                        }
+
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .background(Color.Transparent)
+                            .padding(
+                                vertical = LocalSpacing.current.medium,
+                                horizontal = LocalSpacing.current.default
+                            )
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        HomeCard(
+                            title = "Logout",
+                            description = "Click here to log out",
+                            icon = R.drawable.ic_logout,
+                            titleColor = logoutContent,
+                            descriptionColor = logoutContentLight,
+                            cardContainerColor = logoutBackground,
+                            cardShadowColor = shadowColor
+                        ) { confirmLogout = !confirmLogout }
+                    }
+                }
             }
 
-            Column(
-                modifier = Modifier
-                    .padding(vertical = LocalSpacing.current.default)
-                    .background(alternateBackgroundColor, MaterialTheme.shapes.large),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top,
-            ) {
-
-                Box(
-                    modifier = Modifier
-                        .background(Color.Transparent)
-                        .padding(LocalSpacing.current.default)
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    VerticalDisplayAndEditTextValues(
-                        firstText = ShopName,
-                        firstTextColor = titleColor,
-                        secondText = shopInfo?.companyName.toNotNull().ifBlank { NotAvailable },
-                        secondTextColor = descriptionColor,
-                        value = shopInfo?.companyName.toNotNull().ifBlank { NotAvailable },
-                        leadingIcon = R.drawable.ic_shop_name,
-                        leadingIconWidth = 32.dp,
-                        onBackgroundColor = titleColor,
-                        keyboardType = KeyboardType.Text,
-                        label = EnterCompanyName,
-                        placeholder = CompanyNamePlaceholder,
-                        textFieldIcon = R.drawable.ic_edit,
-                        getUpdatedValue = {}
-                    )
-                }
-
-
-                Box(
-                    modifier = Modifier
-                        .background(Color.Transparent)
-                        .padding(LocalSpacing.current.default)
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    VerticalDisplayAndEditTextValues(
-                        firstText = Contact,
-                        firstTextColor = titleColor,
-                        secondText = shopInfo?.companyContact.toNotNull().ifBlank { NotAvailable },
-                        secondTextColor = descriptionColor,
-                        value = shopInfo?.companyContact.toNotNull().ifBlank { NotAvailable },
-                        leadingIcon = R.drawable.ic_contact,
-                        leadingIconWidth = 32.dp,
-                        onBackgroundColor = titleColor,
-                        keyboardType = KeyboardType.Phone,
-                        label = EnterCompanyContact,
-                        placeholder = CompanyContactPlaceholder,
-                        textFieldIcon = R.drawable.ic_edit,
-                        getUpdatedValue = {}
-                    )
-                }
-
-                Box(
-                    modifier = Modifier
-                        .background(Color.Transparent)
-                        .padding(LocalSpacing.current.default)
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    VerticalDisplayAndEditTextValues(
-                        firstText = Location,
-                        firstTextColor = titleColor,
-                        secondText = shopInfo?.companyLocation.toNotNull().ifBlank { NotAvailable },
-                        secondTextColor = descriptionColor,
-                        value = shopInfo?.companyLocation.toNotNull().ifBlank { NotAvailable },
-                        leadingIcon = R.drawable.ic_location,
-                        leadingIconWidth = 32.dp,
-                        onBackgroundColor = titleColor,
-                        keyboardType = KeyboardType.Text,
-                        label = EnterCustomerLocation,
-                        placeholder = CompanyLocationPlaceholder,
-                        textFieldIcon = R.drawable.ic_edit,
-                        getUpdatedValue = {}
-                    )
-                }
-            }
-
-
-            Row(
-                modifier = Modifier
-                    .padding(vertical = LocalSpacing.current.default),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-            ){
-                Box(modifier = Modifier
-                    .background(Color.Transparent)
-                    .weight(1f)
-                    .height(120.dp)
-                    .padding(horizontal = LocalSpacing.current.small),
-                    contentAlignment = Alignment.Center
-                ){
-                    val isSubscribed = shopInfo?.subscriptionPackage.isNullOrBlank()
-                    InfoDisplayCard(
-                        image = if (!isSubscribed) R.drawable.ic_check else R.drawable.ic_cancel,
-                        imageWidth = 32.dp,
-                        bigText = "\n${shopInfo?.subscriptionPackage.toNotNull().ifBlank { "Not Subscribed" }}",
-                        bigTextSize = 18.sp,
-                        bigTextColor = greenContent,
-                        smallTextFontWeight = FontWeight.SemiBold,
-                        smallText = emptyString,
-                        smallTextSize = 2.sp,
-                        smallTextColor = greenContentLight,
-                        backgroundColor = cardBackgroundColor,
-                        elevation = LocalSpacing.current.small,
-                        isAmount = false
-                    )
-                }
-
-                Box(modifier = Modifier
-                    .background(Color.Transparent)
-                    .weight(1f)
-                    .height(120.dp)
-                    .padding(horizontal = LocalSpacing.current.small),
-                    contentAlignment = Alignment.Center
-                ){
-                    val endDate = shopInfo?.subscriptionEndDate?.toLocalDate()
-                    val endDateDay = endDate?.dayOfWeek?.toString()?.take(3).toNotNull().lowercase()
-                        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
-                    val endDateString = endDate?.toDateString().toNotNull()
-                    InfoDisplayCard(
-                        image = R.drawable.days,
-                        imageWidth = 32.dp,
-                        bigText = if (endDate.toTimestamp() < Date().time) "$endDateDay, $endDateString" else "Not Subscribed",
-                        bigTextSize = 16.sp,
-                        bigTextColor = greenContent,
-                        smallTextFontWeight = FontWeight.SemiBold,
-                        smallText = "Subscription End date",
-                        smallTextSize = 14.sp,
-                        smallTextColor = descriptionColor,
-                        backgroundColor = cardBackgroundColor,
-                        elevation = LocalSpacing.current.small,
-                        isAmount = false
-                    )
-                }
-            }
-
-            Column(
-                modifier = Modifier
-                    .padding(vertical = LocalSpacing.current.default)
-                    .background(alternateBackgroundColor, MaterialTheme.shapes.large),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top,
-            ) {
-                Box(
-                    modifier = Modifier
-                        .background(Color.Transparent)
-                        .padding(LocalSpacing.current.noPadding)
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    HorizontalDisplayAndEditTextValues(
-                        modifier = Modifier.padding(
-                            horizontal = LocalSpacing.current.smallMedium,
-                            vertical = LocalSpacing.current.default,
-                        ),
-                        leadingIcon = null,
-                        firstText = "Other Information",
-                        firstTextSize = 14.sp,
-                        secondText = emptyString,
-                        readOnly = true
-                    )
-                }
-
-
-                Box(
-                    modifier = Modifier
-                        .background(mainBackgroundColor)
-                        .padding(LocalSpacing.current.default)
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    VerticalDisplayAndEditTextValues(
-                        firstText = Email,
-                        firstTextColor = titleColor,
-                        secondText = shopInfo?.email.toNotNull().ifBlank { NotAvailable },
-                        secondTextColor = descriptionColor,
-                        value = shopInfo?.email.toNotNull().ifBlank { NotAvailable },
-                        leadingIcon = R.drawable.ic_email,
-                        leadingIconWidth = 32.dp,
-                        onBackgroundColor = titleColor,
-                        label = EnterCompanyEmail,
-                        placeholder = CompanyEmailPlaceholder,
-                        keyboardType = KeyboardType.Email,
-                        textFieldIcon = R.drawable.ic_edit,
-                        getUpdatedValue = {}
-                    )
-                }
-
-                Box(
-                    modifier = Modifier
-                        .background(mainBackgroundColor)
-                        .padding(LocalSpacing.current.default)
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    VerticalDisplayAndEditTextValues(
-                        firstText = ProductsSold,
-                        firstTextColor = titleColor,
-                        secondText = shopInfo?.companyProductsAndServices.toNotNull().ifBlank { NotAvailable },
-                        secondTextColor = descriptionColor,
-                        value = shopInfo?.companyProductsAndServices.toNotNull().ifBlank { NotAvailable },
-                        leadingIcon = R.drawable.ic_product,
-                        leadingIconWidth = 32.dp,
-                        onBackgroundColor = titleColor,
-                        keyboardType = KeyboardType.Text,
-                        label = EnterCompanyProducts,
-                        placeholder = CompanyProductPlaceholder,
-                        textFieldIcon = R.drawable.ic_edit,
-                        getUpdatedValue = {}
-                    )
-                }
-
-                Box(
-                    modifier = Modifier
-                        .background(mainBackgroundColor)
-                        .padding(LocalSpacing.current.default)
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    VerticalDisplayAndEditTextValues(
-                        modifier = Modifier.fillMaxWidth(),
-                        firstText = ShopOwners,
-                        firstTextColor = titleColor,
-                        secondText = shopInfo?.companyOwners.toNotNull().ifBlank { NotAvailable },
-                        secondTextColor = descriptionColor,
-                        value = shopInfo?.companyOwners.toNotNull().ifBlank { NotAvailable },
-                        leadingIcon = R.drawable.ic_person_filled,
-                        leadingIconWidth = 32.dp,
-                        onBackgroundColor = titleColor,
-                        keyboardType = KeyboardType.Text,
-                        label = EnterCompanyOwner,
-                        placeholder = CompanyOwnerPlaceholder,
-                        textFieldIcon = R.drawable.ic_edit,
-                        getUpdatedValue = {}
-                    )
-                }
-
-            }
-
-            Box(
-                modifier = Modifier
-                    .background(Color.Transparent)
-                    .padding(
-                        vertical = LocalSpacing.current.medium,
-                        horizontal = LocalSpacing.current.default
-                    )
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ){
-                HomeCard(
-                    title = "Logout",
-                    description = "Click here to log out",
-                    icon = R.drawable.ic_logout,
-                    titleColor = logoutContent,
-                    descriptionColor = logoutContentLight,
-                    cardContainerColor = logoutBackground,
-                    cardShadowColor = shadowColor
-                ) { confirmLogout = !confirmLogout }
-            }
         }
     }
     
