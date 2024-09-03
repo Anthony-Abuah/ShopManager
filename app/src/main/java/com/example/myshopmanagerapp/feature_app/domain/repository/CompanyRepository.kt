@@ -15,8 +15,16 @@ interface CompanyRepository {
 
     suspend fun changePassword(currentPassword: String, newPassword: String, confirmedPassword: String)
 
-    suspend fun onlineShopAccount(company: CompanyEntity, confirmedPassword: String)
+    suspend fun changeShopName(currentPassword: String, shopName: String)
+    suspend fun changeEmail(currentPassword: String, email: String)
+    suspend fun changeContact(currentPassword: String, contact: String)
+    suspend fun changeLocation(currentPassword: String, location: String)
+    suspend fun changeProductsAndServices(currentPassword: String, productsAndServices: String)
+    suspend fun changeOtherInfo(currentPassword: String, otherInfo: String)
+
     suspend fun registerShopAccount(company: CompanyEntity, confirmedPassword: String)
+
+    suspend fun registerLocalAccountOnline(company: CompanyEntity)
 
     suspend fun login(email: String, password: String): Flow<Resource<String>>
 
@@ -42,10 +50,6 @@ interface CompanyRepository {
 
     fun restartApp()
 
-    /*
-    suspend fun syncCompanyInfo()
 
-    suspend fun restoreDatabase(context: Context, restart: Boolean = true): Flow<Resource<String>>
-    */
 
 }

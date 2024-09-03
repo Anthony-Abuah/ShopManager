@@ -215,6 +215,30 @@ class CompanyViewModel @Inject constructor(
         companyRepository.changePassword(currentPassword, newPassword, confirmedPassword)
     }
 
+    fun changeEmail(currentPassword: String, email: String) = viewModelScope.launch {
+        companyRepository.changeEmail(currentPassword, email)
+    }
+
+    fun changeShopName(currentPassword: String, shopName: String) = viewModelScope.launch {
+        companyRepository.changeShopName(currentPassword, shopName)
+    }
+
+    fun changeContact(currentPassword: String, contact: String) = viewModelScope.launch {
+        companyRepository.changeContact(currentPassword, contact)
+    }
+
+    fun changeLocation(currentPassword: String, location: String) = viewModelScope.launch {
+        companyRepository.changeLocation(currentPassword, location)
+    }
+
+    fun changeProductsAndServices(currentPassword: String, products: String) = viewModelScope.launch {
+        companyRepository.changeProductsAndServices(currentPassword, products)
+    }
+
+    fun changeOtherInfo(currentPassword: String, otherInfo: String) = viewModelScope.launch {
+        companyRepository.changeOtherInfo(currentPassword, otherInfo)
+    }
+
     fun updateReceipt() = viewModelScope.launch {
         generatePDFRepository.updateReceipt(updateReceiptInfo).onEach { response->
             when(response){

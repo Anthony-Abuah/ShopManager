@@ -1,15 +1,18 @@
 package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.profile
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -25,25 +28,29 @@ import com.example.myshopmanagerapp.core.FormRelatedString.CompanyContactPlaceho
 import com.example.myshopmanagerapp.core.FormRelatedString.CompanyEmailPlaceholder
 import com.example.myshopmanagerapp.core.FormRelatedString.CompanyLocationPlaceholder
 import com.example.myshopmanagerapp.core.FormRelatedString.CompanyNamePlaceholder
-import com.example.myshopmanagerapp.core.FormRelatedString.CompanyOwnerPlaceholder
+import com.example.myshopmanagerapp.core.FormRelatedString.CompanyPasswordPlaceholder
 import com.example.myshopmanagerapp.core.FormRelatedString.CompanyProductPlaceholder
 import com.example.myshopmanagerapp.core.FormRelatedString.Contact
+import com.example.myshopmanagerapp.core.FormRelatedString.DateRegistered
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterCompanyContact
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterCompanyEmail
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterCompanyName
-import com.example.myshopmanagerapp.core.FormRelatedString.EnterCompanyOwner
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterCompanyProducts
+import com.example.myshopmanagerapp.core.FormRelatedString.EnterCurrentPassword
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterCustomerLocation
+import com.example.myshopmanagerapp.core.FormRelatedString.EnterPassword
+import com.example.myshopmanagerapp.core.FormRelatedString.EnterShortDescription
 import com.example.myshopmanagerapp.core.FormRelatedString.Location
+import com.example.myshopmanagerapp.core.FormRelatedString.OtherInfo
 import com.example.myshopmanagerapp.core.FormRelatedString.ProductsSold
 import com.example.myshopmanagerapp.core.FormRelatedString.ShopName
 import com.example.myshopmanagerapp.core.FormRelatedString.ShopOwners
 import com.example.myshopmanagerapp.core.FormRelatedString.ShopPersonnel
+import com.example.myshopmanagerapp.core.FormRelatedString.ShortNotesPlaceholder
 import com.example.myshopmanagerapp.core.Functions.toDateString
 import com.example.myshopmanagerapp.core.Functions.toEllipses
 import com.example.myshopmanagerapp.core.Functions.toLocalDate
 import com.example.myshopmanagerapp.core.Functions.toNotNull
-import com.example.myshopmanagerapp.core.Functions.toTimestamp
 import com.example.myshopmanagerapp.core.TypeConverters.toCompanyOwners
 import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntities
 import com.example.myshopmanagerapp.feature_app.data.local.entities.company.CompanyEntity
@@ -56,12 +63,18 @@ import java.util.*
 fun ProfileContent(
     isLoggedIn: Boolean,
     shopInfo: CompanyEntity?,
-    logoutMessage: String?,
-    isLoggingOut: Boolean,
-    logout: ()-> Unit,
-    openLoginPage: ()-> Unit,
-    openRegisterPage: ()-> Unit,
+    repositoryMessage: String?,
+    changeShopName: (String, String) -> Unit,
+    changeContact: (String, String) -> Unit,
+    changeEmail: (String, String) -> Unit,
+    changeLocation: (String, String) -> Unit,
+    changeProductsSold: (String, String) -> Unit,
+    changeOtherInfo: (String, String) -> Unit,
+    logout: () -> Unit,
+    openLoginPage: () -> Unit,
+    openRegisterPage: () -> Unit,
 ) {
+    val context = LocalContext.current
     val backgroundColor = if (isSystemInDarkTheme()) Grey5 else Color.White
     val mainBackgroundColor = if (isSystemInDarkTheme()) Grey10 else Grey99
     val alternateBackgroundColor = if (isSystemInDarkTheme()) Grey15 else Grey95
@@ -71,7 +84,6 @@ fun ProfileContent(
     val descriptionColor = if (isSystemInDarkTheme()) Grey70 else Grey40
     val titleColor = if (isSystemInDarkTheme()) Grey99 else Grey10
 
-    val greenContentLight = if (isSystemInDarkTheme()) Grey70 else Green30
     val greenContent = if (isSystemInDarkTheme()) Grey99 else Green20
 
     val logoutBackground = if (isSystemInDarkTheme()) Red10 else Red95
@@ -83,6 +95,30 @@ fun ProfileContent(
     }
     var confirmLogout by remember {
         mutableStateOf(false)
+    }
+    var openPasswordDialog by remember {
+        mutableStateOf(false)
+    }
+    var editOption by remember {
+        mutableStateOf(0)
+    }
+    var editedShopName by remember {
+        mutableStateOf(shopInfo?.companyName.toNotNull())
+    }
+    var editedContact by remember {
+        mutableStateOf(shopInfo?.companyContact.toNotNull())
+    }
+    var editedLocation by remember {
+        mutableStateOf(shopInfo?.companyLocation.toNotNull())
+    }
+    var editedEmail by remember {
+        mutableStateOf(shopInfo?.email.toNotNull())
+    }
+    var editedProductsAndServices by remember {
+        mutableStateOf(shopInfo?.companyProductsAndServices.toNotNull())
+    }
+    var editedOtherInfo by remember {
+        mutableStateOf(shopInfo?.otherInfo.toNotNull())
     }
 
     if (isLoggedIn.not()) {
@@ -186,7 +222,7 @@ fun ProfileContent(
             val location = "Location: ${shopInfo?.companyLocation?.toNotNull().toEllipses(25)}"
 
             Box(modifier = Modifier
-                .background(Color.Transparent)
+                .background(MaterialTheme.colorScheme.background)
                 .fillMaxWidth()
                 .height(200.dp)
                 .padding(LocalSpacing.current.default),
@@ -209,33 +245,7 @@ fun ProfileContent(
 
             Box(modifier = Modifier.weight(1f)) {
                 BasicScreenColumnWithoutBottomBar {
-                    Box(
-                        modifier = Modifier
-                            .padding(vertical = LocalSpacing.current.default)
-                            .height(120.dp)
-                            .background(Color.Transparent)
-                            .fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        val registeredDate = shopInfo?.dateCreated?.toLocalDate()
-                        val registeredDay = registeredDate?.dayOfWeek?.toString()?.lowercase()
-                            ?.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-                        val registeredDateString = registeredDate?.toDateString()
-                        InfoDisplayCard(
-                            image = R.drawable.days,
-                            imageWidth = 45.dp,
-                            bigText = "$registeredDay, $registeredDateString",
-                            bigTextSize = 18.sp,
-                            smallTextFontWeight = FontWeight.SemiBold,
-                            smallText = "Date Registered",
-                            smallTextSize = 14.sp,
-                            smallTextColor = descriptionColor,
-                            backgroundColor = cardBackgroundColor,
-                            elevation = LocalSpacing.current.small,
-                            isAmount = false
-                        )
-                    }
-
+                    Spacer(modifier = Modifier.height(LocalSpacing.current.default))
                     Column(
                         modifier = Modifier
                             .padding(vertical = LocalSpacing.current.default)
@@ -243,6 +253,9 @@ fun ProfileContent(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Top,
                     ) {
+
+                        HorizontalDivider()
+
                         Box(
                             modifier = Modifier
                                 .background(Color.Transparent)
@@ -264,10 +277,15 @@ fun ProfileContent(
                                 label = EnterCompanyName,
                                 placeholder = CompanyNamePlaceholder,
                                 textFieldIcon = R.drawable.ic_edit,
-                                getUpdatedValue = {}
+                                getUpdatedValue = {
+                                    editedShopName = it
+                                    openPasswordDialog = !openPasswordDialog
+                                    editOption = 0
+                                }
                             )
                         }
 
+                        HorizontalDivider()
 
                         Box(
                             modifier = Modifier
@@ -291,9 +309,15 @@ fun ProfileContent(
                                 label = EnterCompanyContact,
                                 placeholder = CompanyContactPlaceholder,
                                 textFieldIcon = R.drawable.ic_edit,
-                                getUpdatedValue = {}
+                                getUpdatedValue = {
+                                    editedContact = it
+                                    openPasswordDialog = !openPasswordDialog
+                                    editOption = 1
+                                }
                             )
                         }
+
+                        HorizontalDivider()
 
                         Box(
                             modifier = Modifier
@@ -317,10 +341,15 @@ fun ProfileContent(
                                 label = EnterCustomerLocation,
                                 placeholder = CompanyLocationPlaceholder,
                                 textFieldIcon = R.drawable.ic_edit,
-                                getUpdatedValue = {}
+                                getUpdatedValue = {
+                                    editedLocation = it
+                                    openPasswordDialog = !openPasswordDialog
+                                    editOption = 2
+                                }
                             )
                         }
 
+                        HorizontalDivider()
 
                         Box(
                             modifier = Modifier
@@ -342,9 +371,15 @@ fun ProfileContent(
                                 placeholder = CompanyEmailPlaceholder,
                                 keyboardType = KeyboardType.Email,
                                 textFieldIcon = R.drawable.ic_edit,
-                                getUpdatedValue = {}
+                                getUpdatedValue = {
+                                    editedEmail = it
+                                    openPasswordDialog = !openPasswordDialog
+                                    editOption = 3
+                                }
                             )
                         }
+
+                        HorizontalDivider()
 
                         Box(
                             modifier = Modifier
@@ -367,10 +402,46 @@ fun ProfileContent(
                                 label = EnterCompanyProducts,
                                 placeholder = CompanyProductPlaceholder,
                                 textFieldIcon = R.drawable.ic_edit,
-                                getUpdatedValue = {}
+                                getUpdatedValue = {
+                                    editedProductsAndServices = it
+                                    openPasswordDialog = !openPasswordDialog
+                                    editOption = 4
+                                }
                             )
                         }
 
+                        HorizontalDivider()
+
+                        Box(
+                            modifier = Modifier
+                                .background(Color.Transparent)
+                                .padding(LocalSpacing.current.default)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            VerticalDisplayAndEditTextValues(
+                                firstText = OtherInfo,
+                                firstTextColor = titleColor,
+                                secondText = shopInfo?.otherInfo.toNotNull()
+                                    .ifBlank { NotAvailable },
+                                secondTextColor = descriptionColor,
+                                value = shopInfo?.otherInfo.toNotNull(),
+                                leadingIcon = R.drawable.ic_short_notes,
+                                leadingIconWidth = 32.dp,
+                                onBackgroundColor = titleColor,
+                                keyboardType = KeyboardType.Text,
+                                label = EnterShortDescription,
+                                placeholder = ShortNotesPlaceholder,
+                                textFieldIcon = R.drawable.ic_edit,
+                                getUpdatedValue = {
+                                    editedOtherInfo = it
+                                    openPasswordDialog = !openPasswordDialog
+                                    editOption = 5
+                                }
+                            )
+                        }
+
+                        HorizontalDivider()
                     }
 
                     Box(
@@ -438,6 +509,34 @@ fun ProfileContent(
                                 .fillMaxWidth(),
                             contentAlignment = Alignment.Center
                         ) {
+                            val registeredDate = shopInfo?.dateCreated?.toLocalDate()
+                            val registeredDay = registeredDate?.dayOfWeek?.toString()?.lowercase()
+                                ?.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+                            val registeredDateString = registeredDate?.toDateString()
+
+                            VerticalDisplayAndEditTextValues(
+                                readOnly = true,
+                                modifier = Modifier.fillMaxWidth(),
+                                firstText = DateRegistered,
+                                firstTextColor = titleColor,
+                                secondText = "$registeredDay, $registeredDateString",
+                                secondTextColor = descriptionColor,
+                                value = emptyString,
+                                leadingIcon = R.drawable.days,
+                                leadingIconWidth = 32.dp,
+                                onBackgroundColor = titleColor,
+                            )
+                        }
+
+                        HorizontalDivider()
+
+                        Box(
+                            modifier = Modifier
+                                .background(mainBackgroundColor)
+                                .padding(LocalSpacing.current.default)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
                             val owners = shopInfo?.companyOwners.toNotNull().toCompanyOwners().map { it.name }
                             val ownersString  = owners.joinToString(separator = ",\n")
                             VerticalDisplayAndEditTextValues(
@@ -453,6 +552,8 @@ fun ProfileContent(
                                 onBackgroundColor = titleColor,
                             )
                         }
+
+                        HorizontalDivider()
 
                         Box(
                             modifier = Modifier
@@ -476,6 +577,8 @@ fun ProfileContent(
                                 onBackgroundColor = titleColor,
                             )
                         }
+
+                        HorizontalDivider()
 
                     }
 
@@ -504,6 +607,46 @@ fun ProfileContent(
 
         }
     }
+
+    BasicTextFieldAlertDialog(
+        openDialog = openPasswordDialog,
+        title = EnterPassword,
+        textContent = "Enter your account's password to proceed",
+        placeholder = CompanyPasswordPlaceholder,
+        label = EnterCurrentPassword,
+        icon = R.drawable.ic_password,
+        keyboardType = KeyboardType.Password,
+        unconfirmedUpdatedToastText = null,
+        confirmedUpdatedToastText = null,
+        getValue = {
+            when(editOption){
+                0->{
+                    changeShopName(it, editedShopName)
+                }
+                1->{
+                    changeContact(it, editedContact)
+                }
+                2->{
+                    changeLocation(it, editedLocation)
+                }
+                3->{
+                    changeEmail(it, editedEmail)
+                }
+                4->{
+                    changeProductsSold(it, editedProductsAndServices)
+                }
+                5->{
+                    changeOtherInfo(it, editedOtherInfo)
+                }
+                else->{
+                    Toast.makeText(context, "No changes made", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    ) {
+        openPasswordDialog = false
+        confirmationInfoDialog = !confirmationInfoDialog
+    }
     
     DeleteConfirmationDialog(
         openDialog = confirmLogout,
@@ -520,12 +663,14 @@ fun ProfileContent(
 
     ConfirmationInfoDialog(
         openDialog = confirmationInfoDialog,
-        isLoading = isLoggingOut,
+        isLoading = false,
         title = null,
-        textContent = logoutMessage.toNotNull(),
+        textContent = repositoryMessage.toNotNull(),
         unconfirmedDeletedToastText = null,
-        confirmedDeleteToastText = logoutMessage.toNotNull()
+        confirmedDeleteToastText = repositoryMessage.toNotNull()
     ) {
         confirmationInfoDialog = false
     }
+
+
 }

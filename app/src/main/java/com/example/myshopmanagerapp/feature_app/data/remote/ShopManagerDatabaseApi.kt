@@ -19,7 +19,13 @@ import com.example.myshopmanagerapp.core.Routes.addRevenues
 import com.example.myshopmanagerapp.core.Routes.addStocks
 import com.example.myshopmanagerapp.core.Routes.addSuppliers
 import com.example.myshopmanagerapp.core.Routes.addWithdrawals
+import com.example.myshopmanagerapp.core.Routes.changeCompanyName
+import com.example.myshopmanagerapp.core.Routes.changeContact
+import com.example.myshopmanagerapp.core.Routes.changeEmail
+import com.example.myshopmanagerapp.core.Routes.changeLocation
+import com.example.myshopmanagerapp.core.Routes.changeOtherInfo
 import com.example.myshopmanagerapp.core.Routes.changePassword
+import com.example.myshopmanagerapp.core.Routes.changeProductsAndServices
 import com.example.myshopmanagerapp.core.Routes.deleteCompany
 import com.example.myshopmanagerapp.core.Routes.getAllCompanies
 import com.example.myshopmanagerapp.core.Routes.getAllCompanyBanks
@@ -38,6 +44,7 @@ import com.example.myshopmanagerapp.core.Routes.getAllCompanySavings
 import com.example.myshopmanagerapp.core.Routes.getAllCompanyStocks
 import com.example.myshopmanagerapp.core.Routes.getAllCompanySuppliers
 import com.example.myshopmanagerapp.core.Routes.getAllCompanyWithdrawals
+import com.example.myshopmanagerapp.core.Routes.getCompany
 import com.example.myshopmanagerapp.core.Routes.login
 import com.example.myshopmanagerapp.core.Routes.smartAddCompanyBanks
 import com.example.myshopmanagerapp.core.Routes.smartAddCompanyCashIns
@@ -119,10 +126,31 @@ interface ShopManagerDatabaseApi {
     @GET(getAllCompanies)
     suspend fun fetchAllCompanies(): ListOfCompanyResponseDto
 
+    @GET(getCompany)
+    suspend fun getCompany(@Path("uniqueCompanyId") uniqueCompanyId: String): CompanyResponseDto?
+
 
 
     @PUT(changePassword)
     fun changePassword(@Path("uniqueCompanyId") uniqueCompanyId: String, @Path("currentPassword") currentPassword: String, @Path("updatedPassword") updatedPassword: String): Call<CompanyResponseDto>?
+
+    @PUT(changeEmail)
+    fun changeEmail(@Path("uniqueCompanyId") uniqueCompanyId: String, @Path("currentPassword") currentPassword: String, @Path("email") email: String): Call<CompanyResponseDto>?
+
+    @PUT(changeCompanyName)
+    fun changeShopName(@Path("uniqueCompanyId") uniqueCompanyId: String, @Path("currentPassword") currentPassword: String, @Path("companyName") companyName: String): Call<CompanyResponseDto>?
+
+    @PUT(changeContact)
+    fun changeCompanyContact(@Path("uniqueCompanyId") uniqueCompanyId: String, @Path("currentPassword") currentPassword: String, @Path("companyContact") companyContact: String): Call<CompanyResponseDto>?
+
+    @PUT(changeLocation)
+    fun changeCompanyLocation(@Path("uniqueCompanyId") uniqueCompanyId: String, @Path("currentPassword") currentPassword: String, @Path("companyLocation") companyLocation: String): Call<CompanyResponseDto>?
+
+    @PUT(changeProductsAndServices)
+    fun changeCompanyProductsAndServices(@Path("uniqueCompanyId") uniqueCompanyId: String, @Path("currentPassword") currentPassword: String, @Path("companyProductsAndServices") companyProductsAndServices: String): Call<CompanyResponseDto>?
+
+    @PUT(changeOtherInfo)
+    fun changeCompanyOtherInfo(@Path("uniqueCompanyId") uniqueCompanyId: String, @Path("currentPassword") currentPassword: String, @Path("otherInfo") companyOtherInfo: String): Call<CompanyResponseDto>?
 
     @DELETE(deleteCompany)
     suspend fun deleteCompany(@Path("uniqueCompanyId") uniqueCompanyId: String): Call<CompanyResponseDto>?

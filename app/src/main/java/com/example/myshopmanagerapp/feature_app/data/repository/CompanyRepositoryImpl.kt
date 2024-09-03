@@ -17,6 +17,7 @@ import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.TypeConverters.toListOfCompanyEntities
 import com.example.myshopmanagerapp.core.TypeConverters.toListOfCompanyEntitiesJson
+import com.example.myshopmanagerapp.core.TypeConverters.toPersonnelEntity
 import com.example.myshopmanagerapp.core.UserPreferences
 import com.example.myshopmanagerapp.feature_app.MyShopManagerApp
 import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
@@ -80,7 +81,9 @@ class CompanyRepositoryImpl(
             userPreferences.saveRepositoryJobMessage(emptyString)
             userPreferences.saveRepositoryJobSuccessValue(false)
             val uniqueCompanyId = userPreferences.getShopInfo.first().toCompanyEntity()?.uniqueCompanyId
-
+            val shopAccountResponse = shopManagerDatabaseApi.getCompany(uniqueCompanyId.toNotNull())
+            val onlineCompanyAccountNotExists = shopAccountResponse?.data.toCompanyInfoDto() == null
+            val isPrincipalAdmin = userPreferences.getPersonnelInfo.first().toPersonnelEntity()?.isPrincipalAdmin == true
             when(true){
                 (isLoggedIn != true)->{
                     userPreferences.saveRepositoryJobSuccessValue(false)
@@ -90,9 +93,25 @@ class CompanyRepositoryImpl(
                     userPreferences.saveRepositoryJobSuccessValue(false)
                     userPreferences.saveRepositoryJobMessage("Passwords do not match")
                 }
+                (!isPrincipalAdmin)->{
+                    userPreferences.saveRepositoryJobSuccessValue(false)
+                    userPreferences.saveRepositoryJobMessage("Only the principal admin has the privileges to make this change")
+                }
                 (uniqueCompanyId == null)->{
                     userPreferences.saveRepositoryJobSuccessValue(false)
                     userPreferences.saveRepositoryJobMessage("Could not get this account's info\nPlease ensure that you're logged in")
+                }
+                onlineCompanyAccountNotExists->{
+                    val shopInfo = userPreferences.getShopInfo.first().toCompanyEntity()
+                    if (shopInfo != null) {
+                        appDatabase.companyDao.updateCompany(shopInfo.copy(password = newPassword))
+                        userPreferences.saveShopInfo(shopInfo.copy(password = newPassword).toCompanyEntityJson().toNotNull())
+                        userPreferences.saveRepositoryJobSuccessValue(true)
+                        userPreferences.saveRepositoryJobMessage("Password changed successfully")
+                    }else{
+                        userPreferences.saveRepositoryJobSuccessValue(false)
+                        userPreferences.saveRepositoryJobMessage( "Couldn't change password")
+                    }
                 }
                 else->{
                     Log.d("CompanyRepository", "Api call enqueue is called")
@@ -105,11 +124,10 @@ class CompanyRepositoryImpl(
                             call: Call<CompanyResponseDto>,
                             response: Response<CompanyResponseDto>
                         ) {
-                            val passwordChangedSuccessfully = response.body()?.data != null
+                            val responseInfo = response.body()?.data.toCompanyInfoDto()
                             GlobalScope.launch(Dispatchers.IO + Job()) {
-                                if (passwordChangedSuccessfully) {
-                                    val responseInfo = response.body()?.data?.toCompanyInfoDto()
-                                    val registeredAccountInfo = responseInfo?.toCompanyEntity()?.toCompanyEntityJson()
+                                if (responseInfo != null) {
+                                    val registeredAccountInfo = responseInfo.toCompanyEntity().toCompanyEntityJson()
                                     registeredAccountInfo?.let {
                                         it.toCompanyEntity()?.let { companyEntity ->
                                             appDatabase.companyDao.deleteAllCompanies()
@@ -133,15 +151,7 @@ class CompanyRepositoryImpl(
                             GlobalScope.launch(Dispatchers.IO + Job()) {
                                 userPreferences.saveRepositoryJobSuccessValue(false)
                                 userPreferences.saveRepositoryJobMessage(t.message ?: "Couldn't connect to server")
-                                val shopInfo = userPreferences.getShopInfo.first().toCompanyEntity()
-                                if (shopInfo != null) {
-                                    appDatabase.companyDao.updateCompany(shopInfo.copy(password = newPassword))
-                                    userPreferences.saveRepositoryJobSuccessValue(true)
-                                    userPreferences.saveRepositoryJobMessage("Password changed successfully")
-                                }else{
-                                    userPreferences.saveRepositoryJobSuccessValue(false)
-                                    userPreferences.saveRepositoryJobMessage( "Couldn't change password")
-                                }
+
                             }
                         }
                     })
@@ -153,13 +163,535 @@ class CompanyRepositoryImpl(
                 "General exception is called"
             )
             userPreferences.saveRepositoryJobSuccessValue(false)
-            userPreferences.saveRepositoryJobMessage(e.message ?: "Unknown error!")
+            userPreferences.saveRepositoryJobMessage("Could not connect to server\nCheck your internet connection and try again")
         }
     }
 
-    override suspend fun onlineShopAccount(company: CompanyEntity, confirmedPassword: String) {
-        TODO("Not yet implemented")
+    @OptIn(DelicateCoroutinesApi::class)
+    override suspend fun changeShopName(currentPassword: String, shopName: String) {
+        val context = MyShopManagerApp.applicationContext()
+        val userPreferences = UserPreferences(context)
+        try {
+            val isLoggedIn = userPreferences.getLoggedInState.first()
+            userPreferences.saveRepositoryJobMessage(emptyString)
+            userPreferences.saveRepositoryJobSuccessValue(false)
+            val uniqueCompanyId = userPreferences.getShopInfo.first().toCompanyEntity()?.uniqueCompanyId
+            val shopAccountResponse = shopManagerDatabaseApi.getCompany(uniqueCompanyId.toNotNull())
+            val onlineCompanyAccountNotExists = shopAccountResponse?.data.toCompanyInfoDto() == null
+            val isPrincipalAdmin = userPreferences.getPersonnelInfo.first().toPersonnelEntity()?.isPrincipalAdmin == true
+            when(true){
+                (isLoggedIn != true)->{
+                    userPreferences.saveRepositoryJobSuccessValue(false)
+                    userPreferences.saveRepositoryJobMessage("Please ensure that you're logged in to change shop name")
+                }
+                (!isPrincipalAdmin)->{
+                    userPreferences.saveRepositoryJobSuccessValue(false)
+                    userPreferences.saveRepositoryJobMessage("Only the principal admin has the privileges to make this change")
+                }
+                (uniqueCompanyId == null)->{
+                    userPreferences.saveRepositoryJobSuccessValue(false)
+                    userPreferences.saveRepositoryJobMessage("Could not get this account's info\nPlease ensure that you're logged in")
+                }
+                onlineCompanyAccountNotExists->{
+                    val shopInfo = userPreferences.getShopInfo.first().toCompanyEntity()
+                    if (shopInfo != null) {
+                        appDatabase.companyDao.updateCompany(shopInfo.copy(companyName = shopName))
+                        userPreferences.saveShopInfo(shopInfo.copy(companyName = shopName).toCompanyEntityJson().toNotNull())
+                        userPreferences.saveRepositoryJobSuccessValue(true)
+                        userPreferences.saveRepositoryJobMessage("Shop name changed successfully")
+                    }else{
+                        userPreferences.saveRepositoryJobSuccessValue(false)
+                        userPreferences.saveRepositoryJobMessage( "Couldn't change shop name")
+                    }
+                }
+                else->{
+                    val call = shopManagerDatabaseApi.changeShopName(uniqueCompanyId,currentPassword, shopName)
+                    call!!.enqueue(object : Callback<CompanyResponseDto>{
+                        override fun onResponse(
+                            call: Call<CompanyResponseDto>,
+                            response: Response<CompanyResponseDto>
+                        ) {
+                            val shopNameChangedSuccessfully = response.body()?.data != null
+                            GlobalScope.launch(Dispatchers.IO + Job()) {
+                                if (shopNameChangedSuccessfully) {
+                                    val responseInfo = response.body()?.data?.toCompanyInfoDto()
+                                    val registeredAccountInfo = responseInfo?.toCompanyEntity()?.toCompanyEntityJson()
+                                    registeredAccountInfo?.let {
+                                        it.toCompanyEntity()?.let { companyEntity ->
+                                            appDatabase.companyDao.deleteAllCompanies()
+                                            appDatabase.companyDao.addCompany(companyEntity)
+                                        }
+                                        userPreferences.saveShopInfo(it)
+                                        userPreferences.saveLoggedInState(true)
+                                        userPreferences.saveRepositoryJobMessage(response.body()?.message.toNotNull())
+
+                                        userPreferences.saveRepositoryJobSuccessValue(true)
+                                        userPreferences.saveRepositoryJobMessage("Shop name changed successfully")
+                                    }
+                                } else {
+                                    userPreferences.saveRepositoryJobSuccessValue(false)
+                                    userPreferences.saveRepositoryJobMessage(response.body()?.message ?: "Unable to change shop name")
+                                }
+
+                            }
+                        }
+                        override fun onFailure(call: Call<CompanyResponseDto>, t: Throwable) {
+                            GlobalScope.launch(Dispatchers.IO + Job()) {
+                                userPreferences.saveRepositoryJobSuccessValue(false)
+                                userPreferences.saveRepositoryJobMessage(t.message ?: "Couldn't connect to server")
+                            }
+                        }
+                    })
+                }
+            }
+        }catch (e: Exception){
+            Log.d(
+                "CompanyRepository",
+                "General exception is called"
+            )
+            userPreferences.saveRepositoryJobSuccessValue(false)
+            userPreferences.saveRepositoryJobMessage("Could not connect to server\nCheck your internet connection and try again")
+        }
     }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    override suspend fun changeEmail(currentPassword: String, email: String) {
+        val context = MyShopManagerApp.applicationContext()
+        val userPreferences = UserPreferences(context)
+        try {
+            val isLoggedIn = userPreferences.getLoggedInState.first()
+            userPreferences.saveRepositoryJobMessage(emptyString)
+            userPreferences.saveRepositoryJobSuccessValue(false)
+            val uniqueCompanyId = userPreferences.getShopInfo.first().toCompanyEntity()?.uniqueCompanyId
+            val shopAccountResponse = shopManagerDatabaseApi.getCompany(uniqueCompanyId.toNotNull())
+            val onlineCompanyAccountNotExists = shopAccountResponse?.data.toCompanyInfoDto() == null
+            val isPrincipalAdmin = userPreferences.getPersonnelInfo.first().toPersonnelEntity()?.isPrincipalAdmin == true
+            when(true){
+                (isLoggedIn != true)->{
+                    userPreferences.saveRepositoryJobSuccessValue(false)
+                    userPreferences.saveRepositoryJobMessage("Please ensure that you're logged in to change email")
+                }
+                (!isPrincipalAdmin)->{
+                    userPreferences.saveRepositoryJobSuccessValue(false)
+                    userPreferences.saveRepositoryJobMessage("Only the principal admin has the privileges to make this change")
+                }
+                (uniqueCompanyId == null)->{
+                    userPreferences.saveRepositoryJobSuccessValue(false)
+                    userPreferences.saveRepositoryJobMessage("Could not get this account's info\nPlease ensure that you're logged in")
+                }
+                onlineCompanyAccountNotExists->{
+                    val shopInfo = userPreferences.getShopInfo.first().toCompanyEntity()
+                    if (shopInfo != null) {
+                        appDatabase.companyDao.updateCompany(shopInfo.copy(email = email))
+                        userPreferences.saveShopInfo(shopInfo.copy(email = email).toCompanyEntityJson().toNotNull())
+                        userPreferences.saveRepositoryJobSuccessValue(true)
+                        userPreferences.saveRepositoryJobMessage("Email changed successfully")
+                    }else{
+                        userPreferences.saveRepositoryJobSuccessValue(false)
+                        userPreferences.saveRepositoryJobMessage( "Couldn't change email")
+                    }
+                }
+                else->{
+                    val call = shopManagerDatabaseApi.changeEmail(uniqueCompanyId,currentPassword, email)
+                    call!!.enqueue(object : Callback<CompanyResponseDto>{
+                        override fun onResponse(
+                            call: Call<CompanyResponseDto>,
+                            response: Response<CompanyResponseDto>
+                        ) {
+                            val emailChangedSuccessfully = response.body()?.data != null
+                            GlobalScope.launch(Dispatchers.IO + Job()) {
+                                if (emailChangedSuccessfully) {
+                                    val responseInfo = response.body()?.data?.toCompanyInfoDto()
+                                    val registeredAccountInfo = responseInfo?.toCompanyEntity()?.toCompanyEntityJson()
+                                    registeredAccountInfo?.let {
+                                        it.toCompanyEntity()?.let { companyEntity ->
+                                            appDatabase.companyDao.deleteAllCompanies()
+                                            appDatabase.companyDao.addCompany(companyEntity)
+                                        }
+                                        userPreferences.saveShopInfo(it)
+                                        userPreferences.saveLoggedInState(true)
+                                        userPreferences.saveRepositoryJobMessage(response.body()?.message.toNotNull())
+
+                                        userPreferences.saveRepositoryJobSuccessValue(true)
+                                        userPreferences.saveRepositoryJobMessage("Email changed successfully")
+                                    }
+                                } else {
+                                    userPreferences.saveRepositoryJobSuccessValue(false)
+                                    userPreferences.saveRepositoryJobMessage(response.body()?.message ?: "Unable to change email")
+                                }
+
+                            }
+                        }
+                        override fun onFailure(call: Call<CompanyResponseDto>, t: Throwable) {
+                            GlobalScope.launch(Dispatchers.IO + Job()) {
+                                userPreferences.saveRepositoryJobSuccessValue(false)
+                                userPreferences.saveRepositoryJobMessage(t.message ?: "Couldn't connect to server")
+                            }
+                        }
+                    })
+                }
+            }
+        }catch (e: Exception){
+            Log.d(
+                "CompanyRepository",
+                "General exception is called"
+            )
+            userPreferences.saveRepositoryJobSuccessValue(false)
+            userPreferences.saveRepositoryJobMessage("Could not connect to server\nCheck your internet connection and try again")
+        }
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    override suspend fun changeContact(currentPassword: String, contact: String) {
+        val context = MyShopManagerApp.applicationContext()
+        val userPreferences = UserPreferences(context)
+        try {
+            val isLoggedIn = userPreferences.getLoggedInState.first()
+            userPreferences.saveRepositoryJobMessage(emptyString)
+            userPreferences.saveRepositoryJobSuccessValue(false)
+            val uniqueCompanyId = userPreferences.getShopInfo.first().toCompanyEntity()?.uniqueCompanyId
+            val shopAccountResponse = shopManagerDatabaseApi.getCompany(uniqueCompanyId.toNotNull())
+            val onlineCompanyAccountNotExists = shopAccountResponse?.data.toCompanyInfoDto() == null
+            val isPrincipalAdmin = userPreferences.getPersonnelInfo.first().toPersonnelEntity()?.isPrincipalAdmin == true
+            when(true){
+                (isLoggedIn != true)->{
+                    userPreferences.saveRepositoryJobSuccessValue(false)
+                    userPreferences.saveRepositoryJobMessage("Please ensure that you're logged in to change contact")
+                }
+                (!isPrincipalAdmin)->{
+                    userPreferences.saveRepositoryJobSuccessValue(false)
+                    userPreferences.saveRepositoryJobMessage("Only the principal admin has the privileges to make this change")
+                }
+                (uniqueCompanyId == null)->{
+                    userPreferences.saveRepositoryJobSuccessValue(false)
+                    userPreferences.saveRepositoryJobMessage("Could not get this account's info\nPlease ensure that you're logged in")
+                }
+                onlineCompanyAccountNotExists->{
+                    val shopInfo = userPreferences.getShopInfo.first().toCompanyEntity()
+                    if (shopInfo != null) {
+                        appDatabase.companyDao.updateCompany(shopInfo.copy(companyContact = contact))
+                        userPreferences.saveShopInfo(shopInfo.copy(companyContact = contact).toCompanyEntityJson().toNotNull())
+                        userPreferences.saveRepositoryJobSuccessValue(true)
+                        userPreferences.saveRepositoryJobMessage("Contact changed successfully")
+                    }else{
+                        userPreferences.saveRepositoryJobSuccessValue(false)
+                        userPreferences.saveRepositoryJobMessage( "Couldn't change contact")
+                    }
+                }
+                else->{
+                    val call = shopManagerDatabaseApi.changeCompanyContact(uniqueCompanyId,currentPassword, contact)
+                    call!!.enqueue(object : Callback<CompanyResponseDto>{
+                        override fun onResponse(
+                            call: Call<CompanyResponseDto>,
+                            response: Response<CompanyResponseDto>
+                        ) {
+                            val contactChangedSuccessfully = response.body()?.data != null
+                            GlobalScope.launch(Dispatchers.IO + Job()) {
+                                if (contactChangedSuccessfully) {
+                                    val responseInfo = response.body()?.data?.toCompanyInfoDto()
+                                    val registeredAccountInfo = responseInfo?.toCompanyEntity()?.toCompanyEntityJson()
+                                    registeredAccountInfo?.let {
+                                        it.toCompanyEntity()?.let { companyEntity ->
+                                            appDatabase.companyDao.deleteAllCompanies()
+                                            appDatabase.companyDao.addCompany(companyEntity)
+                                        }
+                                        userPreferences.saveShopInfo(it)
+                                        userPreferences.saveLoggedInState(true)
+                                        userPreferences.saveRepositoryJobMessage(response.body()?.message.toNotNull())
+
+                                        userPreferences.saveRepositoryJobSuccessValue(true)
+                                        userPreferences.saveRepositoryJobMessage("Contact changed successfully")
+                                    }
+                                } else {
+                                    userPreferences.saveRepositoryJobSuccessValue(false)
+                                    userPreferences.saveRepositoryJobMessage(response.body()?.message ?: "Unable to change contact")
+                                }
+
+                            }
+                        }
+                        override fun onFailure(call: Call<CompanyResponseDto>, t: Throwable) {
+                            GlobalScope.launch(Dispatchers.IO + Job()) {
+                                userPreferences.saveRepositoryJobSuccessValue(false)
+                                userPreferences.saveRepositoryJobMessage(t.message ?: "Couldn't connect to server")
+                            }
+                        }
+                    })
+                }
+            }
+        }catch (e: Exception){
+            Log.d(
+                "CompanyRepository",
+                "General exception is called"
+            )
+            userPreferences.saveRepositoryJobSuccessValue(false)
+            userPreferences.saveRepositoryJobMessage("Could not connect to server\nCheck your internet connection and try again")
+        }
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    override suspend fun changeLocation(currentPassword: String, location: String) {
+        val context = MyShopManagerApp.applicationContext()
+        val userPreferences = UserPreferences(context)
+        try {
+            val isLoggedIn = userPreferences.getLoggedInState.first()
+            userPreferences.saveRepositoryJobMessage(emptyString)
+            userPreferences.saveRepositoryJobSuccessValue(false)
+            val uniqueCompanyId = userPreferences.getShopInfo.first().toCompanyEntity()?.uniqueCompanyId
+            val shopAccountResponse = shopManagerDatabaseApi.getCompany(uniqueCompanyId.toNotNull())
+            val onlineCompanyAccountNotExists = shopAccountResponse?.data.toCompanyInfoDto() == null
+            val isPrincipalAdmin = userPreferences.getPersonnelInfo.first().toPersonnelEntity()?.isPrincipalAdmin == true
+            when(true){
+                (isLoggedIn != true)->{
+                    userPreferences.saveRepositoryJobSuccessValue(false)
+                    userPreferences.saveRepositoryJobMessage("Please ensure that you're logged in to change location")
+                }
+                (!isPrincipalAdmin)->{
+                    userPreferences.saveRepositoryJobSuccessValue(false)
+                    userPreferences.saveRepositoryJobMessage("Only the principal admin has the privileges to make this change")
+                }
+                (uniqueCompanyId == null)->{
+                    userPreferences.saveRepositoryJobSuccessValue(false)
+                    userPreferences.saveRepositoryJobMessage("Could not get this account's info\nPlease ensure that you're logged in")
+                }
+                onlineCompanyAccountNotExists->{
+                    val shopInfo = userPreferences.getShopInfo.first().toCompanyEntity()
+                    if (shopInfo != null) {
+                        appDatabase.companyDao.updateCompany(shopInfo.copy(companyLocation = location))
+                        userPreferences.saveShopInfo(shopInfo.copy(companyLocation = location).toCompanyEntityJson().toNotNull())
+                        userPreferences.saveRepositoryJobSuccessValue(true)
+                        userPreferences.saveRepositoryJobMessage("Location changed successfully")
+                    }else{
+                        userPreferences.saveRepositoryJobSuccessValue(false)
+                        userPreferences.saveRepositoryJobMessage( "Couldn't change location")
+                    }
+                }
+                else->{
+                    val call = shopManagerDatabaseApi.changeCompanyLocation(uniqueCompanyId,currentPassword, location)
+                    call!!.enqueue(object : Callback<CompanyResponseDto>{
+                        override fun onResponse(
+                            call: Call<CompanyResponseDto>,
+                            response: Response<CompanyResponseDto>
+                        ) {
+                            val locationChangedSuccessfully = response.body()?.data != null
+                            GlobalScope.launch(Dispatchers.IO + Job()) {
+                                if (locationChangedSuccessfully) {
+                                    val responseInfo = response.body()?.data?.toCompanyInfoDto()
+                                    val registeredAccountInfo = responseInfo?.toCompanyEntity()?.toCompanyEntityJson()
+                                    registeredAccountInfo?.let {
+                                        it.toCompanyEntity()?.let { companyEntity ->
+                                            appDatabase.companyDao.deleteAllCompanies()
+                                            appDatabase.companyDao.addCompany(companyEntity)
+                                        }
+                                        userPreferences.saveShopInfo(it)
+                                        userPreferences.saveLoggedInState(true)
+                                        userPreferences.saveRepositoryJobMessage(response.body()?.message.toNotNull())
+
+                                        userPreferences.saveRepositoryJobSuccessValue(true)
+                                        userPreferences.saveRepositoryJobMessage("Location changed successfully")
+                                    }
+                                } else {
+                                    userPreferences.saveRepositoryJobSuccessValue(false)
+                                    userPreferences.saveRepositoryJobMessage(response.body()?.message ?: "Unable to change location")
+                                }
+
+                            }
+                        }
+                        override fun onFailure(call: Call<CompanyResponseDto>, t: Throwable) {
+                            GlobalScope.launch(Dispatchers.IO + Job()) {
+                                userPreferences.saveRepositoryJobSuccessValue(false)
+                                userPreferences.saveRepositoryJobMessage(t.message ?: "Couldn't connect to server")
+                            }
+                        }
+                    })
+                }
+            }
+        }catch (e: Exception){
+            Log.d(
+                "CompanyRepository",
+                "General exception is called"
+            )
+            userPreferences.saveRepositoryJobSuccessValue(false)
+            userPreferences.saveRepositoryJobMessage("Could not connect to server\nCheck your internet connection and try again")
+        }
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    override suspend fun changeProductsAndServices(
+        currentPassword: String,
+        productsAndServices: String
+    ) {
+        val context = MyShopManagerApp.applicationContext()
+        val userPreferences = UserPreferences(context)
+        try {
+            val isLoggedIn = userPreferences.getLoggedInState.first()
+            userPreferences.saveRepositoryJobMessage(emptyString)
+            userPreferences.saveRepositoryJobSuccessValue(false)
+            val uniqueCompanyId = userPreferences.getShopInfo.first().toCompanyEntity()?.uniqueCompanyId
+            val shopAccountResponse = shopManagerDatabaseApi.getCompany(uniqueCompanyId.toNotNull())
+            val onlineCompanyAccountNotExists = shopAccountResponse?.data.toCompanyInfoDto() == null
+            val isPrincipalAdmin = userPreferences.getPersonnelInfo.first().toPersonnelEntity()?.isPrincipalAdmin == true
+            when(true){
+                (isLoggedIn != true)->{
+                    userPreferences.saveRepositoryJobSuccessValue(false)
+                    userPreferences.saveRepositoryJobMessage("Please ensure that you're logged in to change company products")
+                }
+                (!isPrincipalAdmin)->{
+                    userPreferences.saveRepositoryJobSuccessValue(false)
+                    userPreferences.saveRepositoryJobMessage("Only the principal admin has the privileges to make this change")
+                }
+                (uniqueCompanyId == null)->{
+                    userPreferences.saveRepositoryJobSuccessValue(false)
+                    userPreferences.saveRepositoryJobMessage("Could not get this account's info\nPlease ensure that you're logged in")
+                }
+                onlineCompanyAccountNotExists->{
+                    val shopInfo = userPreferences.getShopInfo.first().toCompanyEntity()
+                    if (shopInfo != null) {
+                        appDatabase.companyDao.updateCompany(shopInfo.copy(companyProductsAndServices = productsAndServices))
+                        userPreferences.saveShopInfo(shopInfo.copy(companyProductsAndServices = productsAndServices).toCompanyEntityJson().toNotNull())
+                        userPreferences.saveRepositoryJobSuccessValue(true)
+                        userPreferences.saveRepositoryJobMessage("Company products changed successfully")
+                    }else{
+                        userPreferences.saveRepositoryJobSuccessValue(false)
+                        userPreferences.saveRepositoryJobMessage( "Couldn't change company products")
+                    }
+                }
+                else->{
+                    val call = shopManagerDatabaseApi.changeCompanyProductsAndServices(uniqueCompanyId,currentPassword, productsAndServices)
+                    call!!.enqueue(object : Callback<CompanyResponseDto>{
+                        override fun onResponse(
+                            call: Call<CompanyResponseDto>,
+                            response: Response<CompanyResponseDto>
+                        ) {
+                            val productsAndServicesChangedSuccessfully = response.body()?.data != null
+                            GlobalScope.launch(Dispatchers.IO + Job()) {
+                                if (productsAndServicesChangedSuccessfully) {
+                                    val responseInfo = response.body()?.data?.toCompanyInfoDto()
+                                    val registeredAccountInfo = responseInfo?.toCompanyEntity()?.toCompanyEntityJson()
+                                    registeredAccountInfo?.let {
+                                        it.toCompanyEntity()?.let { companyEntity ->
+                                            appDatabase.companyDao.deleteAllCompanies()
+                                            appDatabase.companyDao.addCompany(companyEntity)
+                                        }
+                                        userPreferences.saveShopInfo(it)
+                                        userPreferences.saveLoggedInState(true)
+                                        userPreferences.saveRepositoryJobMessage(response.body()?.message.toNotNull())
+
+                                        userPreferences.saveRepositoryJobSuccessValue(true)
+                                        userPreferences.saveRepositoryJobMessage("Products changed successfully")
+                                    }
+                                } else {
+                                    userPreferences.saveRepositoryJobSuccessValue(false)
+                                    userPreferences.saveRepositoryJobMessage(response.body()?.message ?: "Unable to change company products")
+                                }
+
+                            }
+                        }
+                        override fun onFailure(call: Call<CompanyResponseDto>, t: Throwable) {
+                            GlobalScope.launch(Dispatchers.IO + Job()) {
+                                userPreferences.saveRepositoryJobSuccessValue(false)
+                                userPreferences.saveRepositoryJobMessage(t.message ?: "Couldn't connect to server")
+                            }
+                        }
+                    })
+                }
+            }
+        }catch (e: Exception){
+            Log.d(
+                "CompanyRepository",
+                "General exception is called"
+            )
+            userPreferences.saveRepositoryJobSuccessValue(false)
+            userPreferences.saveRepositoryJobMessage("Could not connect to server\nCheck your internet connection and try again")
+        }
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    override suspend fun changeOtherInfo(currentPassword: String, otherInfo: String) {
+        val context = MyShopManagerApp.applicationContext()
+        val userPreferences = UserPreferences(context)
+        try {
+            val isLoggedIn = userPreferences.getLoggedInState.first()
+            userPreferences.saveRepositoryJobMessage(emptyString)
+            userPreferences.saveRepositoryJobSuccessValue(false)
+            val uniqueCompanyId = userPreferences.getShopInfo.first().toCompanyEntity()?.uniqueCompanyId
+            val shopAccountResponse = shopManagerDatabaseApi.getCompany(uniqueCompanyId.toNotNull())
+            val onlineCompanyAccountNotExists = shopAccountResponse?.data.toCompanyInfoDto() == null
+            val isPrincipalAdmin = userPreferences.getPersonnelInfo.first().toPersonnelEntity()?.isPrincipalAdmin == true
+            when(true){
+                (isLoggedIn != true)->{
+                    userPreferences.saveRepositoryJobSuccessValue(false)
+                    userPreferences.saveRepositoryJobMessage("Please ensure that you're logged in to change other info")
+                }
+                (!isPrincipalAdmin)->{
+                    userPreferences.saveRepositoryJobSuccessValue(false)
+                    userPreferences.saveRepositoryJobMessage("Only the principal admin has the privileges to make this change")
+                }
+                (uniqueCompanyId == null)->{
+                    userPreferences.saveRepositoryJobSuccessValue(false)
+                    userPreferences.saveRepositoryJobMessage("Could not get this account's info\nPlease ensure that you're logged in")
+                }
+                onlineCompanyAccountNotExists->{
+                    val shopInfo = userPreferences.getShopInfo.first().toCompanyEntity()
+                    if (shopInfo != null) {
+                        appDatabase.companyDao.updateCompany(shopInfo.copy(otherInfo = otherInfo))
+                        userPreferences.saveShopInfo(shopInfo.copy(otherInfo = otherInfo).toCompanyEntityJson().toNotNull())
+                        userPreferences.saveRepositoryJobSuccessValue(true)
+                        userPreferences.saveRepositoryJobMessage("Other Info changed successfully")
+                    }else{
+                        userPreferences.saveRepositoryJobSuccessValue(false)
+                        userPreferences.saveRepositoryJobMessage( "Couldn't change other info")
+                    }
+                }
+                else->{
+                    val call = shopManagerDatabaseApi.changeCompanyOtherInfo(uniqueCompanyId,currentPassword, otherInfo)
+                    call!!.enqueue(object : Callback<CompanyResponseDto>{
+                        override fun onResponse(
+                            call: Call<CompanyResponseDto>,
+                            response: Response<CompanyResponseDto>
+                        ) {
+                            val emailChangedSuccessfully = response.body()?.data != null
+                            GlobalScope.launch(Dispatchers.IO + Job()) {
+                                if (emailChangedSuccessfully) {
+                                    val responseInfo = response.body()?.data?.toCompanyInfoDto()
+                                    val registeredAccountInfo = responseInfo?.toCompanyEntity()?.toCompanyEntityJson()
+                                    registeredAccountInfo?.let {
+                                        it.toCompanyEntity()?.let { companyEntity ->
+                                            appDatabase.companyDao.deleteAllCompanies()
+                                            appDatabase.companyDao.addCompany(companyEntity)
+                                        }
+                                        userPreferences.saveShopInfo(it)
+                                        userPreferences.saveLoggedInState(true)
+                                        userPreferences.saveRepositoryJobMessage(response.body()?.message.toNotNull())
+
+                                        userPreferences.saveRepositoryJobSuccessValue(true)
+                                        userPreferences.saveRepositoryJobMessage("Other info changed successfully")
+                                    }
+                                } else {
+                                    userPreferences.saveRepositoryJobSuccessValue(false)
+                                    userPreferences.saveRepositoryJobMessage(response.body()?.message ?: "Unable to change other info")
+                                }
+
+                            }
+                        }
+                        override fun onFailure(call: Call<CompanyResponseDto>, t: Throwable) {
+                            GlobalScope.launch(Dispatchers.IO + Job()) {
+                                userPreferences.saveRepositoryJobSuccessValue(false)
+                                userPreferences.saveRepositoryJobMessage(t.message ?: "Couldn't connect to server")
+                            }
+                        }
+                    })
+                }
+            }
+        }catch (e: Exception){
+            Log.d(
+                "CompanyRepository",
+                "General exception is called"
+            )
+            userPreferences.saveRepositoryJobSuccessValue(false)
+            userPreferences.saveRepositoryJobMessage("Could not connect to server\nCheck your internet connection and try again")
+        }
+    }
+
 
     @OptIn(DelicateCoroutinesApi::class)
     override suspend fun registerShopAccount(
@@ -208,6 +740,8 @@ class CompanyRepositoryImpl(
                                         val responseInfo = response.body()?.data?.toCompanyInfoDto()
                                         val registeredAccountInfo = responseInfo?.toCompanyEntity()?.toCompanyEntityJson()
                                         registeredAccountInfo?.let {
+                                            appDatabase.companyDao.deleteAllCompanies()
+                                            appDatabase.companyDao.addCompany(it.toCompanyEntity()!!)
                                             userPreferences.saveShopInfo(it)
                                             userPreferences.saveLoggedInState(true)
                                             userPreferences.saveRepositoryJobMessage(response.body()?.message.toNotNull())
@@ -279,6 +813,63 @@ class CompanyRepositoryImpl(
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
+    override suspend fun registerLocalAccountOnline(company: CompanyEntity) {
+        val context = MyShopManagerApp.applicationContext()
+        val userPreferences = UserPreferences(context)
+
+        val uniqueCompanyId = userPreferences.getShopInfo.first().toCompanyEntity()?.uniqueCompanyId
+        val shopAccountResponse = shopManagerDatabaseApi.getCompany(uniqueCompanyId.toNotNull())
+        val onlineCompanyAccountNotExists = shopAccountResponse?.data.toCompanyInfoDto() == null
+
+        if (onlineCompanyAccountNotExists) {
+            val call = shopManagerDatabaseApi.addCompany(company.toCompanyDto())
+            call!!.enqueue(object : Callback<AddCompanyResponse> {
+                override fun onResponse(
+                    call: Call<AddCompanyResponse>,
+                    response: Response<AddCompanyResponse>
+                ) {
+                    val isRegisteredSuccessfully = response.body()?.data != null
+                    GlobalScope.launch(Dispatchers.IO + Job()) {
+                        if (isRegisteredSuccessfully) {
+                            val responseInfo = response.body()?.data?.toCompanyInfoDto()
+                            val registeredAccountInfo =
+                                responseInfo?.toCompanyEntity()?.toCompanyEntityJson()
+                            registeredAccountInfo?.let {
+                                appDatabase.companyDao.deleteAllCompanies()
+                                appDatabase.companyDao.addCompany(it.toCompanyEntity()!!)
+                                userPreferences.saveShopInfo(it)
+                                userPreferences.saveLoggedInState(true)
+                                userPreferences.saveRepositoryJobMessage(response.body()?.message.toNotNull())
+
+                                userPreferences.saveRepositoryJobSuccessValue(true)
+                                userPreferences.saveRepositoryJobMessage("Account created successfully")
+                            }
+                        } else {
+                            userPreferences.saveRepositoryJobSuccessValue(false)
+                            userPreferences.saveRepositoryJobMessage(response.body()?.message.toNotNull())
+
+                        }
+                    }
+                }
+
+                override fun onFailure(
+                    call: Call<AddCompanyResponse>,
+                    t: Throwable
+                ) {
+                    GlobalScope.launch(Dispatchers.IO + Job()) {
+                        userPreferences.saveRepositoryJobSuccessValue(false)
+                        userPreferences.saveRepositoryJobMessage(t.message.toNotNull())
+                    }
+                }
+            })
+        }else{
+            userPreferences.saveRepositoryJobSuccessValue(false)
+            userPreferences.saveRepositoryJobMessage("Account already exists")
+        }
+
+    }
+
     override suspend fun login(email: String, password: String): Flow<Resource<String>> = flow{
         try {
             emit(Resource.Loading())
@@ -336,7 +927,6 @@ class CompanyRepositoryImpl(
                             Log.d("CompanyRepository", "2nd Shop info json = $thisShop1")
                         }
                     }
-
                 }
             }
 

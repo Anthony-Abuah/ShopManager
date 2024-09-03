@@ -52,7 +52,9 @@ object FormRelatedString{
     const val ClickToBackupDataRemotely = "Click to backup data remotely"
     const val ClickToSyncData = "Click to sync remote data with local data"
     const val ProductsSold = "Products sold"
+    const val OtherInfo = "Other info"
     const val ShopOwners = "Shop Owner(s)"
+    const val DateRegistered = "Date Registered"
     const val ShopPersonnel = "Shop Personnel"
 
     const val ShopName = "Shop Name"

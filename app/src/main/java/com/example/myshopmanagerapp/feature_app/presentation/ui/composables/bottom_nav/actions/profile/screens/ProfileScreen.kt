@@ -1,6 +1,5 @@
 package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.profile.screens
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -54,18 +53,32 @@ fun ProfileScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            val companyLogOutMessage = userPreferences.getRepositoryJobMessage.collectAsState(initial = emptyString).value
-
+            val repositoryMessage = userPreferences.getRepositoryJobMessage.collectAsState(initial = emptyString).value
             ProfileContent(
                 isLoggedIn = isLoggedIn?: false,
                 shopInfo = shopInfo.toCompanyEntity(),
-                logoutMessage = companyLogOutMessage.toNotNull(),
-                isLoggingOut = false,
+                repositoryMessage = repositoryMessage.toNotNull(),
+                changeShopName = { password, shopName->
+                    companyViewModel.changeShopName(password, shopName)
+                },
+                changeContact = { password, contact->
+                    companyViewModel.changeShopName(password, contact)
+                },
+                changeEmail = { password, email->
+                    companyViewModel.changeEmail(password, email)
+                },
+                changeLocation = { password, location->
+                    companyViewModel.changeLocation(password, location)
+                },
+                changeProductsSold = { password, productsSold->
+                    companyViewModel.changeProductsAndServices(password, productsSold)
+                },
+                changeOtherInfo = { password, otherInfo->
+                    companyViewModel.changeOtherInfo(password, otherInfo)
+                },
                 logout = { companyViewModel.companyLogout() },
-                openRegisterPage = { openSignUpPage() },
                 openLoginPage = { openLoginPage() },
-            )
-            Log.d("ProfileScreen", "company info Json = ${shopInfo.toCompanyEntity()}")
+            ) { openSignUpPage() }
         }
     }
 }
