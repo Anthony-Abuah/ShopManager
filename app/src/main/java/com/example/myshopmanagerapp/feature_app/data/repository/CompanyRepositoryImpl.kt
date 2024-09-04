@@ -760,9 +760,9 @@ class CompanyRepositoryImpl(
                             call: Call<CompanyResponseDto>,
                             response: Response<CompanyResponseDto>
                         ) {
-                            val emailChangedSuccessfully = response.body()?.data.toCompanyInfoDto() != null
+                            val otherInfoChangedSuccessfully = response.body()?.data.toCompanyInfoDto() != null
                             GlobalScope.launch(Dispatchers.IO + Job()) {
-                                if (emailChangedSuccessfully) {
+                                if (otherInfoChangedSuccessfully) {
                                     val responseInfo = response.body()?.data?.toCompanyInfoDto()
                                     val registeredAccountInfo = responseInfo?.toCompanyEntity()?.toCompanyEntityJson()
                                     registeredAccountInfo?.let {
