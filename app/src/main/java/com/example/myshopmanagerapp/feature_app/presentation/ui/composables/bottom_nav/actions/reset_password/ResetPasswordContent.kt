@@ -1,10 +1,8 @@
-package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.change_password
+package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.reset_password
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,9 +15,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myshopmanagerapp.R
 import com.example.myshopmanagerapp.core.Constants.emptyString
+import com.example.myshopmanagerapp.core.FormRelatedString.CompanyEmailPlaceholder
 import com.example.myshopmanagerapp.core.FormRelatedString.ConfirmPassword
-import com.example.myshopmanagerapp.core.FormRelatedString.EnterCurrentPassword
+import com.example.myshopmanagerapp.core.FormRelatedString.EnterCompanyEmail
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterNewPassword
+import com.example.myshopmanagerapp.core.FormRelatedString.EnterPersonnelPassword
 import com.example.myshopmanagerapp.core.Functions.toCompanyEntity
 import com.example.myshopmanagerapp.core.Functions.toEllipses
 import com.example.myshopmanagerapp.core.Functions.toNotNull
@@ -31,12 +31,11 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpaci
 
 
 @Composable
-fun ChangePasswordContent(
-    changePasswordMessage: String?,
-    changePasswordIsSuccessful: Boolean,
-    changePassword: (String, String, String) -> Unit,
-    navigateToResetPasswordScreen: () -> Unit,
-    navigateToProfileScreen: () -> Unit,
+fun ResetPasswordContent(
+    resetPasswordMessage: String?,
+    resetPasswordIsSuccessful: Boolean,
+    resetPassword: (String, String, String, String) -> Unit,
+    navigateBack: () -> Unit,
 ) {
     val context = LocalContext.current
     val userPreferences = UserPreferences(context)
@@ -47,6 +46,7 @@ fun ChangePasswordContent(
     val shopInfoJson = userPreferences.getShopInfo.collectAsState(initial = emptyString).value.toNotNull()
     val shopInfo = shopInfoJson.toCompanyEntity()
     val descriptionColor = if (isSystemInDarkTheme()) Grey70 else Grey40
+
 
     Column(
         modifier = Modifier
@@ -86,7 +86,7 @@ fun ChangePasswordContent(
             .fillMaxWidth()
             .weight(1f)){
             BasicScreenColumnWithoutBottomBar {
-                var currentPassword by remember {
+                var email by remember {
                     mutableStateOf(emptyString)
                 }
                 var newPassword by remember {
@@ -96,21 +96,28 @@ fun ChangePasswordContent(
                     mutableStateOf(emptyString)
                 }
 
+                var personnelPassword by remember {
+                    mutableStateOf(emptyString)
+                }
+
                 Spacer(modifier = Modifier.height(LocalSpacing.current.textFieldHeight))
 
-                // Current Password
+                // Company Email
                 Box(
-                    modifier = Modifier.padding(LocalSpacing.current.small),
+                    modifier = Modifier.padding(LocalSpacing.current.smallMedium),
                     contentAlignment = Alignment.Center
                 ) {
-                    PasswordTextField(
-                        value = currentPassword,
+                    BasicTextFieldWithTrailingIconError(
+                        value = email,
                         onValueChange = {
-                            currentPassword = it
+                            email = it
                         },
-                        placeholder = emptyString,
-                        label = EnterCurrentPassword,
-                        keyboardType = KeyboardType.Password
+                        isError = false,
+                        readOnly = false,
+                        placeholder = CompanyEmailPlaceholder,
+                        label = EnterCompanyEmail,
+                        icon = R.drawable.ic_email,
+                        keyboardType = KeyboardType.Email
                     )
                 }
 
@@ -152,6 +159,24 @@ fun ChangePasswordContent(
                     )
                 }
 
+                Spacer(modifier = Modifier.height(LocalSpacing.current.smallMedium))
+
+                // Personnel Password
+                Box(
+                    modifier = Modifier.padding(LocalSpacing.current.small),
+                    contentAlignment = Alignment.Center
+                ) {
+                    PasswordTextField(
+                        value = personnelPassword,
+                        onValueChange = {
+                            personnelPassword = it
+                        },
+                        placeholder = emptyString,
+                        label = EnterPersonnelPassword,
+                        keyboardType = KeyboardType.Password
+                    )
+                }
+
 
                 Spacer(modifier = Modifier.height(LocalSpacing.current.smallMedium))
 
@@ -163,35 +188,12 @@ fun ChangePasswordContent(
                     ),
                     contentAlignment = Alignment.Center
                 ) {
-                    BasicButton(buttonName = "Change Password") {
-                        changePassword(currentPassword, newPassword, confirmedPassword)
+                    BasicButton(buttonName = "Reset Password") {
+                        resetPassword(email, newPassword, confirmedPassword, personnelPassword)
                         confirmationInfoDialog = !confirmationInfoDialog
                     }
 
                 }
-
-                // Reset Password text
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                        vertical = LocalSpacing.current.small,
-                        horizontal = LocalSpacing.current.small)
-                        .clickable {
-                            navigateToResetPasswordScreen()
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Forgot Password? Click to reset password!",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Normal,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-
-                }
-
-
 
             }
         }
@@ -199,14 +201,14 @@ fun ChangePasswordContent(
 
     ConfirmationInfoDialog(
         openDialog = confirmationInfoDialog,
-        isLoading = changePasswordMessage.isNullOrEmpty(),
+        isLoading = resetPasswordMessage.isNullOrEmpty(),
         title = null,
-        textContent = changePasswordMessage.toNotNull(),
+        textContent = resetPasswordMessage.toNotNull(),
         unconfirmedDeletedToastText = null,
         confirmedDeleteToastText = null
     ) {
-        if (changePasswordIsSuccessful){
-            navigateToProfileScreen()
+        if (resetPasswordIsSuccessful){
+            navigateBack()
         }
         confirmationInfoDialog = false
     }

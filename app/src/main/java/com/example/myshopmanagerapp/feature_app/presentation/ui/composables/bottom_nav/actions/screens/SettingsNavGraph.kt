@@ -24,6 +24,7 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bott
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.register.screens.RegisterScreen
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.supplier_role.screen.SupplierRoleScreen
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.bank_personnel.screen.BankPersonnelScreen
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.reset_password.screens.ResetPasswordScreen
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.personnel.screens.PersonnelProfileNavGraph
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.records.screens.HomeScreens
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.records.generate_receipt.screen.ReceiptNavGraph
@@ -486,6 +487,7 @@ fun SettingsNavGraph(
                 navController.popBackStack()
             }
         }
+
         composable(route = SettingsScreens.ChangePasswordScreen.route,
             enterTransition = {
                 slideInHorizontally(
@@ -505,7 +507,33 @@ fun SettingsNavGraph(
                     )
                 ) + fadeOut(animationSpec = tween(500))
             }){
-            ChangePasswordScreen {
+            ChangePasswordScreen(navigateToResetPasswordScreen = {
+                navController.navigate(SettingsScreens.ResetPasswordScreen.route)
+            }) {
+                navController.popBackStack()
+            }
+        }
+
+        composable(route = SettingsScreens.ResetPasswordScreen.route,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { 500 },
+                    animationSpec = tween(
+                        durationMillis = 500,
+                        easing = LinearOutSlowInEasing
+                    )
+                ) + fadeIn(animationSpec = tween(500))
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { -500 },
+                    animationSpec = tween(
+                        durationMillis = 500,
+                        easing = LinearOutSlowInEasing
+                    )
+                ) + fadeOut(animationSpec = tween(500))
+            }){
+            ResetPasswordScreen {
                 navController.popBackStack()
             }
         }

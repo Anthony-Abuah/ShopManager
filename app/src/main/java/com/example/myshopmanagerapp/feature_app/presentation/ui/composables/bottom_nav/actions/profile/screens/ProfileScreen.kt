@@ -62,7 +62,7 @@ fun ProfileScreen(
                     companyViewModel.changeShopName(password, shopName)
                 },
                 changeContact = { password, contact->
-                    companyViewModel.changeShopName(password, contact)
+                    companyViewModel.changeContact(password, contact)
                 },
                 changeEmail = { password, email->
                     companyViewModel.changeEmail(password, email)

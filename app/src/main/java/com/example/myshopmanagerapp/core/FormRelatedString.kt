@@ -332,6 +332,7 @@ object FormRelatedString{
     const val PersonnelShortNotesPlaceholder = "Any other thing that you want to write about the personnel"
     const val EnterPersonnelFirstName = "Enter personnel's first name"
     const val EnterPersonnelUserName = "Enter personnel's username"
+    const val EnterPersonnelPassword = "Enter principal personnel's password"
     const val EnterPersonnelLastName = "Enter personnel's last name"
     const val EnterPersonnelOtherName = "Enter personnel's other names"
     const val EnterPersonnelContact = "Enter personnel's contact"

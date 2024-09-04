@@ -23,6 +23,7 @@ import com.example.myshopmanagerapp.feature_app.presentation.view_models.Personn
 @Composable
 fun ChangePasswordScreen(
     companyViewModel: CompanyViewModel = hiltViewModel(),
+    navigateToResetPasswordScreen: () -> Unit,
     navigateToProfileScreen: () -> Unit
 ) {
 
@@ -51,6 +52,9 @@ fun ChangePasswordScreen(
                 changePasswordIsSuccessful = passwordChangedSuccessful ?: false,
                 changePassword = {currentPassword, newPassword, confirmedPassword->
                     companyViewModel.changePassword(currentPassword, newPassword, confirmedPassword)
+                },
+                navigateToResetPasswordScreen = {
+                    navigateToResetPasswordScreen()
                 }
             ) {
                 navigateToProfileScreen()
@@ -96,7 +100,8 @@ fun ChangePersonnelPasswordScreen(
                     else{
                         Toast.makeText(context, "Passwords do not match", Toast.LENGTH_LONG).show()
                     }
-                }
+                },
+                navigateToResetPasswordScreen = {}
             ) {
                 navigateToProfileScreen()
             }

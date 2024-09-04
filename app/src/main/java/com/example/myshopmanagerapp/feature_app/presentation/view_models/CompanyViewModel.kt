@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myshopmanagerapp.core.Constants.emptyString
+import com.example.myshopmanagerapp.core.Functions.toCompanyEntity
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.Resource
 import com.example.myshopmanagerapp.core.UIEvent
@@ -54,6 +55,9 @@ class CompanyViewModel @Inject constructor(
 
 
     var companyInfo by mutableStateOf<CompanyEntity?>(CompanyEntity(0, emptyString, emptyString, emptyString, emptyString, emptyString, emptyString, emptyString, emptyString, emptyString, Date(), emptyString, emptyString, 0, emptyString))
+        private set
+
+    var shopInfo by mutableStateOf(CompanyEntity(0, emptyString, emptyString, emptyString, emptyString, emptyString, emptyString, emptyString, emptyString, emptyString, Date(), emptyString, emptyString, 0, emptyString))
         private set
 
     var addCompanyInfo by mutableStateOf(CompanyEntity(0, emptyString, emptyString, emptyString, emptyString, emptyString, emptyString, emptyString, emptyString, emptyString, Date(), emptyString, emptyString, 0, emptyString))
@@ -110,6 +114,8 @@ class CompanyViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val context = MyShopManagerApp.applicationContext()
+            val userPreferences = UserPreferences(context)
+            shopInfo = userPreferences.getShopInfo.first().toNotNull().toCompanyEntity() ?: shopInfo
             isLoggedIn = UserPreferences(context).getLoggedInState.first() ?: false
         }
     }
@@ -211,8 +217,16 @@ class CompanyViewModel @Inject constructor(
         companyRepository.registerShopAccount(company, passwordConfirmation)
     }
 
+    fun createCloudProfile() = viewModelScope.launch {
+        companyRepository.registerLocalAccountOnline(shopInfo)
+    }
+
     fun changePassword(currentPassword: String, newPassword: String, confirmedPassword: String) = viewModelScope.launch {
         companyRepository.changePassword(currentPassword, newPassword, confirmedPassword)
+    }
+
+    fun resetPassword(email: String, newPassword: String, confirmedPassword: String, personnelPassword: String) = viewModelScope.launch {
+        companyRepository.resetPassword(email, newPassword, confirmedPassword, personnelPassword)
     }
 
     fun changeEmail(currentPassword: String, email: String) = viewModelScope.launch {

@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.myshopmanagerapp.R
 import com.example.myshopmanagerapp.core.Constants.emptyString
+import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.UserPreferences
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenColumnWithoutBottomBar
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.ConfirmationInfoDialog
@@ -22,6 +23,8 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpaci
 
 @Composable
 fun SettingsContent(
+    repositoryMessage: String?,
+    createCloudProfile: () -> Unit,
     navigateToProfileScreen: () -> Unit,
     navigateToRegisterScreen: () -> Unit,
     navigateToLoginScreen: () -> Unit,
@@ -41,6 +44,9 @@ fun SettingsContent(
     val loggedInValue = userPreferences.getLoggedInState.collectAsState(initial = false).value
     val isLoggedIn = loggedInValue == true
     var openAlertDialog by remember {
+        mutableStateOf(false)
+    }
+    var confirmationInfoDialog by remember {
         mutableStateOf(false)
     }
     var alertDialogMessage by remember {
@@ -125,18 +131,19 @@ fun SettingsContent(
             .fillMaxWidth()
             .padding(LocalSpacing.current.smallMedium)
             .clickable {
-                if (isLoggedIn){
-                    alertDialogMessage = "You're already logged in.\nTo login into a new account, please log out first"
+                if (!isLoggedIn){
+                    alertDialogMessage = "You're not logged in.\nThis action creates an online account if you from your already created account on this local device"
                     openAlertDialog = !openAlertDialog
                 }else{
-                    navigateToLoginScreen()
+                    createCloudProfile()
+                    confirmationInfoDialog = !confirmationInfoDialog
                 }
            },
         ) {
             SettingsContentCard(
                 icon = R.drawable.ic_login,
                 title = "Create cloud profile",
-                info = null
+                info = "Create an online profile for your local account"
             )
         }
 
@@ -311,6 +318,17 @@ fun SettingsContent(
         confirmedDeleteToastText = null
     ) {
         openAlertDialog = false
+    }
+
+    ConfirmationInfoDialog(
+        openDialog = confirmationInfoDialog,
+        isLoading = repositoryMessage.isNullOrBlank(),
+        title = emptyString,
+        textContent = repositoryMessage.toNotNull(),
+        unconfirmedDeletedToastText = null,
+        confirmedDeleteToastText = null
+    ) {
+        confirmationInfoDialog = false
     }
 
 }

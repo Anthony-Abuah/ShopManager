@@ -26,6 +26,7 @@ import com.example.myshopmanagerapp.core.Routes.changeLocation
 import com.example.myshopmanagerapp.core.Routes.changeOtherInfo
 import com.example.myshopmanagerapp.core.Routes.changePassword
 import com.example.myshopmanagerapp.core.Routes.changeProductsAndServices
+import com.example.myshopmanagerapp.core.Routes.createOnlineCompany
 import com.example.myshopmanagerapp.core.Routes.deleteCompany
 import com.example.myshopmanagerapp.core.Routes.getAllCompanies
 import com.example.myshopmanagerapp.core.Routes.getAllCompanyBanks
@@ -46,6 +47,7 @@ import com.example.myshopmanagerapp.core.Routes.getAllCompanySuppliers
 import com.example.myshopmanagerapp.core.Routes.getAllCompanyWithdrawals
 import com.example.myshopmanagerapp.core.Routes.getCompany
 import com.example.myshopmanagerapp.core.Routes.login
+import com.example.myshopmanagerapp.core.Routes.resetPassword
 import com.example.myshopmanagerapp.core.Routes.smartAddCompanyBanks
 import com.example.myshopmanagerapp.core.Routes.smartAddCompanyCashIns
 import com.example.myshopmanagerapp.core.Routes.smartAddCompanyCustomers
@@ -130,9 +132,11 @@ interface ShopManagerDatabaseApi {
     suspend fun getCompany(@Path("uniqueCompanyId") uniqueCompanyId: String): CompanyResponseDto?
 
 
-
     @PUT(changePassword)
     fun changePassword(@Path("uniqueCompanyId") uniqueCompanyId: String, @Path("currentPassword") currentPassword: String, @Path("updatedPassword") updatedPassword: String): Call<CompanyResponseDto>?
+
+    @PUT(resetPassword)
+    fun resetPassword(@Path("uniqueCompanyId") uniqueCompanyId: String, @Path("email") email: String, @Path("updatedPassword") updatedPassword: String, @Path("personnelPassword") personnelPassword: String): Call<CompanyResponseDto>?
 
     @PUT(changeEmail)
     fun changeEmail(@Path("uniqueCompanyId") uniqueCompanyId: String, @Path("currentPassword") currentPassword: String, @Path("email") email: String): Call<CompanyResponseDto>?
@@ -157,6 +161,9 @@ interface ShopManagerDatabaseApi {
 
     @POST(addCompany)
     fun addCompany(@Body companyInfo: CompanyInfoDto): Call<AddCompanyResponse>?
+
+    @POST(createOnlineCompany)
+    fun createOnlineCompany(@Body companyInfo: CompanyInfoDto): Call<AddCompanyResponse>?
 
 
     // Customer route

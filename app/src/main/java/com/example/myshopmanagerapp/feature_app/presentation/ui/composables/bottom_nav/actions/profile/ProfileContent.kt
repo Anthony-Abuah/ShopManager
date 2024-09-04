@@ -663,7 +663,7 @@ fun ProfileContent(
 
     ConfirmationInfoDialog(
         openDialog = confirmationInfoDialog,
-        isLoading = false,
+        isLoading = repositoryMessage.isNullOrBlank(),
         title = null,
         textContent = repositoryMessage.toNotNull(),
         unconfirmedDeletedToastText = null,

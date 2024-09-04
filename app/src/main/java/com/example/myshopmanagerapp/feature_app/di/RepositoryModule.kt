@@ -5,6 +5,8 @@ import com.example.myshopmanagerapp.feature_app.data.local.AppDatabase
 import com.example.myshopmanagerapp.feature_app.data.remote.ShopManagerDatabaseApi
 import com.example.myshopmanagerapp.feature_app.data.repository.*
 import com.example.myshopmanagerapp.feature_app.domain.repository.*
+import com.example.myshopmanagerapp.feature_app.security.HashService
+import com.example.myshopmanagerapp.feature_app.security.HashServiceImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -89,6 +91,7 @@ object RepositoryModule {
         stockRepository: StockRepository,
         supplierRepository: SupplierRepository,
         withdrawalRepository: WithdrawalRepository,
+        hashService: HashService
     ): CompanyRepository {
         return CompanyRepositoryImpl(
             db,
@@ -106,7 +109,8 @@ object RepositoryModule {
             savingsRepository,
             stockRepository,
             supplierRepository,
-            withdrawalRepository
+            withdrawalRepository,
+            hashService
         )
     }
 
@@ -181,6 +185,12 @@ object RepositoryModule {
         shopManagerDatabaseApi: ShopManagerDatabaseApi
     ): BackupRepository {
         return BackupRepositoryImpl(db, shopManagerDatabaseApi)
+    }
+    @Provides
+    @Singleton
+    fun provideHashService(
+    ): HashService {
+        return HashServiceImpl()
     }
 
 }

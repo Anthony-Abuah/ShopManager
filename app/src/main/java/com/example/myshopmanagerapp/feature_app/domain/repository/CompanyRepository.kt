@@ -15,6 +15,8 @@ interface CompanyRepository {
 
     suspend fun changePassword(currentPassword: String, newPassword: String, confirmedPassword: String)
 
+    suspend fun resetPassword(email: String, newPassword: String, confirmedPassword: String, personnelPassword: String)
+
     suspend fun changeShopName(currentPassword: String, shopName: String)
     suspend fun changeEmail(currentPassword: String, email: String)
     suspend fun changeContact(currentPassword: String, contact: String)
