@@ -12,14 +12,14 @@ interface BackupRepository {
 
     suspend fun restoreDatabase(context: Context, restart: Boolean = true): Flow<Resource<String>>
 
-    suspend fun absoluteBackup(coroutineScope: CoroutineScope): Flow<Resource<String>>
-    suspend fun absoluteBackup1(coroutineScope: CoroutineScope)
+    suspend fun absoluteBackup()
 
-    suspend fun smartBackup(coroutineScope: CoroutineScope): Flow<Resource<String>>
 
-    suspend fun smartBackup1()
+    suspend fun smartBackup()
 
     suspend fun absoluteSyncCompanyInfo()
+
+    suspend fun flowAbsoluteSyncCompanyInfo(): Flow<Resource<String>>
 
     suspend fun smartSyncCompanyInfo(coroutineScope: CoroutineScope): Flow<Resource<String>>
 

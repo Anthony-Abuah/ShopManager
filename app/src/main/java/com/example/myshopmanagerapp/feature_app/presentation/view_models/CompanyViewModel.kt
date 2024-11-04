@@ -18,6 +18,7 @@ import com.example.myshopmanagerapp.feature_app.data.local.entities.company.Comp
 import com.example.myshopmanagerapp.feature_app.data.local.entities.personnel.PersonnelEntity
 import com.example.myshopmanagerapp.feature_app.data.local.entities.receipt.ReceiptEntity
 import com.example.myshopmanagerapp.feature_app.domain.model.ItemQuantityInfo
+import com.example.myshopmanagerapp.feature_app.domain.model.PaymentMethod
 import com.example.myshopmanagerapp.feature_app.domain.model.ReceiptInfo
 import com.example.myshopmanagerapp.feature_app.domain.repository.CompanyRepository
 import com.example.myshopmanagerapp.feature_app.domain.repository.GeneratePDFRepository
@@ -594,6 +595,18 @@ class CompanyViewModel @Inject constructor(
     fun addReceiptItems(items: List<ItemQuantityInfo>) {
         receiptInfo = receiptInfo.copy(
             items = items
+        )
+    }
+
+    fun addPaymentMethod(paymentMethod: String) {
+        receiptInfo = receiptInfo.copy(
+            paymentMethod = paymentMethod
+        )
+    }
+
+    fun addTransactionId(transactionId: String) {
+        receiptInfo = receiptInfo.copy(
+            transactionId = transactionId
         )
     }
 

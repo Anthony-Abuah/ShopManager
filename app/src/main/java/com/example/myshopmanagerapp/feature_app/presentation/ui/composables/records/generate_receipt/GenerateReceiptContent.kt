@@ -1,5 +1,6 @@
 package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.records.generate_receipt
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -12,20 +13,30 @@ import androidx.compose.ui.text.input.KeyboardType
 import com.example.myshopmanagerapp.R
 import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.CustomerEntities
+import com.example.myshopmanagerapp.core.FormRelatedString.AddPaymentMethod
+import com.example.myshopmanagerapp.core.FormRelatedString.EnterTransactionId
 import com.example.myshopmanagerapp.core.FormRelatedString.GHS
+import com.example.myshopmanagerapp.core.FormRelatedString.PaymentMethodPlaceholder
 import com.example.myshopmanagerapp.core.FormRelatedString.ReceiptCustomerPlaceholder
 import com.example.myshopmanagerapp.core.FormRelatedString.ReceiptDayOfWeek
+import com.example.myshopmanagerapp.core.FormRelatedString.SelectPaymentMethod
 import com.example.myshopmanagerapp.core.FormRelatedString.SelectReceiptCustomer
 import com.example.myshopmanagerapp.core.FormRelatedString.SelectReceiptDate
+import com.example.myshopmanagerapp.core.FormRelatedString.TransactionIdPlaceholder
 import com.example.myshopmanagerapp.core.Functions.toDateString
 import com.example.myshopmanagerapp.core.Functions.toLocalDate
+import com.example.myshopmanagerapp.core.Functions.toNotNull
+import com.example.myshopmanagerapp.core.TypeConverters.toListOfPaymentMethods
+import com.example.myshopmanagerapp.core.TypeConverters.toListOfPaymentMethodsJson
 import com.example.myshopmanagerapp.core.UserPreferences
 import com.example.myshopmanagerapp.feature_app.data.local.entities.customers.CustomerEntity
 import com.example.myshopmanagerapp.feature_app.data.local.entities.inventory_items.InventoryItemEntity
 import com.example.myshopmanagerapp.feature_app.data.local.entities.receipt.ReceiptEntity
 import com.example.myshopmanagerapp.feature_app.domain.model.ItemQuantityInfo
+import com.example.myshopmanagerapp.feature_app.domain.model.PaymentMethod
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.*
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
+import kotlinx.coroutines.launch
 import java.util.*
 
 
@@ -38,6 +49,8 @@ fun GenerateReceiptContent(
     inventoryItems: List<InventoryItemEntity>,
     allCustomers: CustomerEntities,
     addReceiptDate: (String) -> Unit,
+    addPaymentMethod: (String) -> Unit,
+    addTransactionId: (String) -> Unit,
     getReceiptItems: (List<ItemQuantityInfo>) -> Unit,
     createInventoryItem: () -> Unit,
     addCustomer: (CustomerEntity?) -> Unit,
@@ -46,9 +59,15 @@ fun GenerateReceiptContent(
     navigateBack: () -> Unit,
 ) {
     val context = LocalContext.current
-    val thisCurrency = UserPreferences(context).getCurrency.collectAsState(initial = emptyString).value
+    val userPreferences = UserPreferences(context)
+    val thisCurrency = userPreferences.getCurrency.collectAsState(initial = emptyString).value
     val currency = if (thisCurrency.isNullOrBlank()) GHS else thisCurrency
+    var paymentMethodsJson = userPreferences.getPaymentMethod.collectAsState(initial = emptyString).value
+    val coroutineScope = rememberCoroutineScope()
 
+    var openPaymentMethodDialog by remember {
+        mutableStateOf(false)
+    }
     var customerName by remember {
         mutableStateOf(emptyString)
     }
@@ -135,6 +154,46 @@ fun GenerateReceiptContent(
                     customer = allCustomers.firstOrNull{customerEntity -> customerEntity.customerName == it }
                     addCustomer(customer)
                 }
+            )
+        }
+
+        // Payment Method
+        Box(modifier = Modifier.padding(LocalSpacing.current.small),
+            contentAlignment = Alignment.Center
+        ){
+            val listOfPaymentMethods = paymentMethodsJson.toListOfPaymentMethods()
+            AutoCompleteWithAddButton(
+                label = SelectPaymentMethod,
+                listItems = listOfPaymentMethods.map { it.paymentMethod },
+                placeholder = PaymentMethodPlaceholder,
+                readOnly = false,
+                expandedIcon = R.drawable.ic_money_filled,
+                unexpandedIcon = R.drawable.ic_money_outline,
+                onClickAddButton = { openPaymentMethodDialog = !openPaymentMethodDialog },
+                getSelectedItem = {_paymentMethod->
+                    addPaymentMethod(_paymentMethod)
+                }
+            )
+        }
+
+        // Transaction Id
+        Box(
+            modifier = Modifier.padding(LocalSpacing.current.small),
+            contentAlignment = Alignment.Center
+        ) {
+            var transactionId by remember { mutableStateOf(emptyString) }
+            BasicTextFieldWithTrailingIconError(
+                value = transactionId,
+                onValueChange = {_transactionId->
+                    transactionId = _transactionId
+                    addTransactionId(transactionId)
+                },
+                isError = false,
+                readOnly = false,
+                placeholder = TransactionIdPlaceholder,
+                label = EnterTransactionId,
+                icon = R.drawable.ic_money_outline,
+                keyboardType = KeyboardType.Text
             )
         }
 
@@ -243,6 +302,33 @@ fun GenerateReceiptContent(
             confirmedDeleteToastText = null
         ) {
             openAddItemDisplayDialog = false
+        }
+
+        BasicTextFieldAlertDialog(
+            openDialog = openPaymentMethodDialog,
+            title = AddPaymentMethod,
+            textContent = emptyString,
+            placeholder = PaymentMethodPlaceholder,
+            label = AddPaymentMethod,
+            icon = R.drawable.ic_money_outline,
+            keyboardType = KeyboardType.Text,
+            unconfirmedUpdatedToastText = "Did not add payment method",
+            confirmedUpdatedToastText = "Payment method added",
+            getValue = {_paymentMethod->
+                val mutableListOfPaymentMethod = paymentMethodsJson.toListOfPaymentMethods().toMutableList()
+                val thisPaymentMethod = PaymentMethod(_paymentMethod)
+                if ( mutableListOfPaymentMethod.add(thisPaymentMethod)){
+                    paymentMethodsJson = mutableListOfPaymentMethod.toSet().toList().toListOfPaymentMethodsJson()
+                    coroutineScope.launch {
+                        userPreferences.savePaymentMethod(paymentMethodsJson.toNotNull())
+                        Toast.makeText(context, "Could not add payment method", Toast.LENGTH_LONG).show()
+                    }
+                }else{
+                    Toast.makeText(context, "Could not add payment method", Toast.LENGTH_LONG).show()
+                }
+            }
+        ) {
+            openPaymentMethodDialog = false
         }
 
 

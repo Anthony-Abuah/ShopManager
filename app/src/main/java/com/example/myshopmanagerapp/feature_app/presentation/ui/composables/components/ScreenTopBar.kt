@@ -1,5 +1,6 @@
 package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -8,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -30,6 +32,7 @@ import com.example.myshopmanagerapp.feature_app.domain.model.ListNumberDropDownI
 import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
 import com.example.myshopmanagerapp.feature_app.domain.model.ProfileDropDownItem
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
+import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.scriptSemiBold
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,29 +40,44 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpaci
 fun FirstScreenTopBar(
     topBarTitleText: String,
 ) {
-    TopAppBar (
-        title = {
-            Row(modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.CenterStart) {
-                    Text(
-                        text = topBarTitleText,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            titleContentColor = MaterialTheme.colorScheme.onBackground,
-            navigationIconContentColor = MaterialTheme.colorScheme.onBackground
-        ),
-        navigationIcon = {}
-    )
+    Card(modifier = Modifier
+        .background(MaterialTheme.colorScheme.background)
+        .fillMaxWidth()
+        .height(LocalSpacing.current.bottomNavBarSize),
+        elevation = CardDefaults.cardElevation(LocalSpacing.current.default)
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            TopAppBar(
+                title = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            Text(
+                                text = topBarTitleText,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground
+                ),
+                navigationIcon = {}
+            )
+        }
+    }
 }
 
 
@@ -70,17 +88,21 @@ fun BasicScreenTopBar(
     backgroundColor: Color = MaterialTheme.colorScheme.background,
     navigateBack: () -> Unit
 ) {
-    TopAppBar (
+
+    TopAppBar(
         title = {
-            Row(modifier = Modifier.fillMaxWidth(),
+            Row(
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.CenterStart) {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.CenterStart
+                ) {
                     Text(
                         text = topBarTitleText,
                         color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -92,17 +114,89 @@ fun BasicScreenTopBar(
             navigationIconContentColor = MaterialTheme.colorScheme.onBackground
         ),
         navigationIcon = {
-            IconButton(
-                onClick = navigateBack
+            Box(modifier = Modifier.fillMaxHeight(),
+                contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
+                IconButton(
+                    onClick = navigateBack
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
             }
         }
     )
+
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ViewDebtScreenTopBar(
+    topBarTitleText: String,
+    backgroundColor: Color = MaterialTheme.colorScheme.background,
+    deleteDebt: () -> Unit,
+    navigateBack: () -> Unit,
+) {
+
+    TopAppBar(
+        title = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Box(
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Text(
+                        text = topBarTitleText,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Box(
+                    modifier = Modifier.clickable { deleteDebt() },
+                    contentAlignment = Alignment.CenterEnd
+                ) {
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = emptyString,
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
+
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = backgroundColor,
+            titleContentColor = MaterialTheme.colorScheme.onBackground,
+            navigationIconContentColor = MaterialTheme.colorScheme.onBackground
+        ),
+        navigationIcon = {
+            Box(modifier = Modifier.fillMaxHeight(),
+                contentAlignment = Alignment.Center
+            ) {
+                IconButton(
+                    onClick = navigateBack
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+            }
+        }
+    )
+
 }
 
 
@@ -131,193 +225,223 @@ fun CustomerScreenTopBar(
     var itemHeight by remember {
         mutableStateOf(0.dp)
     }
-
-    TopAppBar (
-        title = {
-            Row(modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.CenterStart) {
-                    Text(
-                        text = topBarTitleText,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                Row(modifier = Modifier.wrapContentWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    Box(modifier = Modifier
-                        .width(LocalSpacing.current.topBarIcon)
-                        .padding(horizontal = LocalSpacing.current.default)
-                        .onSizeChanged { itemHeight = with(density) { it.height.toDp() } }
-                        .pointerInput(true) {
-                            detectTapGestures(
-                                onPress = {
-                                    expandSortItems = true
-                                    pressOffset = DpOffset(0.toDp(), it.y.toDp())
-                                }
-                            )
-                        },
-                        contentAlignment = Alignment.CenterEnd) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_sort),
-                            contentDescription = emptyString,
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
-                        DropdownMenu(modifier = Modifier
-                            .width(300.dp),
-                            expanded = expandSortItems,
-                            onDismissRequest = { expandSortItems = false },
-                            offset = pressOffset
+    Card(modifier = Modifier
+        .background(MaterialTheme.colorScheme.background)
+        .fillMaxWidth()
+        .height(LocalSpacing.current.bottomNavBarSize),
+        elevation = CardDefaults.cardElevation(LocalSpacing.current.default)
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            TopAppBar(
+                title = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier.weight(1f),
+                            contentAlignment = Alignment.CenterStart
                         ) {
-                            listOfSortItems.forEachIndexed{ index, value->
-                                Box(modifier = Modifier
-                                    .height(LocalSpacing.current.dropDownItem),
-                                    contentAlignment = Alignment.CenterStart
-                                ) {
-                                    DropdownMenuItem(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        text = {
-                                            Row(modifier = Modifier.fillMaxWidth(),
-                                                horizontalArrangement = Arrangement.Start,
-                                                verticalAlignment = Alignment.CenterVertically
-                                            ) {
-                                                value.icon?.let {
-                                                    Icon(
-                                                        modifier = Modifier.padding(end = LocalSpacing.current.default),
-                                                        painter = painterResource(id = it),
-                                                        contentDescription = emptyString,
-                                                        tint = MaterialTheme.colorScheme.onSurface
-                                                    )
-                                                }
+                            Text(
+                                text = topBarTitleText,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
 
-                                                Text(
-                                                    text = value.titleText,
-                                                    color = MaterialTheme.colorScheme.onSurface,
-                                                    style = MaterialTheme.typography.bodyLarge,
-                                                    fontWeight = FontWeight.Normal
-                                                )
-                                            }
-                                        },
-                                        onClick = {
-                                            onSort(value)
-                                            expandSortItems = false
+                        Row(
+                            modifier = Modifier.wrapContentWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            Box(modifier = Modifier
+                                .width(LocalSpacing.current.topBarIcon)
+                                .padding(horizontal = LocalSpacing.current.default)
+                                .onSizeChanged {
+                                    itemHeight = with(density) { it.height.toDp() }
+                                }
+                                .pointerInput(true) {
+                                    detectTapGestures(
+                                        onPress = {
+                                            expandSortItems = true
+                                            pressOffset = DpOffset(0.toDp(), it.y.toDp())
                                         }
                                     )
-                                }
-                                if (index == 1 || index == 3){
-                                    HorizontalDivider()
+                                },
+                                contentAlignment = Alignment.CenterEnd
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_sort),
+                                    contentDescription = emptyString,
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
+                                DropdownMenu(
+                                    modifier = Modifier
+                                        .width(300.dp),
+                                    expanded = expandSortItems,
+                                    onDismissRequest = { expandSortItems = false },
+                                    offset = pressOffset
+                                ) {
+                                    listOfSortItems.forEachIndexed { index, value ->
+                                        Box(
+                                            modifier = Modifier
+                                                .height(LocalSpacing.current.dropDownItem),
+                                            contentAlignment = Alignment.CenterStart
+                                        ) {
+                                            DropdownMenuItem(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                text = {
+                                                    Row(
+                                                        modifier = Modifier.fillMaxWidth(),
+                                                        horizontalArrangement = Arrangement.Start,
+                                                        verticalAlignment = Alignment.CenterVertically
+                                                    ) {
+                                                        value.icon?.let {
+                                                            Icon(
+                                                                modifier = Modifier.padding(end = LocalSpacing.current.default),
+                                                                painter = painterResource(id = it),
+                                                                contentDescription = emptyString,
+                                                                tint = MaterialTheme.colorScheme.onSurface
+                                                            )
+                                                        }
+
+                                                        Text(
+                                                            text = value.titleText,
+                                                            color = MaterialTheme.colorScheme.onSurface,
+                                                            style = MaterialTheme.typography.bodyLarge,
+                                                            fontWeight = FontWeight.Normal
+                                                        )
+                                                    }
+                                                },
+                                                onClick = {
+                                                    onSort(value)
+                                                    expandSortItems = false
+                                                }
+                                            )
+                                        }
+                                        if (index == 1 || index == 3) {
+                                            HorizontalDivider()
+                                        }
+                                    }
                                 }
                             }
-                        }
-                    }
 
-                    Box(modifier = Modifier
-                        .width(LocalSpacing.current.topBarIcon)
-                        .padding(horizontal = LocalSpacing.current.default)
-                        .onSizeChanged { itemHeight = with(density) { it.height.toDp() } }
-                        .pointerInput(true) {
-                            detectTapGestures(
-                                onPress = {
-                                    expandListNumberDropItems = true
-                                    pressOffset = DpOffset(0.toDp(), it.y.toDp())
+                            Box(modifier = Modifier
+                                .width(LocalSpacing.current.topBarIcon)
+                                .padding(horizontal = LocalSpacing.current.default)
+                                .onSizeChanged {
+                                    itemHeight = with(density) { it.height.toDp() }
                                 }
-                            )
-                        },
-                        contentAlignment = Alignment.CenterEnd) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_list),
-                            contentDescription = emptyString,
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
-                        DropdownMenu(modifier = Modifier
-                            .width(150.dp),
-                            expanded = expandListNumberDropItems,
-                            onDismissRequest = { expandListNumberDropItems = false },
-                            offset = pressOffset
-                        ) {
-                            listDropDownItems.forEachIndexed{ index, value->
-                                Box(modifier = Modifier
-                                    .height(LocalSpacing.current.dropDownItem),
-                                    contentAlignment = Alignment.CenterStart
-                                ) {
-                                    DropdownMenuItem(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        text = {
-                                            Row(modifier = Modifier.fillMaxWidth(),
-                                                horizontalArrangement = Arrangement.Start,
-                                                verticalAlignment = Alignment.CenterVertically
-                                            ) {
-                                                value.icon?.let {
-                                                    Icon(
-                                                        modifier = Modifier.padding(end = LocalSpacing.current.default),
-                                                        painter = painterResource(id = it),
-                                                        contentDescription = emptyString,
-                                                        tint = MaterialTheme.colorScheme.onSurface
-                                                    )
-                                                }
-
-                                                Text(
-                                                    text = value.titleText,
-                                                    color = MaterialTheme.colorScheme.onSurface,
-                                                    style = MaterialTheme.typography.bodyLarge,
-                                                    fontWeight = FontWeight.Normal
-                                                )
-                                            }
-                                        },
-                                        onClick = {
-                                            onClickListItem(value)
-                                            expandListNumberDropItems = false
+                                .pointerInput(true) {
+                                    detectTapGestures(
+                                        onPress = {
+                                            expandListNumberDropItems = true
+                                            pressOffset = DpOffset(0.toDp(), it.y.toDp())
                                         }
                                     )
-                                }
-                                if (index == 0 || index == 5){
-                                    HorizontalDivider()
+                                },
+                                contentAlignment = Alignment.CenterEnd
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_list),
+                                    contentDescription = emptyString,
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
+                                DropdownMenu(
+                                    modifier = Modifier
+                                        .width(150.dp),
+                                    expanded = expandListNumberDropItems,
+                                    onDismissRequest = { expandListNumberDropItems = false },
+                                    offset = pressOffset
+                                ) {
+                                    listDropDownItems.forEachIndexed { index, value ->
+                                        Box(
+                                            modifier = Modifier
+                                                .height(LocalSpacing.current.dropDownItem),
+                                            contentAlignment = Alignment.CenterStart
+                                        ) {
+                                            DropdownMenuItem(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                text = {
+                                                    Row(
+                                                        modifier = Modifier.fillMaxWidth(),
+                                                        horizontalArrangement = Arrangement.Start,
+                                                        verticalAlignment = Alignment.CenterVertically
+                                                    ) {
+                                                        value.icon?.let {
+                                                            Icon(
+                                                                modifier = Modifier.padding(end = LocalSpacing.current.default),
+                                                                painter = painterResource(id = it),
+                                                                contentDescription = emptyString,
+                                                                tint = MaterialTheme.colorScheme.onSurface
+                                                            )
+                                                        }
+
+                                                        Text(
+                                                            text = value.titleText,
+                                                            color = MaterialTheme.colorScheme.onSurface,
+                                                            style = MaterialTheme.typography.bodyLarge,
+                                                            fontWeight = FontWeight.Normal
+                                                        )
+                                                    }
+                                                },
+                                                onClick = {
+                                                    onClickListItem(value)
+                                                    expandListNumberDropItems = false
+                                                }
+                                            )
+                                        }
+                                        if (index == 0 || index == 5) {
+                                            HorizontalDivider()
+                                        }
+                                    }
                                 }
                             }
+
+                            Box(modifier = Modifier
+                                .width(LocalSpacing.current.topBarIcon)
+                                .clickable { onClickPDF() }
+                                .padding(horizontal = LocalSpacing.current.default),
+                                contentAlignment = Alignment.CenterEnd) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_pdf),
+                                    contentDescription = emptyString,
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
+
+
+                        }
+
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground
+                ),
+                navigationIcon = {
+                    Box(modifier = Modifier.fillMaxHeight(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        IconButton(
+                            onClick = navigateBack
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
                         }
                     }
-
-                    Box(modifier = Modifier
-                        .width(LocalSpacing.current.topBarIcon)
-                        .clickable { onClickPDF() }
-                        .padding(horizontal = LocalSpacing.current.default),
-                        contentAlignment = Alignment.CenterEnd){
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_pdf),
-                            contentDescription = emptyString,
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
-
-
-
                 }
-
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            titleContentColor = MaterialTheme.colorScheme.onBackground,
-            navigationIconContentColor = MaterialTheme.colorScheme.onBackground
-        ),
-        navigationIcon = {
-            IconButton(
-                onClick = navigateBack
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
+            )
         }
-    )
+    }
 }
 
 
@@ -425,63 +549,99 @@ fun HomeScreenTopBar(
     navigateToPersonnelNavGraph: () -> Unit,
     navigateBack: () -> Unit
 ) {
-    TopAppBar (
-        title = {
-            Row(modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.CenterStart) {
-                    Text(
-                        text = topBarTitleText,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                Column(modifier = Modifier.size(60.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Box(modifier = Modifier.size(LocalSpacing.current.topBarIcon)
-                        .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape),
+    Card(modifier = Modifier
+        .background(MaterialTheme.colorScheme.background)
+        .fillMaxWidth()
+        .height(LocalSpacing.current.bottomNavBarSize),
+        elevation = CardDefaults.cardElevation(LocalSpacing.current.default)
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            TopAppBar(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Transparent),
+                title = {
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier.weight(1f),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            Text(
+                                text = topBarTitleText,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        Column(
+                            modifier = Modifier
+                                .padding(LocalSpacing.current.extraSmall)
+                                .wrapContentWidth()
+                                .fillMaxHeight(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(LocalSpacing.current.large)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    modifier = Modifier
+                                        .padding(LocalSpacing.current.extraSmall)
+                                        .fillMaxSize()
+                                        .clickable { navigateToPersonnelNavGraph() },
+                                    painter = painterResource(id = personnelIcon),
+                                    contentDescription = emptyString,
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
+
+                            Text(
+                                text = personnelUserName,
+                                fontSize = 10.sp,
+                                fontFamily = scriptSemiBold,
+                                fontWeight = FontWeight.Bold,
+                                overflow = TextOverflow.Ellipsis,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground
+                ),
+                navigationIcon = {
+                    Box(modifier = Modifier.fillMaxHeight(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            modifier = Modifier
-                                .width(LocalSpacing.current.dropDownItem)
-                                .clickable { navigateToPersonnelNavGraph() },
-                            painter = painterResource(id = personnelIcon),
-                            contentDescription = emptyString,
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
+                        IconButton(
+                            onClick = navigateBack
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_nav_drawer),
+                                contentDescription = emptyString,
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
                     }
-
-                    Text(text = personnelUserName,
-                        fontSize = 8.sp,
-                        overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
                 }
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            titleContentColor = MaterialTheme.colorScheme.onBackground,
-            navigationIconContentColor = MaterialTheme.colorScheme.onBackground
-        ),
-        navigationIcon = {
-            IconButton(
-                onClick = navigateBack
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_nav_drawer),
-                    contentDescription = emptyString,
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
+            )
         }
-    )
+    }
+
 }
 
 
@@ -489,6 +649,9 @@ fun HomeScreenTopBar(
 @Composable
 fun SearchTopBar(
     placeholder: String,
+    navigationIconColor: Color = MaterialTheme.colorScheme.onBackground,
+    backgroundColor: Color = MaterialTheme.colorScheme.background,
+    onBackgroundColor: Color = MaterialTheme.colorScheme.onBackground,
     goBack: () -> Unit = {},
     getSearchValue: (String) -> Unit
 ) {
@@ -511,13 +674,13 @@ fun SearchTopBar(
                     .clickable { goBack() },
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = emptyString,
-                tint = MaterialTheme.colorScheme.onBackground
+                tint = navigationIconColor
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            titleContentColor = MaterialTheme.colorScheme.onBackground,
-            navigationIconContentColor = MaterialTheme.colorScheme.onBackground
+            containerColor = backgroundColor,
+            titleContentColor = onBackgroundColor,
+            navigationIconContentColor = onBackgroundColor,
         )
     )
 }
@@ -541,86 +704,109 @@ fun StockReportScreenTopBar(
     var itemHeight by remember {
         mutableStateOf(0.dp)
     }
-    TopAppBar (
-        modifier = Modifier,
-        title = {
-            Row(modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(modifier = Modifier.weight(5f),
-                    contentAlignment = Alignment.CenterStart) {
-                    Text(
-                        text = topBarTitleText,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                Box(modifier = Modifier
-                    .weight(1f)
-                    .onSizeChanged {
-                        itemHeight = with(density) { it.height.toDp() }
-                    }
-                    .pointerInput(true) {
-                        detectTapGestures(
-                            onPress = {
-                                isContextMenuVisible = true
-                                pressOffset = DpOffset(it.x.toDp(), it.y.toDp())
-                            }
-                        )
-                    },
-                    contentAlignment = Alignment.CenterEnd) {
-                    Icon(imageVector = Icons.Default.Tune,
-                        contentDescription = emptyString,
-                        tint = MaterialTheme.colorScheme.onBackground
-                    )
-                    DropdownMenu(modifier = Modifier
-                        .padding(end = LocalSpacing.current.small),
-                        expanded = isContextMenuVisible,
-                        onDismissRequest = { isContextMenuVisible = false },
-                        offset = pressOffset
+    Card(modifier = Modifier
+        .background(MaterialTheme.colorScheme.background)
+        .fillMaxWidth()
+        .height(LocalSpacing.current.bottomNavBarSize),
+        elevation = CardDefaults.cardElevation(LocalSpacing.current.default)
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            TopAppBar(
+                modifier = Modifier,
+                title = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        periodDropDownItems.forEach{ item->
-                            Box(modifier = Modifier
-                                .height(LocalSpacing.current.dropDownItem),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                DropdownMenuItem(
-                                    text = {
-                                        Text(text = item.titleText,
-                                            color = MaterialTheme.colorScheme.onSurface,
-                                            style = MaterialTheme.typography.bodyLarge,
-                                            fontWeight = FontWeight.Normal
-                                        )
-                                    },
-                                    onClick = {
-                                        onClickItem(item)
-                                        isContextMenuVisible = false
+                        Box(
+                            modifier = Modifier.weight(5f),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            Text(
+                                text = topBarTitleText,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Box(modifier = Modifier
+                            .weight(1f)
+                            .onSizeChanged {
+                                itemHeight = with(density) { it.height.toDp() }
+                            }
+                            .pointerInput(true) {
+                                detectTapGestures(
+                                    onPress = {
+                                        isContextMenuVisible = true
+                                        pressOffset = DpOffset(it.x.toDp(), it.y.toDp())
                                     }
                                 )
+                            },
+                            contentAlignment = Alignment.CenterEnd
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Tune,
+                                contentDescription = emptyString,
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
+                            DropdownMenu(
+                                modifier = Modifier
+                                    .padding(end = LocalSpacing.current.small),
+                                expanded = isContextMenuVisible,
+                                onDismissRequest = { isContextMenuVisible = false },
+                                offset = pressOffset
+                            ) {
+                                periodDropDownItems.forEach { item ->
+                                    Box(
+                                        modifier = Modifier
+                                            .height(LocalSpacing.current.dropDownItem),
+                                        contentAlignment = Alignment.CenterStart
+                                    ) {
+                                        DropdownMenuItem(
+                                            text = {
+                                                Text(
+                                                    text = item.titleText,
+                                                    color = MaterialTheme.colorScheme.onSurface,
+                                                    style = MaterialTheme.typography.bodyLarge,
+                                                    fontWeight = FontWeight.Normal
+                                                )
+                                            },
+                                            onClick = {
+                                                onClickItem(item)
+                                                isContextMenuVisible = false
+                                            }
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground
+                ),
+                navigationIcon = {
+                    Box(modifier = Modifier.fillMaxHeight(),
+                    contentAlignment = Alignment.Center) {
+                        IconButton(
+                            onClick = navigateBack
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+                    }
                 }
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            titleContentColor = MaterialTheme.colorScheme.onBackground,
-            navigationIconContentColor = MaterialTheme.colorScheme.onBackground
-        ),
-        navigationIcon = {
-            IconButton(
-                onClick = navigateBack
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
+            )
         }
-    )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -642,86 +828,109 @@ fun ProfileScreenTopBar(
     var itemHeight by remember {
         mutableStateOf(0.dp)
     }
-    TopAppBar (
-        modifier = Modifier,
-        title = {
-            Row(modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(modifier = Modifier.weight(5f),
-                    contentAlignment = Alignment.CenterStart) {
-                    Text(
-                        text = topBarTitleText,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                Box(modifier = Modifier
-                    .weight(1f)
-                    .onSizeChanged {
-                        itemHeight = with(density) { it.height.toDp() }
-                    }
-                    .pointerInput(true) {
-                        detectTapGestures(
-                            onPress = {
-                                isContextMenuVisible = true
-                                pressOffset = DpOffset(it.x.toDp(), it.y.toDp())
-                            }
-                        )
-                    },
-                    contentAlignment = Alignment.CenterEnd) {
-                    Icon(imageVector = Icons.Default.Tune,
-                        contentDescription = emptyString,
-                        tint = MaterialTheme.colorScheme.onBackground
-                    )
-                    DropdownMenu(modifier = Modifier
-                        .padding(end = LocalSpacing.current.small),
-                        expanded = isContextMenuVisible,
-                        onDismissRequest = { isContextMenuVisible = false },
-                        offset = pressOffset
+    Card(modifier = Modifier
+        .background(MaterialTheme.colorScheme.background)
+        .fillMaxWidth()
+        .height(LocalSpacing.current.bottomNavBarSize),
+        elevation = CardDefaults.cardElevation(LocalSpacing.current.default)
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            TopAppBar(
+                modifier = Modifier,
+                title = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        profileDropDownItems.forEach{ item->
-                            Box(modifier = Modifier
-                                .height(LocalSpacing.current.dropDownItem),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                DropdownMenuItem(
-                                    text = {
-                                        Text(text = item.titleText,
-                                            color = MaterialTheme.colorScheme.onSurface,
-                                            style = MaterialTheme.typography.bodyLarge,
-                                            fontWeight = FontWeight.Normal
-                                        )
-                                    },
-                                    onClick = {
-                                        onClickItem(item)
-                                        isContextMenuVisible = false
+                        Box(
+                            modifier = Modifier.weight(5f),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            Text(
+                                text = topBarTitleText,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Box(modifier = Modifier
+                            .weight(1f)
+                            .onSizeChanged {
+                                itemHeight = with(density) { it.height.toDp() }
+                            }
+                            .pointerInput(true) {
+                                detectTapGestures(
+                                    onPress = {
+                                        isContextMenuVisible = true
+                                        pressOffset = DpOffset(it.x.toDp(), it.y.toDp())
                                     }
                                 )
+                            },
+                            contentAlignment = Alignment.CenterEnd
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Tune,
+                                contentDescription = emptyString,
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
+                            DropdownMenu(
+                                modifier = Modifier
+                                    .padding(end = LocalSpacing.current.small),
+                                expanded = isContextMenuVisible,
+                                onDismissRequest = { isContextMenuVisible = false },
+                                offset = pressOffset
+                            ) {
+                                profileDropDownItems.forEach { item ->
+                                    Box(
+                                        modifier = Modifier
+                                            .height(LocalSpacing.current.dropDownItem),
+                                        contentAlignment = Alignment.CenterStart
+                                    ) {
+                                        DropdownMenuItem(
+                                            text = {
+                                                Text(
+                                                    text = item.titleText,
+                                                    color = MaterialTheme.colorScheme.onSurface,
+                                                    style = MaterialTheme.typography.bodyLarge,
+                                                    fontWeight = FontWeight.Normal
+                                                )
+                                            },
+                                            onClick = {
+                                                onClickItem(item)
+                                                isContextMenuVisible = false
+                                            }
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground
+                ),
+                navigationIcon = {
+                    Box(modifier = Modifier.fillMaxHeight(),
+                    contentAlignment = Alignment.Center) {
+                        IconButton(
+                            onClick = navigateBack
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+                    }
                 }
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            titleContentColor = MaterialTheme.colorScheme.onBackground,
-            navigationIconContentColor = MaterialTheme.colorScheme.onBackground
-        ),
-        navigationIcon = {
-            IconButton(
-                onClick = navigateBack
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
+            )
         }
-    )
+    }
 }
 
 

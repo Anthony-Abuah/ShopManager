@@ -7,6 +7,7 @@ import android.graphics.pdf.PdfDocument
 import android.graphics.pdf.PdfDocument.PageInfo
 import com.example.myshopmanagerapp.R
 import com.example.myshopmanagerapp.core.*
+import com.example.myshopmanagerapp.core.Constants.Cash
 import com.example.myshopmanagerapp.core.Functions.generateReceiptId
 import com.example.myshopmanagerapp.core.Functions.shortened
 import com.example.myshopmanagerapp.core.Functions.toDate
@@ -81,7 +82,8 @@ class GeneratePDFRepositoryImpl(
                 else-> {
                     val personnelName = "${personnel.lastName} ${personnel.firstName} ${personnel.otherNames}"
                     val personnelRole = personnel.role.toNotNull()
-                    val receiptInfo = receipt.copy(uniqueReceiptId = uniqueReceiptId, personnelName = personnelName, personnelRole = personnelRole)
+                    val paymentMethod = receipt.paymentMethod.toNotNull().ifBlank { Cash }
+                    val receiptInfo = receipt.copy(uniqueReceiptId = uniqueReceiptId, personnelName = personnelName, paymentMethod = paymentMethod, personnelRole = personnelRole)
                     receiptDao.addReceipt(receiptInfo)
                     val addedReceiptIdsJson = AdditionEntityMarkers(context).getAddedReceiptIds.first().toNotNull()
                     val addedReceiptIds = addedReceiptIdsJson.toUniqueIds().plus(UniqueId(receipt.uniqueReceiptId)).toSet().toList()

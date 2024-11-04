@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -22,6 +23,8 @@ import androidx.compose.ui.unit.sp
 import com.example.myshopmanagerapp.R
 import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
+import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.robotoBold
+import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.robotoRegular
 
 
 @Composable
@@ -35,10 +38,12 @@ fun InfoDisplayCard(
     bigTextSize: TextUnit,
     bigTextFontWeight: FontWeight = FontWeight.ExtraBold,
     bigTextColor: Color = MaterialTheme.colorScheme.onBackground,
+    bigTextFontFamily: FontFamily = robotoBold,
     smallText: String,
     smallTextSize: TextUnit,
     smallTextFontWeight: FontWeight = FontWeight.SemiBold,
     smallTextColor: Color = MaterialTheme.colorScheme.onBackground,
+    smallTextFontFamily: FontFamily = robotoRegular,
     shape: Shape = MaterialTheme.shapes.large,
     elevation: Dp = LocalSpacing.current.noElevation,
     backgroundColor: Color = Color.Transparent,
@@ -111,7 +116,8 @@ fun InfoDisplayCard(
                     fontSize = bigTextSize,
                     fontWeight = bigTextFontWeight,
                     overflow = TextOverflow.Ellipsis,
-                    color = bigTextColor
+                    color = bigTextColor,
+                    fontFamily = bigTextFontFamily
                 )
             }
 
@@ -126,7 +132,8 @@ fun InfoDisplayCard(
                     fontSize = smallTextSize,
                     fontWeight = smallTextFontWeight,
                     overflow = TextOverflow.Ellipsis,
-                    color = smallTextColor
+                    color = smallTextColor,
+                    fontFamily = smallTextFontFamily
                 )
             }
 

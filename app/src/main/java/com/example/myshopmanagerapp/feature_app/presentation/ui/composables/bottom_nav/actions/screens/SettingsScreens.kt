@@ -9,6 +9,7 @@ sealed class SettingsScreens(val route: String){
     object ChangePasswordScreen: SettingsScreens("to_change_password_screen")
     object ResetPasswordScreen: SettingsScreens("to_reset_password_screen")
     object ExpenseTypeScreen: SettingsScreens("to_expense_type_screen")
+    object PaymentMethodScreen: SettingsScreens("to_payment_method_screen")
     object ExpenseNameScreen: SettingsScreens("to_expense_name_screen")
     object ManufacturersScreen: SettingsScreens("to_manufacturers_screen")
     object ItemCategoryScreen: SettingsScreens("to_item_category_screen")

@@ -45,6 +45,7 @@ val YellowishGreen90 = Color(0xFFEDEDDE)
 val YellowishGreen95 = Color(0xFFF6F6EF)
 
 
+val Blue5 = Color(0xFF000019)
 val Blue10 = Color(0xFF000033)
 val Blue20 = Color(0xFF000066)
 val Blue30 = Color(0xFF000099)
@@ -68,6 +69,7 @@ val Red70 = Color(0xFFFF6666)
 val Red80 = Color(0xFFFF9999)
 val Red90 = Color(0xFFFFCCCC)
 val Red95 = Color(0xFFFFE6E6)
+val Red99 = Color(0xFFFFF0F0)
 
 
 val DimRed10 = Color(0xFF330C00)

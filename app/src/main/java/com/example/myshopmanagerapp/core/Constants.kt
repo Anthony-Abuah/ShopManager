@@ -58,6 +58,8 @@ object Constants{
     const val Savings_Table = "SavingsTable"
     const val InventoryStock_Table = "InventoryStockTable"
 
+    const val Hour = "hour"
+    const val Hours = "hours"
     const val Loan = "Loan"
     const val Email = "Email"
     const val Password = "1234"
@@ -71,10 +73,20 @@ object Constants{
     const val ZERO = 0
     const val ONE = 1
     const val Cash = "Cash"
+    const val Sales = "Sales"
     const val emptyString = ""
     const val UnknownError = "Unknown Error!"
     const val Zero = "0"
     const val zero = "0.0"
+
+    const val DataBackUpSuccessful = "All data is successfully backed up"
+    const val ServerErrorMessage = "Couldn't connect to server"
+    const val InternetConnectionMessage = "Check your internet connection and try again"
+
+    const val ViewExpenses = "View Expenses"
+    const val TotalDebt = "Total Debt"
+    const val OutstandingDebt = "Outstanding Debt"
+
 
     const val Edit = "Edit"
     const val Delete = "Delete"
@@ -90,6 +102,7 @@ object Constants{
     const val IntValue = "Int Value"
 
 
+    const val Personnel = "Personnel"
     const val RegisterMessage = "registerMessage"
     const val IOException_HttpException = "IOExceptionOrHttpException"
     const val ExceptionOrErrorMessage = "ExceptionOrErrorMessage"
@@ -104,6 +117,7 @@ object Constants{
     const val BankPersonnel = "bankPersonnel"
     const val PersonnelRoles = "personnelRoles"
     const val ExpenseNames = "expenseNames"
+    const val PaymentMethod = "paymentMethod"
     const val ExpenseTypes = "expenseTypes"
     const val RevenueTypes = "revenueTypes"
     const val ItemCategory = "itemCategory"
@@ -116,6 +130,7 @@ object Constants{
     private const val ThisYear = "This Year"
     private const val LastYear = "Last Year"
     const val SelectRange = "Select Range"
+    const val SelectedDuration = "Selected Duration"
 
 
     private const val Search = "Search"

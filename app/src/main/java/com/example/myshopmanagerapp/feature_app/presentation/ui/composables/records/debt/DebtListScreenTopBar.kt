@@ -10,6 +10,7 @@ import com.example.myshopmanagerapp.core.Constants.listOfDebtSortItems
 import com.example.myshopmanagerapp.core.Constants.listOfListNumbers
 import com.example.myshopmanagerapp.core.Constants.listOfPeriods
 import com.example.myshopmanagerapp.core.DebtEntities
+import com.example.myshopmanagerapp.core.DebtRepaymentEntities
 import com.example.myshopmanagerapp.core.FormRelatedString.EnterValue
 import com.example.myshopmanagerapp.core.FormRelatedString.SearchPlaceholder
 import com.example.myshopmanagerapp.core.Functions.convertToDouble
@@ -28,13 +29,16 @@ import java.time.LocalDate
 @Composable
 fun DebtListScreenTopBar(
     entireDebts: DebtEntities,
+    entireDebtRepayments: DebtRepaymentEntities,
     allDebts: DebtEntities,
+    allDebtRepayments: DebtRepaymentEntities,
     showSearchBar: Boolean,
     showComparisonBar: Boolean,
     showDateRangePickerBar: Boolean,
     getPersonnelName: (String)-> String,
     getCustomerName: (String)-> String,
     openDialogInfo: (String)-> Unit,
+    getSelectedPeriod: (String)-> Unit,
     openSearchBar: ()-> Unit,
     openDateRangePickerBar: ()-> Unit,
     closeSearchBar: ()-> Unit,
@@ -42,12 +46,15 @@ fun DebtListScreenTopBar(
     closeComparisonBar: ()-> Unit,
     openComparisonBar: ()-> Unit,
     printDebts: ()-> Unit,
-    getDebts: (DebtEntities)-> Unit,
+    getDebts: (DebtEntities, DebtRepaymentEntities) -> Unit,
     navigateBack: ()-> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
     var comparisonIsGreater by remember {
         mutableStateOf(false)
+    }
+    var selectedPeriod by remember {
+        mutableStateOf(AllTime)
     }
     val context = LocalContext.current
     when(true){
@@ -59,13 +66,16 @@ fun DebtListScreenTopBar(
                     if (_searchValue.isBlank()){
                         coroutineScope.launch {
                             delay(10000L)
-                            getDebts(entireDebts)
+                            getDebts(entireDebts, entireDebtRepayments)
                             openDialogInfo(emptyString)
                             openDialogInfo(emptyString)
                             closeSearchBar()
                         }
                     }else{
-                        getDebts(entireDebts.filter { getCustomerName(it.uniqueCustomerId).contains(_searchValue, true) || getPersonnelName(it.uniquePersonnelId).contains(_searchValue, true) })
+                        getDebts(
+                            entireDebts.filter { getCustomerName(it.uniqueCustomerId).contains(_searchValue, true) || getPersonnelName(it.uniquePersonnelId).contains(_searchValue, true) },
+                            entireDebtRepayments.filter { getCustomerName(it.uniqueCustomerId).contains(_searchValue, true) || getPersonnelName(it.uniquePersonnelId).contains(_searchValue, true) },
+                        )
                         openDialogInfo(emptyString)
                         openDialogInfo(emptyString)
                     }
@@ -82,10 +92,10 @@ fun DebtListScreenTopBar(
                 },
                 getComparisonValue = {_value->
                     if (comparisonIsGreater) {
-                        getDebts(allDebts.filter { it.debtAmount >= convertToDouble(_value) })
+                        getDebts(allDebts.filter { it.debtAmount >= convertToDouble(_value) }, emptyList())
                     }
                     else{
-                        getDebts(allDebts.filter { it.debtAmount <= convertToDouble(_value) })
+                        getDebts(allDebts.filter { it.debtAmount <= convertToDouble(_value) }, emptyList())
                     }
                     closeComparisonBar()
                     openDialogInfo(emptyString)
@@ -101,11 +111,15 @@ fun DebtListScreenTopBar(
                     closeComparisonBar()
                     closeSearchBar()
                     closeDateRangePickerBar()
+                    getSelectedPeriod(selectedPeriod)
                 },
                 getDateRange = {_startDateString, _endDateString->
                     val startDate = _startDateString.toLocalDate().toTimestamp()
                     val endDate = _endDateString.toLocalDate().toTimestamp()
-                    getDebts(allDebts.filter { it.date in startDate..endDate })
+                    getDebts(
+                        allDebts.filter { it.date in startDate..endDate },
+                        allDebtRepayments.filter { it.date in startDate..endDate }
+                    )
                     closeDateRangePickerBar()
                     openDialogInfo(emptyString)
                     openDialogInfo(emptyString)
@@ -119,28 +133,28 @@ fun DebtListScreenTopBar(
                 onSort = { _value ->
                     when (_value.number) {
                         1 -> {
-                            getDebts(entireDebts.sortedBy { it.date })
+                            getDebts(entireDebts.sortedBy { it.date }, entireDebtRepayments)
                             openDialogInfo(emptyString)
                             openDialogInfo(emptyString)
                             val dialogMessage = "Most recent debts will appear at the bottom"
                             Toast.makeText(context, dialogMessage, Toast.LENGTH_LONG).show()
                         }
                         2 -> {
-                            getDebts(allDebts.sortedByDescending { it.date })
+                            getDebts(allDebts.sortedByDescending { it.date }, entireDebtRepayments)
                             openDialogInfo(emptyString)
                             openDialogInfo(emptyString)
                             val dialogMessage = "Most recent debts will appear on top"
                             Toast.makeText(context, dialogMessage, Toast.LENGTH_LONG).show()
                         }
                         3 -> {
-                            getDebts(allDebts.sortedBy { it.debtAmount })
+                            getDebts(allDebts.sortedBy { it.debtAmount }, entireDebtRepayments)
                             openDialogInfo(emptyString)
                             openDialogInfo(emptyString)
                             val dialogMessage = "Lowest debts will appear at the top"
                             Toast.makeText(context, dialogMessage, Toast.LENGTH_LONG).show()
                         }
                         4 -> {
-                            getDebts(allDebts.sortedByDescending { it.debtAmount })
+                            getDebts(allDebts.sortedByDescending { it.debtAmount }, entireDebtRepayments)
                             openDialogInfo(emptyString)
                             openDialogInfo(emptyString)
                             val dialogMessage = "Highest debts will appear at the top"
@@ -157,16 +171,23 @@ fun DebtListScreenTopBar(
                     }
                 },
                 onClickPeriodItem = { _period ->
+                    if (_period.titleText != SelectRange){
+                        selectedPeriod = _period.titleText
+                    }
+                    getSelectedPeriod(_period.titleText)
                     val firstDate = _period.firstDate.toDate().time
                     val lastDate = _period.lastDate.toDate().time
                     when(true){
-                        (_period.titleText == AllTime) -> { getDebts(entireDebts)
+                        (_period.titleText == AllTime) -> { getDebts(entireDebts, entireDebtRepayments)
                             openDialogInfo(emptyString)
                             openDialogInfo(emptyString)
                         }
                         (_period.titleText == SelectRange) -> { openDateRangePickerBar() }
                         else -> {
-                            getDebts(entireDebts.filter { it.date in firstDate until lastDate })
+                            getDebts(
+                                entireDebts.filter { it.date in firstDate until lastDate },
+                                entireDebtRepayments.filter { it.date in firstDate until lastDate }
+                            )
                             openDialogInfo(emptyString)
                             openDialogInfo(emptyString)
                         }
@@ -176,7 +197,7 @@ fun DebtListScreenTopBar(
                     val number = _listNumber.number
                     when (_listNumber.number) {
                         0 -> {
-                            getDebts(entireDebts)
+                            getDebts(entireDebts, entireDebtRepayments)
                             openDialogInfo(emptyString)
                             openDialogInfo(emptyString)
                             val dialogMessage = "All debts are selected"
@@ -194,7 +215,7 @@ fun DebtListScreenTopBar(
                             openDialogInfo(dialogMessage)
                         }
                         else -> {
-                            getDebts(allDebts.take(number))
+                            getDebts(allDebts.take(number), emptyList())
                             val dialogMessage = "First $number debts selected"
                             Toast.makeText(context, dialogMessage, Toast.LENGTH_LONG).show()
                         }

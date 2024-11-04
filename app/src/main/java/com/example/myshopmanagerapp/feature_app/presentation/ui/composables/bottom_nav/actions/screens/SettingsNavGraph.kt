@@ -24,6 +24,7 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bott
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.register.screens.RegisterScreen
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.supplier_role.screen.SupplierRoleScreen
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.bank_personnel.screen.BankPersonnelScreen
+import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.payment_method.screens.PaymentMethodScreen
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.reset_password.screens.ResetPasswordScreen
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.personnel.screens.PersonnelProfileNavGraph
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.records.screens.HomeScreens
@@ -78,6 +79,9 @@ fun SettingsNavGraph(
                 },
                 navigateToExpenseTypeScreen = {
                     navController.navigate(SettingsScreens.ExpenseTypeScreen.route)
+                },
+                navigateToPaymentMethodScreen = {
+                    navController.navigate(SettingsScreens.PaymentMethodScreen.route)
                 },
                 navigateToExpenseNameScreen = {
                     navController.navigate(SettingsScreens.ExpenseNameScreen.route)
@@ -266,8 +270,35 @@ fun SettingsNavGraph(
                         easing = LinearOutSlowInEasing
                     )
                 ) + fadeOut(animationSpec = tween(500))
-            }){
+            })
+        {
             ExpenseTypeScreen {
+                navController.popBackStack()
+            }
+        }
+
+
+        composable(route = SettingsScreens.PaymentMethodScreen.route,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { 500 },
+                    animationSpec = tween(
+                        durationMillis = 500,
+                        easing = LinearOutSlowInEasing
+                    )
+                ) + fadeIn(animationSpec = tween(500))
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { -500 },
+                    animationSpec = tween(
+                        durationMillis = 500,
+                        easing = LinearOutSlowInEasing
+                    )
+                ) + fadeOut(animationSpec = tween(500))
+            })
+        {
+            PaymentMethodScreen {
                 navController.popBackStack()
             }
         }

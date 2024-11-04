@@ -113,7 +113,7 @@ fun MainRevenueReportContent(
                 contentAlignment = Alignment.Center
             ) {
                 HorizontalInfoDisplayCard(
-                    icon = R.drawable.days,
+                    icon = R.drawable.date,
                     modifier = Modifier.padding(LocalSpacing.current.small),
                     name = NumberOfDaysOpened,
                     nameTextSize = 16.sp,

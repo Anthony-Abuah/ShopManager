@@ -140,11 +140,15 @@ object FormRelatedString{
     const val SelectReceiptDate = "Select the date"
     const val ReceiptDayOfWeek = "Day of the week"
     const val SelectReceiptCustomer = "Select Customer"
+    const val SelectPaymentMethod = "Select Payment Method"
+    const val AddPaymentMethod = "Add Payment Method"
+    const val PaymentMethodPlaceholder = "Eg: Cash"
     const val ReceiptCustomerPlaceholder = "Eg: Aunty Esi"
     const val EnterUnitCostPrice = "Enter unit cost price"
     const val EnterTotalAmount = "Enter total amount"
     const val EnterUnitSellingPrice = "Enter unit selling price"
     const val PricePlaceholder = "Eg: 500.00"
+    const val TransactionIdPlaceholder = "Eg: TransactionId_12345"
     const val AddItem = "Add Item"
 
 
@@ -189,7 +193,7 @@ object FormRelatedString{
     const val UniqueExpenseId = "Unique Expense Id"
     const val ExpenseAmount = "Expense Amount"
     const val ExpenseType = "Expense type"
-    const val ExpenseName = "Expense type"
+    const val ExpenseName = "Expense name"
     const val ExpenseShortNotesPlaceholder = "Any other information you'd like to add concerning this expense"
     const val ExpenseTypeNotAdded = "Expense type not added"
     const val ExpenseNameNotAdded = "Expense name not added"
@@ -237,7 +241,7 @@ object FormRelatedString{
     // Add Revenue Questions
     const val SelectRevenueDate = "Select the date"
     const val RevenueDayOfTheWeek = "Day of the week"
-    const val NumberOfHours = "Number of hours (optional)"
+    const val NumberOfHours = "Number of hours opened"
     const val RevenueAmountPlaceholder = "Eg: 500.00"
     const val RevenueHoursPlaceholder = "Eg: 5 hours"
     const val EnterRevenueAmount = "Enter revenue amount"
@@ -267,7 +271,18 @@ object FormRelatedString{
         "10 hours",
         "11 hours",
         "12 hours",
-        "13+ hours",
+        "13 hours",
+        "14 hours",
+        "15 hours",
+        "16 hours",
+        "17 hours",
+        "18 hours",
+        "19 hours",
+        "20 hours",
+        "21 hours",
+        "22 hours",
+        "23 hours",
+        "24 hours",
     )
 
     // Account information

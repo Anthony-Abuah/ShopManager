@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -27,13 +28,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myshopmanagerapp.R
 import com.example.myshopmanagerapp.core.Constants.emptyString
+import com.example.myshopmanagerapp.core.FormRelatedString
 import com.example.myshopmanagerapp.core.Functions.textIsInvalid
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
+import java.time.LocalDate
 
 
 @Composable
 fun VerticalDisplayAndEditTextValues(
     modifier: Modifier = Modifier,
+    innerHorizontalPadding: Dp = 4.dp,
+    innerVerticalPadding: Dp = 2.dp,
     leadingIcon: Int? = R.drawable.personnel,
     leadingIconWidth: Dp = 32.dp,
     trailingIcon: Int? = null,
@@ -53,10 +58,12 @@ fun VerticalDisplayAndEditTextValues(
     value: String = emptyString,
     placeholder: String = emptyString,
     readOnly: Boolean = false,
+    isError: Boolean = false,
     label: String = emptyString,
     textFieldIcon: Int = R.drawable.ic_person_filled,
     keyboardType: KeyboardType = KeyboardType.Text,
     isAutoCompleteTextField: Boolean = false,
+    isDate: Boolean = false,
     addNewItem: ()-> Unit = {},
     listItems: List<String> = emptyList(),
     expandedIcon: Int = R.drawable.ic_person_filled,
@@ -64,6 +71,7 @@ fun VerticalDisplayAndEditTextValues(
     selectOnlyList: Boolean = false,
     getUpdatedValue: (String) ->Unit = {},
 ) {
+    val context = LocalContext.current
     var expandRow by remember {
         mutableStateOf(false)
     }
@@ -76,7 +84,8 @@ fun VerticalDisplayAndEditTextValues(
         elevation = elevation,
         backgroundColor = backgroundColor
     ) {
-        Column(modifier = Modifier.fillMaxWidth(),
+        Column(modifier = Modifier.fillMaxWidth()
+            .padding(horizontal = innerHorizontalPadding, vertical = innerVerticalPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
@@ -180,6 +189,7 @@ fun VerticalDisplayAndEditTextValues(
                             contentAlignment = Alignment.Center
                         ) {
                             AutoCompleteWithAddButton(
+                                value = value,
                                 label = label,
                                 listItems = listItems,
                                 placeholder = placeholder,
@@ -198,6 +208,49 @@ fun VerticalDisplayAndEditTextValues(
                             .padding(LocalSpacing.current.small)
                             .clickable {
                                 getUpdatedValue(updatedValue)
+                                expandRow = !expandRow
+                            },
+                            contentAlignment = Alignment.CenterEnd
+                        ){
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = emptyString,
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+                    }
+                }
+            }
+            else if (isDate){
+                AnimatedVisibility(
+                    modifier = Modifier.fillMaxWidth(),
+                    visible = expandRow
+                ) {
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(LocalSpacing.current.small),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        var updatedDate by remember { mutableStateOf(value) }
+                        Box(modifier = Modifier.weight(1f),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            DatePickerTextField(
+                                defaultDate = value.ifBlank { LocalDate.now().toString() },
+                                context = context,
+                                onValueChange = {
+                                    updatedDate = it
+                                    getUpdatedValue(it)
+                                },
+                                label = FormRelatedString.SelectDate
+                            )
+                        }
+                        Box(modifier = Modifier
+                            .width(LocalSpacing.current.topBarIcon)
+                            .padding(LocalSpacing.current.small)
+                            .clickable {
+                                getUpdatedValue(updatedDate)
                                 expandRow = !expandRow
                             },
                             contentAlignment = Alignment.CenterEnd
@@ -235,7 +288,7 @@ fun VerticalDisplayAndEditTextValues(
                                     updatedValue = it
                                     textValueIsInvalid = textIsInvalid(it)
                                 },
-                                isError = textValueIsInvalid,
+                                isError = isError,
                                 readOnly = selectOnlyList,
                                 placeholder = placeholder,
                                 label = label,
@@ -248,10 +301,8 @@ fun VerticalDisplayAndEditTextValues(
                                 .width(LocalSpacing.current.topBarIcon)
                                 .padding(LocalSpacing.current.small)
                                 .clickable {
-                                    if (!textValueIsInvalid) {
                                         getUpdatedValue(updatedValue)
                                         expandRow = false
-                                    }
                                 },
                             contentAlignment = Alignment.CenterEnd
                         ) {
@@ -264,7 +315,6 @@ fun VerticalDisplayAndEditTextValues(
                     }
                 }
             }
-
 
         }
 

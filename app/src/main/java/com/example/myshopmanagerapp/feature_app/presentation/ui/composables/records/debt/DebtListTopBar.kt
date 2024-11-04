@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -23,12 +24,14 @@ import com.example.myshopmanagerapp.R
 import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.feature_app.domain.model.ListNumberDropDownItem
 import com.example.myshopmanagerapp.feature_app.domain.model.PeriodDropDownItem
-import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
+import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.*
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DebtListTopBar(
+    containerColor: Color = MaterialTheme.colorScheme.background,
+    onContainerColor: Color = MaterialTheme.colorScheme.onBackground,
     topBarTitleText: String,
     periodDropDownItems: List<PeriodDropDownItem>,
     onClickPeriodItem: (PeriodDropDownItem) -> Unit,
@@ -276,9 +279,9 @@ fun DebtListTopBar(
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            titleContentColor = MaterialTheme.colorScheme.onBackground,
-            navigationIconContentColor = MaterialTheme.colorScheme.onBackground
+            containerColor = containerColor,//MaterialTheme.colorScheme.background,
+            titleContentColor = onContainerColor,//MaterialTheme.colorScheme.onBackground,
+            navigationIconContentColor = onContainerColor,//MaterialTheme.colorScheme.onBackground
         ),
         navigationIcon = {
             IconButton(
@@ -287,7 +290,7 @@ fun DebtListTopBar(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onBackground
+                    tint = onContainerColor//MaterialTheme.colorScheme.onBackground
                 )
             }
         }

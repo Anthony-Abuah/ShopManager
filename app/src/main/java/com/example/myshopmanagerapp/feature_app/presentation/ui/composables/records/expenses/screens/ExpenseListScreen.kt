@@ -52,10 +52,10 @@ fun ExpenseListScreen(
         mutableStateOf(false)
     }
     var allExpenses = expenseViewModel.expenseEntitiesState.value.expenseEntities ?: emptyList()
+    val allPersonnel = personnelViewModel.personnelEntitiesState.value.personnelEntities ?: emptyList()
 
     Scaffold(
         topBar = {
-            val allPersonnel = personnelViewModel.personnelEntitiesState.value.personnelEntities ?: emptyList()
             ExpenseListScreenTopBar(
                 entireExpenses = expenseViewModel.expenseEntitiesState.value.expenseEntities ?: emptyList(),
                 allExpenses = allExpenses,
@@ -102,6 +102,10 @@ fun ExpenseListScreen(
                 expenseDeletingMessage = expenseViewModel.deleteExpenseState.value.message,
                 expenseDeletionIsSuccessful = expenseViewModel.deleteExpenseState.value.isSuccessful,
                 reloadAllExpenses = { expenseViewModel.getAllExpenses() },
+                getPersonnelName = { _uniquePersonnelId ->
+                    val thisPersonnel = allPersonnel.firstOrNull{it.uniquePersonnelId == _uniquePersonnelId}
+                    return@ExpenseListContent "${thisPersonnel?.firstName.toNotNull()} ${thisPersonnel?.lastName.toNotNull()} ${thisPersonnel?.otherNames.toNotNull()}"
+                },
                 navigateToViewExpenseScreen = {_uniqueExpenseId->
                     navigateToViewExpenseScreen(_uniqueExpenseId)
                 },

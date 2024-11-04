@@ -7,12 +7,15 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.UIEvent
+import com.example.myshopmanagerapp.core.UserPreferences
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.backup.BackupAndRestoreContent
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenTopBar
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.BackupViewModel
@@ -24,7 +27,6 @@ fun BackupAndRestoreScreen(
     backupViewModel: BackupViewModel =  hiltViewModel(),
     navigateBack: () -> Unit
 ) {
-
     val context = LocalContext.current
 
     val scaffoldState = rememberScaffoldState()
@@ -48,6 +50,9 @@ fun BackupAndRestoreScreen(
             }
         }
     ){
+        val userPreferences = UserPreferences(context)
+        val repositoryJobMessage = userPreferences.getRepositoryJobMessage.collectAsState(initial = emptyString).value
+
         Column(modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -61,13 +66,13 @@ fun BackupAndRestoreScreen(
                 dataRestoreConfirmationMessage = localDataRestore.message.toNotNull(),
                 localBackupData = { backupViewModel.backupDatabase(context) },
                 localRestoreData = { backupViewModel.restoreDatabase(context) },
-                absoluteRemoteBackup = { backupViewModel.absoluteRemoteBackup1() },
-                smartRemoteBackup = { backupViewModel.smartBackup1() },
+                absoluteRemoteBackup = { backupViewModel.absoluteRemoteBackup() },
+                smartRemoteBackup = { backupViewModel.smartBackup() },
                 absoluteSyncData = { backupViewModel.absoluteSyncData() },
                 smartSyncData = { backupViewModel.smartSyncData() },
                 floatValue = backupViewModel.floatValue,
                 floatFunction = { backupViewModel.getFloatValue() },
-                repositoryJobMessage = backupViewModel.repositoryMessage,
+                repositoryJobMessage = repositoryJobMessage,
                 repositoryJobFunction = { backupViewModel.getRepositoryMessage() }
             )
         }

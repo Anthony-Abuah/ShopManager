@@ -1,45 +1,59 @@
 package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
 
 @Composable
 fun AddFloatingActionButton(
+    containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
+    contentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
     onAdd: () -> Unit
 ){
     Card(modifier = Modifier
-        .size(LocalSpacing.current.floatingActionButton)
-        .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
         .clickable { onAdd() },
-        shape = CircleShape,
+        shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            containerColor = containerColor,
+            contentColor = contentColor
         ),
-        elevation = CardDefaults.cardElevation(LocalSpacing.current.smallMedium)
+        elevation = CardDefaults.cardElevation(LocalSpacing.current.noElevation)
     ) {
-        Box(modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ){
-            Icon(imageVector = Icons.Default.Add,
+
+        Row(modifier = Modifier.padding(
+            vertical = LocalSpacing.current.smallMedium,
+            horizontal = LocalSpacing.current.medium),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+
+            Icon(
+                modifier = Modifier.size(20.dp),
+                imageVector = Icons.Default.AddCircle,
                 contentDescription = emptyString,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                tint = contentColor
             )
+
+            Spacer(modifier = Modifier.width(LocalSpacing.current.small))
+
+            Text(
+                text = "ADD NEW",
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp,
+                color = contentColor
+            )
+
         }
     }
 }

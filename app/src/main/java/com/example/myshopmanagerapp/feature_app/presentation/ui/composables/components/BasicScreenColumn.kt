@@ -5,6 +5,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,11 +35,11 @@ fun BasicScreenColumnWithBottomBar(
 fun BasicScreenColumnWithoutBottomBar(
     content: @Composable (ColumnScope.() -> Unit)
 ) {
-    val backgroundColor = if (isSystemInDarkTheme()) Grey5 else Color.White
+    //val backgroundColor = if (isSystemInDarkTheme()) Grey5 else Color.White
     Column(
         modifier = Modifier
             .fillMaxSize(1f)
-            .background(backgroundColor)
+            .background(MaterialTheme.colorScheme.background)
             .padding(LocalSpacing.current.noPadding)
             .verticalScroll(state = rememberScrollState(), enabled = true),
         horizontalAlignment = Alignment.CenterHorizontally,

@@ -20,6 +20,7 @@ import com.example.myshopmanagerapp.feature_app.data.local.entities.withdrawals.
 import com.example.myshopmanagerapp.feature_app.domain.model.*
 import com.example.myshopmanagerapp.feature_app.presentation.view_models.states.revenue.ItemValueState
 
+typealias PaymentMethods = List<PaymentMethod>
 typealias CompanyOwners = List<CompanyOwner>
 typealias ListOfShopLoginInfo = List<ShopLoginInfo>
 typealias ItemQuantityInfoList = List<ItemQuantityInfo>

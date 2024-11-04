@@ -28,6 +28,21 @@ object TypeConverters {
         ) ?: "[]"
     }
 
+    fun String?.toListOfPaymentMethods(): List<PaymentMethod> {
+        return this?.let {
+            jsonParser.fromJson<List<PaymentMethod>>(
+                it, object : TypeToken<List<PaymentMethod>>(){}.type)
+        }?: emptyList()
+    }
+
+    fun PaymentMethods?.toListOfPaymentMethodsJson(): String{
+        return jsonParser.toJson(
+            this,
+            object : TypeToken<PaymentMethods>(){}.type
+        ) ?: "[]"
+    }
+
+
     fun String?.toListOfShopLoginInfo(): List<ShopLoginInfo> {
         return this?.let {
             jsonParser.fromJson<List<ShopLoginInfo>>(

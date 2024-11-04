@@ -23,6 +23,7 @@ fun ExpenseListContent(
     expenseDeletionIsSuccessful: Boolean,
     isDeletingExpense: Boolean,
     expenseDeletingMessage: String?,
+    getPersonnelName: (String)-> String,
     reloadAllExpenses: () -> Unit,
     navigateToViewExpenseScreen: (String) -> Unit,
     onConfirmDelete: (String) -> Unit,
@@ -55,15 +56,21 @@ fun ExpenseListContent(
     } else {
         BasicScreenColumnWithoutBottomBar {
             allExpenses.forEachIndexed { index,expense ->
-                if (index == 0){ HorizontalDivider() }
+                if (index == 0){ HorizontalDivider(
+                    thickness = LocalSpacing.current.divider,
+                    color = MaterialTheme.colorScheme.onBackground) }
                 Box(
-                    modifier = Modifier.padding(LocalSpacing.current.small),
+                    modifier = Modifier.padding(
+                        horizontal = LocalSpacing.current.small,
+                        vertical = LocalSpacing.current.default,
+                    ),
                     contentAlignment = Alignment.Center
                 ) {
                     ExpenseCard(
                         expense = expense,
                         currency = "GHS",
                         number = index.plus(1).toString(),
+                        personnel = getPersonnelName(expense.uniquePersonnelId),
                         onDelete = {
                             uniqueExpenseId = expense.uniqueExpenseId
                             openDeleteConfirmation = !openDeleteConfirmation
@@ -72,7 +79,7 @@ fun ExpenseListContent(
                         navigateToViewExpenseScreen(expense.uniqueExpenseId)
                     }
                 }
-                HorizontalDivider()
+
             }
         }
         DeleteConfirmationDialog(

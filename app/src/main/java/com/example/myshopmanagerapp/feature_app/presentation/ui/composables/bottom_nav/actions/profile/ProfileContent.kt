@@ -218,6 +218,7 @@ fun ProfileContent(
                 .background(backgroundColor)
         ) {
             val shopName = shopInfo?.companyName?.toNotNull().toEllipses(30)
+            val uniqueShopId = "ShopId: ${shopInfo?.uniqueCompanyId?.toNotNull().toEllipses(40)}"
             val contact = "Contact: ${shopInfo?.companyContact?.toNotNull().toEllipses(25)}"
             val location = "Location: ${shopInfo?.companyLocation?.toNotNull().toEllipses(25)}"
 
@@ -234,7 +235,7 @@ fun ProfileContent(
                     bigText = shopName,
                     bigTextSize = 20.sp,
                     smallTextFontWeight = FontWeight.Normal,
-                    smallText = "$contact\n$location",
+                    smallText = "$contact\n$location\n$uniqueShopId",
                     smallTextSize = 15.sp,
                     smallTextColor = descriptionColor,
                     backgroundColor = Color.Transparent,
@@ -254,7 +255,9 @@ fun ProfileContent(
                         verticalArrangement = Arrangement.Top,
                     ) {
 
-                        HorizontalDivider()
+                        HorizontalDivider(
+                    thickness = LocalSpacing.current.divider,
+                    color = MaterialTheme.colorScheme.onBackground)
 
                         Box(
                             modifier = Modifier
@@ -285,7 +288,9 @@ fun ProfileContent(
                             )
                         }
 
-                        HorizontalDivider()
+                        HorizontalDivider(
+                    thickness = LocalSpacing.current.divider,
+                    color = MaterialTheme.colorScheme.onBackground)
 
                         Box(
                             modifier = Modifier
@@ -317,7 +322,9 @@ fun ProfileContent(
                             )
                         }
 
-                        HorizontalDivider()
+                        HorizontalDivider(
+                    thickness = LocalSpacing.current.divider,
+                    color = MaterialTheme.colorScheme.onBackground)
 
                         Box(
                             modifier = Modifier
@@ -349,7 +356,9 @@ fun ProfileContent(
                             )
                         }
 
-                        HorizontalDivider()
+                        HorizontalDivider(
+                    thickness = LocalSpacing.current.divider,
+                    color = MaterialTheme.colorScheme.onBackground)
 
                         Box(
                             modifier = Modifier
@@ -379,7 +388,9 @@ fun ProfileContent(
                             )
                         }
 
-                        HorizontalDivider()
+                        HorizontalDivider(
+                    thickness = LocalSpacing.current.divider,
+                    color = MaterialTheme.colorScheme.onBackground)
 
                         Box(
                             modifier = Modifier
@@ -394,7 +405,7 @@ fun ProfileContent(
                                 secondText = shopInfo?.companyProductsAndServices.toNotNull()
                                     .ifBlank { NotAvailable },
                                 secondTextColor = descriptionColor,
-                                value = emptyString,
+                                value = shopInfo?.companyProductsAndServices.toNotNull(),
                                 leadingIcon = R.drawable.ic_product,
                                 leadingIconWidth = 32.dp,
                                 onBackgroundColor = titleColor,
@@ -410,7 +421,9 @@ fun ProfileContent(
                             )
                         }
 
-                        HorizontalDivider()
+                        HorizontalDivider(
+                    thickness = LocalSpacing.current.divider,
+                    color = MaterialTheme.colorScheme.onBackground)
 
                         Box(
                             modifier = Modifier
@@ -441,7 +454,9 @@ fun ProfileContent(
                             )
                         }
 
-                        HorizontalDivider()
+                        HorizontalDivider(
+                    thickness = LocalSpacing.current.divider,
+                    color = MaterialTheme.colorScheme.onBackground)
                     }
 
                     Box(
@@ -458,7 +473,7 @@ fun ProfileContent(
                                 .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
                         val endDateString = endDate?.toDateString().toNotNull()
                         InfoDisplayCard(
-                            image = R.drawable.days,
+                            image = R.drawable.date,
                             imageWidth = 32.dp,
                             bigText = if (shopInfo?.subscriptionEndDate.toNotNull() > Date().time ) "$endDateDay, $endDateString" else "Not Subscribed",
                             bigTextSize = 16.sp,
@@ -522,13 +537,15 @@ fun ProfileContent(
                                 secondText = "$registeredDay, $registeredDateString",
                                 secondTextColor = descriptionColor,
                                 value = emptyString,
-                                leadingIcon = R.drawable.days,
+                                leadingIcon = R.drawable.date,
                                 leadingIconWidth = 32.dp,
                                 onBackgroundColor = titleColor,
                             )
                         }
 
-                        HorizontalDivider()
+                        HorizontalDivider(
+                    thickness = LocalSpacing.current.divider,
+                    color = MaterialTheme.colorScheme.onBackground)
 
                         Box(
                             modifier = Modifier
@@ -553,7 +570,9 @@ fun ProfileContent(
                             )
                         }
 
-                        HorizontalDivider()
+                        HorizontalDivider(
+                    thickness = LocalSpacing.current.divider,
+                    color = MaterialTheme.colorScheme.onBackground)
 
                         Box(
                             modifier = Modifier
@@ -578,7 +597,9 @@ fun ProfileContent(
                             )
                         }
 
-                        HorizontalDivider()
+                        HorizontalDivider(
+                    thickness = LocalSpacing.current.divider,
+                    color = MaterialTheme.colorScheme.onBackground)
 
                     }
 

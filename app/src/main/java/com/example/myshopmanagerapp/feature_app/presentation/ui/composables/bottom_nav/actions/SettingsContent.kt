@@ -28,6 +28,7 @@ fun SettingsContent(
     navigateToProfileScreen: () -> Unit,
     navigateToRegisterScreen: () -> Unit,
     navigateToLoginScreen: () -> Unit,
+    navigateToPaymentMethodScreen: () -> Unit,
     navigateToExpenseTypeScreen: () -> Unit,
     navigateToExpenseNameScreen: () -> Unit,
     navigateToManufacturersScreen: () -> Unit,
@@ -304,6 +305,18 @@ fun SettingsContent(
             SettingsContentCard(
                 icon = R.drawable.ic_role,
                 title = "Supplier Role",
+                info = null
+            )
+        }
+
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .padding(LocalSpacing.current.smallMedium)
+            .clickable { navigateToPaymentMethodScreen() },
+        ) {
+            SettingsContentCard(
+                icon = R.drawable.ic_money_filled,
+                title = "Payment Method",
                 info = null
             )
         }

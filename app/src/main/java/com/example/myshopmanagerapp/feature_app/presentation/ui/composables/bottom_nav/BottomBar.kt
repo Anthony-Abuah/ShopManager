@@ -27,31 +27,23 @@ fun BottomBar(
     BottomNavigation(modifier = Modifier
         .height(LocalSpacing.current.bottomNavBarSize)
         .fillMaxWidth(),
-        backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
-        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        backgroundColor = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground,
         elevation = LocalSpacing.current.medium
     ) {
-        Column(modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
+        Row(
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            HorizontalDivider()
-
-            Row(
-                modifier = Modifier
-                    .fillMaxSize(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                screens.forEach { screen ->
-                    AddItem(
-                        screen = screen,
-                        currentDestination = currentDestination,
-                        navController = navHostController
-                    )
-                }
+            screens.forEach { screen ->
+                AddItem(
+                    screen = screen,
+                    currentDestination = currentDestination,
+                    navController = navHostController
+                )
             }
         }
-
     }
 }

@@ -104,7 +104,7 @@ fun ResetPasswordContent(
 
                 // Company Email
                 Box(
-                    modifier = Modifier.padding(LocalSpacing.current.smallMedium),
+                    modifier = Modifier.padding(LocalSpacing.current.small),
                     contentAlignment = Alignment.Center
                 ) {
                     BasicTextFieldWithTrailingIconError(

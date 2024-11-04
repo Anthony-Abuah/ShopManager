@@ -89,7 +89,7 @@ fun HomeScreen(
                         ) {
                             Column(
                                 modifier = Modifier
-                                    .background(MaterialTheme.colorScheme.surface)
+                                    .background(MaterialTheme.colorScheme.background)
                                     .fillMaxWidth()
                                     .wrapContentHeight(),
                                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -126,7 +126,7 @@ fun HomeScreen(
 
                             Column(
                                 modifier = Modifier
-                                    .background(Color.Transparent)
+                                    .background(MaterialTheme.colorScheme.background)
                                     .fillMaxWidth()
                                     .fillMaxHeight(1f)
                                     .verticalScroll(rememberScrollState()),
@@ -139,6 +139,10 @@ fun HomeScreen(
                                     Spacer(modifier = Modifier.height(LocalSpacing.current.small))
 
                                     NavigationDrawerItem(
+                                        colors = NavigationDrawerItemDefaults.colors(
+                                            selectedContainerColor = MaterialTheme.colorScheme.surface,
+                                            unselectedContainerColor = MaterialTheme.colorScheme.background,
+                                        ),
                                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                                         label = { Text(text = navDrawerItem.title) },
                                         selected = index == selectedItemIndex,
@@ -196,7 +200,7 @@ fun HomeScreen(
                         ) {
                             Column(
                                 modifier = Modifier
-                                    .background(MaterialTheme.colorScheme.surface)
+                                    .background(MaterialTheme.colorScheme.background)
                                     .fillMaxWidth()
                                     .wrapContentHeight(),
                                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -233,7 +237,7 @@ fun HomeScreen(
 
                             Column(
                                 modifier = Modifier
-                                    .background(Color.Transparent)
+                                    .background(MaterialTheme.colorScheme.background)
                                     .fillMaxWidth()
                                     .fillMaxHeight(1f)
                                     .verticalScroll(rememberScrollState()),
@@ -246,6 +250,10 @@ fun HomeScreen(
                                     Spacer(modifier = Modifier.height(LocalSpacing.current.small))
 
                                     NavigationDrawerItem(
+                                        colors = NavigationDrawerItemDefaults.colors(
+                                            selectedContainerColor = MaterialTheme.colorScheme.surface,
+                                            unselectedContainerColor = MaterialTheme.colorScheme.background,
+                                        ),
                                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                                         label = { Text(text = navDrawerItem.title) },
                                         selected = index == selectedItemIndex,

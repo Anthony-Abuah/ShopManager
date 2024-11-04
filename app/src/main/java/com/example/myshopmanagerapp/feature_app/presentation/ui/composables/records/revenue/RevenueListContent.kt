@@ -54,9 +54,16 @@ fun RevenueListContent(
     } else {
         BasicScreenColumnWithoutBottomBar {
             allRevenues.forEachIndexed { index, revenue ->
-                if (index == 0) { HorizontalDivider() }
+                if (index == 0) {
+                    HorizontalDivider(
+                    thickness = LocalSpacing.current.divider,
+                    color = MaterialTheme.colorScheme.onBackground)
+                }
                 Box(
-                    modifier = Modifier.padding(LocalSpacing.current.small),
+                    modifier = Modifier.padding(
+                        horizontal = LocalSpacing.current.small,
+                        vertical = LocalSpacing.current.default,
+                    ),
                     contentAlignment = Alignment.Center
                 ) {
                     RevenueCard(
@@ -72,7 +79,7 @@ fun RevenueListContent(
                         navigateToViewRevenueScreen(revenue.uniqueRevenueId)
                     }
                 }
-                HorizontalDivider()
+
             }
         }
         DeleteConfirmationDialog(

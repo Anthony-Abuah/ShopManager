@@ -79,6 +79,12 @@ fun GenerateReceiptScreen(
                 getReceiptItems = {_items->
                     companyViewModel.addReceiptItems(_items)
                 },
+                addTransactionId = {_transactionId->
+                    companyViewModel.addTransactionId(_transactionId)
+                },
+                addPaymentMethod = {_paymentMethod->
+                    companyViewModel.addPaymentMethod(_paymentMethod)
+                },
                 createInventoryItem = { navigateToAddInventoryItemScreen() },
                 addCustomer = {customer->
                     companyViewModel.addReceiptCustomer(customer?.customerName.toNotNull(), customer?.customerContact.toNotNull())

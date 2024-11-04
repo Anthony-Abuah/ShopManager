@@ -9,6 +9,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.myshopmanagerapp.core.Constants.ViewExpenses
+import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.Functions.convertToDouble
 import com.example.myshopmanagerapp.core.Functions.toDate
 import com.example.myshopmanagerapp.core.Functions.toLocalDate
@@ -33,7 +35,7 @@ fun ViewExpenseScreen(
     }
     Scaffold(
         topBar = {
-            BasicScreenTopBar(topBarTitleText = "View Expense") {
+            BasicScreenTopBar(topBarTitleText = ViewExpenses) {
                 navigateBack()
             }
         }

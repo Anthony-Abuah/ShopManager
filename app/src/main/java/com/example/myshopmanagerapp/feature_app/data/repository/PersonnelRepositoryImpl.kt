@@ -92,9 +92,10 @@ class PersonnelRepositoryImpl(
             val context = MyShopManagerApp.applicationContext()
             val userPreferences = UserPreferences(context)
             val isLoggedIn = userPreferences.getLoggedInState.first() == true
+            val personnelIsLoggedIn = userPreferences.getPersonnelLoggedInState.first() == true
             val companyEntity = userPreferences.getShopInfo.first()?.toCompanyEntity()
             val hasAdminRights = userPreferences.getPersonnelInfo.first().toPersonnelEntity()?.hasAdminRights == true
-            val invalidParameters = (personnel.firstName.isEmpty() || personnel.lastName.isEmpty() || personnel.contact.isEmpty() || personnel.password.isBlank())
+            val invalidParameters = (personnel.firstName.isEmpty() || personnel.lastName.isEmpty() || personnel.contact.isEmpty() || personnel.userName.isBlank() || personnel.password.isBlank())
             val allPersonnel = appDatabase.personnelDao.getAllPersonnel() ?: emptyList()
             val allPersonnelNames = allPersonnel.map { it.firstName.trim().lowercase(Locale.ROOT) + it.lastName.trim().lowercase(Locale.ROOT) + it.otherNames?.trim()?.lowercase(Locale.ROOT) }
             val name = personnel.firstName.trim().lowercase(Locale.ROOT) + personnel.lastName.trim().lowercase(Locale.ROOT) + personnel.otherNames?.trim()?.lowercase(Locale.ROOT)
@@ -105,6 +106,9 @@ class PersonnelRepositoryImpl(
                 }
                 (!isLoggedIn)->{
                     emit(Resource.Error("Unable to add personnel \nYou're not logged in to any shop account"))
+                }
+                (!personnelIsLoggedIn)->{
+                    emit(Resource.Error("Unable to add personnel \nYou're not logged as a personnel or employee"))
                 }
                 (allPersonnelNames.contains(name))->{
                     emit(Resource.Error("Unable to add personnel \nPersonnel with provided names already exists"))
@@ -159,13 +163,13 @@ class PersonnelRepositoryImpl(
             val context = MyShopManagerApp.applicationContext()
             val userPreferences = UserPreferences(context)
             val isLoggedIn = userPreferences.getLoggedInState.first() == true
+            val personnelIsLoggedIn = userPreferences.getPersonnelLoggedInState.first() == true
             val loggedInPersonnel = userPreferences.getPersonnelInfo.first()?.toPersonnelEntity()
             val personnelHimself = loggedInPersonnel?.uniquePersonnelId == personnel.uniquePersonnelId
             val companyEntity = userPreferences.getShopInfo.first()?.toCompanyEntity()
             val hasAdminRights = userPreferences.getPersonnelInfo.first().toPersonnelEntity()?.hasAdminRights == true
             val invalidParameters = (personnel.firstName.isEmpty() || personnel.lastName.isEmpty() || personnel.contact.isEmpty() || personnel.password.isBlank())
             val unUpdatedPersonnel = appDatabase.personnelDao.getPersonnel(personnel.uniquePersonnelId)
-
             val allPersonnel = appDatabase.personnelDao.getAllPersonnel() ?: emptyList()
             val filteredPersonnelNames = allPersonnel.filter { !(it.firstName == unUpdatedPersonnel?.firstName && it.lastName == unUpdatedPersonnel.lastName && it.otherNames == unUpdatedPersonnel.otherNames) }
             val allPersonnelNames = filteredPersonnelNames.map { it.firstName.trim().lowercase(Locale.ROOT) + it.lastName.trim().lowercase(Locale.ROOT) + it.otherNames?.trim()?.lowercase(Locale.ROOT) }
@@ -177,6 +181,9 @@ class PersonnelRepositoryImpl(
                 }
                 (!isLoggedIn)->{
                     emit(Resource.Error("Unable to update personnel \nYou're not logged in to any shop account"))
+                }
+                (!personnelIsLoggedIn)->{
+                    emit(Resource.Error("Unable to update personnel \nYou're not logged in as a personnel"))
                 }
                 (companyEntity == null)->{
                     emit(Resource.Error("Unable to update personnel \nCould not load the logged in shop info\nPlease try again later"))

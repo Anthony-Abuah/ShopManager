@@ -6,6 +6,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +39,7 @@ fun PreferencesContent() {
 
     BasicScreenColumnWithoutBottomBar {
 
+        HorizontalDivider()
         Box(
             modifier = Modifier
                 .background(Color.Transparent)
@@ -50,7 +52,7 @@ fun PreferencesContent() {
                 firstTextColor = titleColor,
                 secondText = currency.ifBlank { GHS },
                 secondTextColor = descriptionColor,
-                value = currency.toNotNull(),
+                value = currency.toNotNull().ifBlank { GHS },
                 readOnly = false,
                 leadingIcon = R.drawable.ic_money_outline,
                 leadingIconWidth = 32.dp,
@@ -73,6 +75,7 @@ fun PreferencesContent() {
                     }
                 }
             )
+            HorizontalDivider()
         }
     }
 

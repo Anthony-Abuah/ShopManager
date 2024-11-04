@@ -30,6 +30,7 @@ import com.example.myshopmanagerapp.core.FormRelatedString.SmartBackUpDialogMess
 import com.example.myshopmanagerapp.core.FormRelatedString.SmartRemoteBackUp
 import com.example.myshopmanagerapp.core.FormRelatedString.SmartSync
 import com.example.myshopmanagerapp.core.FormRelatedString.SmartSyncDialogMessage
+import com.example.myshopmanagerapp.core.Functions.toNotNull
 import com.example.myshopmanagerapp.core.UserPreferences
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.bottom_nav.actions.SettingsContentCard
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.BasicScreenColumnWithoutBottomBar
@@ -37,7 +38,6 @@ import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.comp
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.DeleteConfirmationDialog
 import com.example.myshopmanagerapp.feature_app.presentation.ui.composables.components.ProgressBar
 import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
-import kotlinx.coroutines.launch
 
 
 @Composable
@@ -48,7 +48,7 @@ fun BackupAndRestoreContent(
     dataRestoreConfirmationMessage: String,
     floatValue: Float,
     floatFunction: ()-> Unit,
-    repositoryJobMessage: String,
+    repositoryJobMessage: String?,
     repositoryJobFunction: ()-> Unit,
     localBackupData: ()-> Unit,
     localRestoreData: ()-> Unit,
@@ -59,8 +59,9 @@ fun BackupAndRestoreContent(
 ) {
     val context = LocalContext.current
     val userPreferences = UserPreferences(context)
-    val coroutineScope = rememberCoroutineScope()
+    val repositoryJobMessage1 = userPreferences.getRepositoryJobMessage.collectAsState(initial = emptyString).value
 
+    val coroutineScope = rememberCoroutineScope()
     var openLocalConfirmationDialog by remember {
         mutableStateOf(false)
     }
@@ -70,13 +71,22 @@ fun BackupAndRestoreContent(
     var dialogMessage by remember {
         mutableStateOf(emptyString)
     }
-    var confirmationInfoDialog by remember {
+    var absoluteBackupConfirmationInfoDialog by remember {
+        mutableStateOf(false)
+    }
+    var smartBackupConfirmationInfoDialog by remember {
+        mutableStateOf(false)
+    }
+    var absoluteDataSyncConfirmationInfoDialog by remember {
+        mutableStateOf(false)
+    }
+    var smartDataSyncConfirmationInfoDialog by remember {
         mutableStateOf(false)
     }
     var openProgressBar by remember {
         mutableStateOf(false)
     }
-    var openRemoteBackupConfirmationDialog by remember {
+    var openBackupConfirmationDialog by remember {
         mutableStateOf(false)
     }
     var openSyncDataConfirmationDialog by remember {
@@ -94,6 +104,7 @@ fun BackupAndRestoreContent(
     var isAbsoluteSync by remember {
         mutableStateOf<Boolean?>(null)
     }
+
     BasicScreenColumnWithoutBottomBar {
         Box(modifier = Modifier
             .fillMaxWidth()
@@ -138,7 +149,9 @@ fun BackupAndRestoreContent(
                 isAbsoluteBackup = true
                 dialogTitle = ConfirmBackup
                 dialogMessage = AbsoluteBackUpDialogMessage
-                openRemoteBackupConfirmationDialog = !openRemoteBackupConfirmationDialog
+                absoluteBackupConfirmationInfoDialog = true
+                absoluteBackupConfirmationInfoDialog = false
+                openBackupConfirmationDialog = !openBackupConfirmationDialog
             },
             contentAlignment = Alignment.Center
         ) {
@@ -156,7 +169,9 @@ fun BackupAndRestoreContent(
                 isAbsoluteBackup = false
                 dialogTitle = ConfirmBackup
                 dialogMessage = SmartBackUpDialogMessage
-                openRemoteBackupConfirmationDialog = !openRemoteBackupConfirmationDialog
+                absoluteBackupConfirmationInfoDialog = true
+                absoluteBackupConfirmationInfoDialog = false
+                openBackupConfirmationDialog = !openBackupConfirmationDialog
             },
             contentAlignment = Alignment.Center
         ) {
@@ -218,13 +233,13 @@ fun BackupAndRestoreContent(
                     localBackupData()
                     isLoading = isBackingUpDatabase
                     dialogMessage = dataBackupConfirmationMessage
-                    confirmationInfoDialog = !confirmationInfoDialog
+                    absoluteBackupConfirmationInfoDialog = !absoluteBackupConfirmationInfoDialog
                 }
                 false->{
                     localRestoreData()
                     isLoading = isRestoringDatabase
                     dialogMessage = dataRestoreConfirmationMessage
-                    confirmationInfoDialog = !confirmationInfoDialog
+                    absoluteBackupConfirmationInfoDialog = !absoluteBackupConfirmationInfoDialog
                 }
                 null->{ openLocalConfirmationDialog = false }
             }
@@ -234,34 +249,27 @@ fun BackupAndRestoreContent(
     }
 
     DeleteConfirmationDialog(
-        openDialog = openRemoteBackupConfirmationDialog,
+        openDialog = openBackupConfirmationDialog,
         title = dialogTitle,
         textContent = dialogMessage,
         unconfirmedDeletedToastText = null,
         confirmedDeleteToastText = null,
         confirmDelete = {
-            coroutineScope.launch {
-                userPreferences.saveRepositoryJobMessage(emptyString)
-            }
             when(isAbsoluteBackup){
                 true->{
                     absoluteRemoteBackup()
-                    isLoading = repositoryJobMessage.isNullOrBlank()
-                    dialogMessage = repositoryJobMessage ?: "Unknown outcome"
-                    confirmationInfoDialog = !confirmationInfoDialog
+                    absoluteBackupConfirmationInfoDialog = !absoluteBackupConfirmationInfoDialog
                 }
                 false->{
                     smartRemoteBackup()
-                    repositoryJobFunction()
-                    isLoading = false //repositoryJobMessage.isNullOrBlank()
-                    dialogMessage = repositoryJobMessage ?: "Unknown outcome"
-                    openProgressBar = !openProgressBar
+                    smartBackupConfirmationInfoDialog = !smartBackupConfirmationInfoDialog
+
                 }
-                null->{ openRemoteBackupConfirmationDialog = false }
+                null->{ openBackupConfirmationDialog = false }
             }
         }
     ) {
-        openRemoteBackupConfirmationDialog = false
+        openBackupConfirmationDialog = false
     }
 
     DeleteConfirmationDialog(
@@ -276,13 +284,13 @@ fun BackupAndRestoreContent(
                     absoluteSyncData()
                     isLoading = repositoryJobMessage.isNullOrBlank()
                     dialogMessage = repositoryJobMessage ?: "Unknown outcome"
-                    confirmationInfoDialog = !confirmationInfoDialog
+                    absoluteBackupConfirmationInfoDialog = !absoluteBackupConfirmationInfoDialog
                 }
                 false->{
                     smartSyncData()
                     isLoading = repositoryJobMessage.isNullOrBlank()
-                    dialogMessage = repositoryJobMessage.ifBlank { "Unknown outcome" }
-                    confirmationInfoDialog = !confirmationInfoDialog
+                    dialogMessage = repositoryJobMessage.toNotNull().ifBlank { "Unknown outcome" }
+                    absoluteBackupConfirmationInfoDialog = !absoluteBackupConfirmationInfoDialog
                 }
                 null->{ openSyncDataConfirmationDialog = false }
             }
@@ -292,29 +300,50 @@ fun BackupAndRestoreContent(
     }
 
     ConfirmationInfoDialog(
-        openDialog = confirmationInfoDialog,
-        isLoading = isLoading,
+        openDialog = absoluteBackupConfirmationInfoDialog,
+        isLoading = userPreferences.getRepositoryJobMessage.collectAsState(initial = emptyString).value.toNotNull().isBlank(),
         title = emptyString,
-        textContent = dialogMessage,
+        textContent = userPreferences.getRepositoryJobMessage.collectAsState(initial = emptyString).value.toNotNull(),
         unconfirmedDeletedToastText = null,
         confirmedDeleteToastText = null
     ) {
-        confirmationInfoDialog = false
+        absoluteBackupConfirmationInfoDialog = false
     }
-    ProgressBar(
-        openDialog = openProgressBar,
-        title = "Backing up",
-        toastText = null,
-        getProgress = {
-            floatFunction()
-            Log.d("BackupRepository", "BackupAndRestoreContent - float value = $floatValue")
-            openProgressBar = (floatValue != 1f)
-            if (!openProgressBar) confirmationInfoDialog = true
-            return@ProgressBar floatValue
-        }) {
-        openProgressBar = !openProgressBar
-        confirmationInfoDialog = true
+
+    ConfirmationInfoDialog(
+        openDialog = smartBackupConfirmationInfoDialog,
+        isLoading = userPreferences.getRepositoryJobMessage.collectAsState(initial = emptyString).value.toNotNull().isBlank(),
+        title = emptyString,
+        textContent = userPreferences.getRepositoryJobMessage.collectAsState(initial = emptyString).value.toNotNull(),
+        unconfirmedDeletedToastText = null,
+        confirmedDeleteToastText = null
+    ) {
+        smartBackupConfirmationInfoDialog = false
     }
+
+
+    ConfirmationInfoDialog(
+        openDialog = absoluteDataSyncConfirmationInfoDialog,
+        isLoading = userPreferences.getRepositoryJobMessage.collectAsState(initial = emptyString).value.toNotNull().isBlank(),
+        title = emptyString,
+        textContent = userPreferences.getRepositoryJobMessage.collectAsState(initial = emptyString).value.toNotNull(),
+        unconfirmedDeletedToastText = null,
+        confirmedDeleteToastText = null
+    ) {
+        absoluteDataSyncConfirmationInfoDialog = false
+    }
+
+    ConfirmationInfoDialog(
+        openDialog = smartDataSyncConfirmationInfoDialog,
+        isLoading = userPreferences.getRepositoryJobMessage.collectAsState(initial = emptyString).value.toNotNull().isBlank(),
+        title = emptyString,
+        textContent = userPreferences.getRepositoryJobMessage.collectAsState(initial = emptyString).value.toNotNull(),
+        unconfirmedDeletedToastText = null,
+        confirmedDeleteToastText = null
+    ) {
+        smartDataSyncConfirmationInfoDialog = false
+    }
+
 }
 
 

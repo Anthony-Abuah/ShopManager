@@ -59,7 +59,7 @@ fun RowScope.AddItem(
                 Text(text = screen.name,
                     color = contentColor,
                     fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Light,
-                    fontSize = 14.sp
+                    fontSize = if(isSelected) 14.sp else 12.sp
                 )
 
                 Spacer(

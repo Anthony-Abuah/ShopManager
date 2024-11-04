@@ -24,6 +24,7 @@ import com.example.myshopmanagerapp.core.Constants.PersonnelEntityInfo
 import com.example.myshopmanagerapp.core.Constants.Personnel_IsLoggedIn
 import com.example.myshopmanagerapp.core.Constants.RevenueTypes
 import com.example.myshopmanagerapp.core.Constants.ListOfShopLoginInfo
+import com.example.myshopmanagerapp.core.Constants.PaymentMethod
 import com.example.myshopmanagerapp.core.Constants.SupplierRole
 import com.example.myshopmanagerapp.core.Constants.emptyString
 import com.example.myshopmanagerapp.core.Functions.toNotNull
@@ -50,6 +51,7 @@ class UserPreferences(private val context: Context) {
         val MANUFACTURER_NAME = stringPreferencesKey(ManufacturerName)
         val BANK_PERSONNEL = stringPreferencesKey(BankPersonnel)
         val PERSONNEL_ROLES = stringPreferencesKey(PersonnelRoles)
+        val PAYMENT_METHOD = stringPreferencesKey(PaymentMethod)
         val EXPENSE_NAMES = stringPreferencesKey(ExpenseNames)
         val EXPENSE_TYPES = stringPreferencesKey(ExpenseTypes)
         val REVENUE_TYPES = stringPreferencesKey(RevenueTypes)
@@ -139,6 +141,15 @@ class UserPreferences(private val context: Context) {
     //save Supplier Role
     suspend fun saveSupplierRole(value: String) {
         context.dataStore.edit { preferences -> preferences[SUPPLIER_ROLE] = value }
+    }
+
+    //get the Payment Method
+    val getPaymentMethod: Flow<String?> = context.dataStore.data
+        .map { preferences -> preferences[PAYMENT_METHOD] ?: emptyString }
+
+    //save the Payment Method
+    suspend fun savePaymentMethod(value: String) {
+        context.dataStore.edit { preferences -> preferences[PAYMENT_METHOD] = value }
     }
 
     //get the Manufacturer

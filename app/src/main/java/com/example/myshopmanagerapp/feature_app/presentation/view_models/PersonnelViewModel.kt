@@ -286,6 +286,16 @@ class PersonnelViewModel @Inject constructor(
             contact = contact
         )
     }
+    fun addPersonnelPassword(password: String) {
+        addPersonnelInfo = addPersonnelInfo.copy(
+            password = password
+        )
+    }
+    fun addPersonnelUsername(username: String) {
+        addPersonnelInfo = addPersonnelInfo.copy(
+            userName = username
+        )
+    }
     fun addPersonnelPhoto(location: String?) {
         addPersonnelInfo = addPersonnelInfo.copy(
             personnelPhoto = location

@@ -1,59 +1,121 @@
 package com.example.myshopmanagerapp.feature_app.presentation.ui.composables.records.debt
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.myshopmanagerapp.R
-import com.example.myshopmanagerapp.core.Constants.Delete
-import com.example.myshopmanagerapp.core.Constants.Edit
 import com.example.myshopmanagerapp.core.Constants.emptyString
-import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.LocalSpacing
+import com.example.myshopmanagerapp.feature_app.presentation.ui.theme.*
+import java.util.*
 
 @Composable
 fun DebtCard(
     date: String,
     debtAmount: String,
     customerName: String,
-    showAllItems: Boolean = false,
     currency: String,
-    number: String,
-    delete: () -> Unit,
-    edit: () -> Unit,
-    showAll: () -> Unit,
-    open: () -> Unit = {},
+    open: () -> Unit,
 ){
-    val contentColor = MaterialTheme.colorScheme.onSurface
-    val cardContainerColor = MaterialTheme.colorScheme.surface
+    val debtBackground = if (isSystemInDarkTheme()) Red5 else Red99
+    val secondaryColor = Grey50
+    val debtColor = Red50
+    val borderColor = if(isSystemInDarkTheme()) Red40 else Red60
 
-    val density = LocalDensity.current
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .padding(LocalSpacing.current.default)
+        .clickable { open() },
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Card(
+            modifier = Modifier.padding(LocalSpacing.current.small),
+            elevation = CardDefaults.cardElevation(defaultElevation = LocalSpacing.current.default),
+            shape = MaterialTheme.shapes.medium,
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+            border = BorderStroke(LocalSpacing.current.divider, MaterialTheme.colorScheme.surfaceContainer)
+        ) {
+            Box(
+                modifier = Modifier,
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    modifier = Modifier
+                        .size(50.dp)
+                        .padding(LocalSpacing.current.small),
+                    painter = painterResource(id = R.drawable.debt),
+                    contentDescription = emptyString
+                )
+            }
+        }
+        Spacer(modifier = Modifier.width(LocalSpacing.current.small))
 
-    var pressOffset by remember {
-        mutableStateOf(DpOffset.Zero)
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                modifier = Modifier.defaultMinSize(minWidth = 100.dp),
+                text = customerName.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() },
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onBackground,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.height(LocalSpacing.current.extraSmall))
+
+            Text(
+                modifier = Modifier.defaultMinSize(minWidth = 100.dp),
+                text = date,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 12.sp,
+                color = secondaryColor,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+        Spacer(modifier = Modifier.width(LocalSpacing.current.small))
+
+        Card(
+            modifier = Modifier.padding(LocalSpacing.current.small),
+            elevation = CardDefaults.cardElevation(defaultElevation = LocalSpacing.current.small),
+            shape = MaterialTheme.shapes.medium,
+            colors = CardDefaults.cardColors(containerColor = debtBackground),
+            border = BorderStroke(color = borderColor, width = LocalSpacing.current.divider)
+        ) {
+            Box(
+                modifier = Modifier,
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    modifier = Modifier.padding(
+                        horizontal = LocalSpacing.current.default,
+                        vertical = LocalSpacing.current.small
+                    ),
+                    text = "$currency $debtAmount",
+                    fontWeight = FontWeight.ExtraBold,
+                    color = debtColor,
+                    fontSize = 10.sp
+                )
+            }
+        }
     }
-    var expandOptionsDropDown by remember {
-        mutableStateOf(false)
-    }
-    var itemHeight by remember {
-        mutableStateOf(0.dp)
-    }
 
-    val show = if (showAllItems) "Collapse All" else "Show All"
-    val dropDownOptions = if(showAllItems) listOf(Edit, Delete, show) else listOf(show)
-
+    /*
     Column(modifier = Modifier.fillMaxWidth()) {
         //if (!showAllItems) { HorizontalDivider() }
         Row(
@@ -225,7 +287,8 @@ fun DebtCard(
                 }
 
                 Box(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
                         .padding(bottom = LocalSpacing.current.default),
                     contentAlignment = Alignment.BottomCenter
                 ) {
@@ -242,6 +305,7 @@ fun DebtCard(
         }
         if (!showAllItems) { HorizontalDivider() }
     }
+    */
 
 }
 

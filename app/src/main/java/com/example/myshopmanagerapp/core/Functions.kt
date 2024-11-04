@@ -31,6 +31,7 @@ import com.google.gson.reflect.TypeToken
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.text.DecimalFormat
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -70,6 +71,14 @@ object Functions {
     fun LocalDate?.toTimestamp(): Long = if (this.isNotNull()) this.toDate().toTimestamp() else 0
 
     fun Double.toTwoDecimalPlaces(): Double = if(this.isNaN()) 0.0 else (this * 100.0).roundToInt() / 100.0
+    fun Double.toDoubleDecimalPlaces(): String {
+        return if (this.isNaN()) "0.00"
+        else {
+            val decimalFormat = DecimalFormat("#,###.00")
+            return  decimalFormat.format(this)
+            //String.format("%.2f", this)
+        }
+    }
 
     fun String?.toLocation(): String {
         val location = this ?: "Location: My Shop Location"

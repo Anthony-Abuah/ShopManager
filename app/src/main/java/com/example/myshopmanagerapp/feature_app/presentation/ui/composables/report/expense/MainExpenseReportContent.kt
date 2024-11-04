@@ -110,7 +110,7 @@ fun MainExpenseReportContent(
                     contentAlignment = Alignment.Center
                 ){
                     InfoDisplayCard(
-                        image = R.drawable.days,
+                        image = R.drawable.date,
                         imageWidth = 40.dp,
                         currency = currency,
                         currencySize = 36.sp,

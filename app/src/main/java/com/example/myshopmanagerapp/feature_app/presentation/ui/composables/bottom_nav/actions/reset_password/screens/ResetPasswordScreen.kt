@@ -33,7 +33,7 @@ fun ResetPasswordScreen(
 
     Scaffold(
         topBar = {
-            BasicScreenTopBar(topBarTitleText = "Change Password") {
+            BasicScreenTopBar(topBarTitleText = "Reset Password") {
                 navigateBack()
             }
         }
